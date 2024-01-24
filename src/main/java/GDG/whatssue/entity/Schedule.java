@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Schedule extends BaseEntity {
     @Id
@@ -52,4 +53,5 @@ public class Schedule extends BaseEntity {
 
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> officialAbsenceRequestList;
+
 }
