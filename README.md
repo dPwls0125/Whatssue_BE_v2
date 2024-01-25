@@ -46,9 +46,11 @@
 ---
 
 ### 👩‍💻 Whatssue Team
+- Product Manager : [@Ji-minhyeok](https://github.com/Ji-minhyeok)
+- Team Leader : [@pinetree2](https://github.com/pinetree2)
 - Designer : [@kms0233](https://github.com/kms0233)
 - FrontEnd Developer : [@hhbb0081](https://github.com/hhbb0081)
-- BackEnd Developer : [@pinetree2](https://github.com/pinetree2), [@kjyyjk](https://github.com/kjyyjk), [@dPwls0125](https://github.com/dPwls0125)
+- BackEnd Developer : [@pinetree2](https://github.com/pinetree2), [@kjyyjk](https://github.com/kjyyjk), [@dPwls0125](https://github.com/dPwls0125) ,[@Ji-minhyeok](https://github.com/Ji-minhyeok)
 
 
 
