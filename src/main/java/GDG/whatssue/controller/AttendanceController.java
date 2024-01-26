@@ -27,8 +27,9 @@ public class AttendanceController {
        AttendanceNumResponseDto dto;
        try{
            dto = attendanceService.openAttendance(clubId,scheduleId);
-       }catch(NoSuchElementException e){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
+       } catch (Exception e) {
+           System.out.println(e);
+           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(e);
        }
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }

@@ -4,27 +4,27 @@ import GDG.whatssue.dto.schedule.AttendanceNumResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
-public class AttendanceService {
+public class AttendanceService  {
     private static Map<Long,Map<Long,Integer>> attendanceNumMap = new HashMap<>();
-    public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId){
+    public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) throws Exception{
         Random random = new Random();
         int randomInt = random.nextInt(1,1001);
-        try {
-            if(!attendanceNumMap.containsKey(clubId)) {
+        if(attendanceNumMap.containsKey(clubId)) {
+            if(attendanceNumMap.get(clubId).containsKey(scheduleId))
+                    throw new Exception("이미 출석이 진행중입니다.");
+            }else{
                 attendanceNumMap.put(clubId, new HashMap<>());
             }
             Map<Long, Integer> innerMap = attendanceNumMap.get(clubId);
             innerMap.put(scheduleId, randomInt);
             randomInt = attendanceNumMap.get(clubId).get(scheduleId);
-        }catch(Exception e){
-            System.out.println("예외 발생 : "+e);
-        }
         AttendanceNumResponseDto attendanceNumResponseDto = AttendanceNumResponseDto.builder()
                 .AttendanceNum(randomInt)
                 .clubId(clubId)

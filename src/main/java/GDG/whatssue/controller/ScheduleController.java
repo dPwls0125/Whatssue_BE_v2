@@ -39,7 +39,6 @@ public class ScheduleController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
     }
 
