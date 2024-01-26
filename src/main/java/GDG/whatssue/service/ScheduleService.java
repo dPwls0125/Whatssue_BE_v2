@@ -1,27 +1,66 @@
 package GDG.whatssue.service;
 
-import GDG.whatssue.dto.schedule.ScheduleAddRequestDto;
+import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
+import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
+import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
 import GDG.whatssue.entity.Club;
+import GDG.whatssue.entity.Schedule;
 import GDG.whatssue.repository.ClubRepository;
 import GDG.whatssue.repository.ScheduleRepository;
-import ch.qos.logback.core.joran.sanity.Pair;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.Map;
-import java.util.Random;
-import java.util.HashMap;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
-    private ScheduleRepository scheduleRepository;
+    private final ScheduleRepository scheduleRepository;
     private final ClubRepository clubRepository;
 
-    public void createSchedule(Long clubId, ScheduleAddRequestDto scheduleRequestDto) {
-        Club findClub = clubRepository.findById(clubId).get();
-        scheduleRepository.save(scheduleRequestDto.toEntity(findClub));
+    public void saveSchedule(Long clubId, AddScheduleRequestDto requestDto) {
+        Club club = clubRepository.findById(clubId).get();
+        Schedule saveSchedule = requestDto.toEntity(club);
+        scheduleRepository.save(saveSchedule);
     }
 
+    /***
+     clubId 필요 여부
+     ***/
+    public GetScheduleResponseDto findSchedule(Long clubId, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+            () -> new NoSuchElementException());
 
 
+        GetScheduleResponseDto scheduleDetailDto = GetScheduleResponseDto.builder()
+            .scheduleId(schedule.getId())
+            .scheduleName(schedule.getScheduleName())
+            .scheduleContent(schedule.getScheduleContent())
+            .scheduleDate(schedule.getScheduleDate().toString())
+            .scheduleTime(schedule.getScheduleTime().toString()).build();
+
+        return scheduleDetailDto;
+    }
+
+    @Transactional
+    public void  updateSchedule(Long clubId, Long scheduleId, ModifyScheduleRequestDto requestDto) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+            () -> new NoSuchElementException());
+
+        schedule.update(
+            requestDto.getScheduleName(),
+            requestDto.getScheduleContent(),
+            requestDto.getScheduleDate(),
+            requestDto.getScheduleTime());
+    }
+
+    /***
+     clubId 필요 여부
+     hard / soft delete 여부
+    ***/
+    public void deleteSchedule(Long clubId, Long scheduleId) throws NoSuchElementException {
+        scheduleRepository.deleteById(scheduleId);
+    }
 }
 
