@@ -30,4 +30,8 @@ public class ScheduleAttendanceResult extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttendanceType attendanceType;
+
+    public void setAttendanceType(AttendanceType attendanceType) {
+        this.attendanceType=attendanceType;
+    }
 }
