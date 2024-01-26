@@ -1,0 +1,143 @@
+package GDG.whatssue.service;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
+import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
+import GDG.whatssue.entity.Club;
+import GDG.whatssue.entity.Schedule;
+import GDG.whatssue.repository.ClubRepository;
+import GDG.whatssue.repository.ScheduleRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class ScheduleServiceTest {
+
+    @Mock
+    ScheduleRepository scheduleRepository;
+
+    @Mock
+    ClubRepository clubRepository;
+
+    @InjectMocks
+    ScheduleService scheduleService;
+
+
+    @Test
+    @DisplayName("일정 추가 성공")
+    void saveScheduleSuccessTest() {
+        //given
+        AddScheduleRequestDto requestDto =
+            AddScheduleRequestDto.builder()
+                .scheduleName("test")
+                .scheduleContent("test")
+                .scheduleDate(LocalDate.now())
+                .scheduleTime(LocalTime.now()).build();
+
+        Club club = new Club(
+            1L,
+            "test",
+            "test",
+            "test",
+            "test",
+            new ArrayList<>(),
+            new ArrayList<>(),
+            new ArrayList<>());
+
+        //stub
+        when(clubRepository.findById(club.getId())).thenReturn(Optional.of(club));
+
+        //when
+        scheduleService.saveSchedule(1L, requestDto);
+
+        //then
+        verify(scheduleRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 clubId로 일정 추가 실패")
+    void saveScheduleFailTest() {
+        //given
+        AddScheduleRequestDto requestDto =
+            AddScheduleRequestDto.builder()
+                .scheduleName("test")
+                .scheduleContent("test")
+                .scheduleDate(LocalDate.now())
+                .scheduleTime(LocalTime.now()).build();
+
+        //stub
+        when(clubRepository.findById(any())).thenReturn(Optional.empty());
+
+        //when, then
+        assertThrows(NoSuchElementException.class, () -> scheduleService.saveSchedule(1L, requestDto));
+    }
+
+    @Test
+    @DisplayName("일정 조회 성공")
+    void getScheduleSuccessTest() {
+        //given
+        long scheduleId = 1L;
+
+        Schedule schedule = Schedule.builder()
+            .id(1L)
+            .club(null)
+            .scheduleName("test")
+            .scheduleContent("test")
+            .scheduleDate(LocalDate.now())
+            .scheduleTime(LocalTime.now())
+            .isChecked(false)
+            .attendanceResultList(new ArrayList<>())
+            .officialAbsenceRequestList(new ArrayList<>()).build();
+
+        //stub
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
+
+        //when
+        GetScheduleResponseDto responseDto = scheduleService.findSchedule(scheduleId);
+
+        //then
+        assertThat(schedule.getScheduleName()).isEqualTo(responseDto.getScheduleName());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 일정 id로 일정 조회 실패")
+    void getScheduleFailTest() {
+        //given
+        long scheduleId = 1L;
+
+        //stub
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.empty());
+
+        //when, then
+        assertThrows(NoSuchElementException.class, () -> scheduleService.findSchedule(scheduleId));
+    }
+
+    @Test
+    @DisplayName("일정 삭제 성공")
+    void deleteScheduleSuccessTest() {
+        //given
+        long scheduleId = 1L;
+
+        //stub
+        doNothing().when(scheduleRepository).deleteById(scheduleId);
+
+        //when
+        scheduleService.deleteSchedule(scheduleId);
+
+        //then
+        verify(scheduleRepository).deleteById(scheduleId);
+    }
+
+}
