@@ -32,4 +32,16 @@ public class AttendanceService  {
                 .build();
         return attendanceNumResponseDto;
     }
+
+    public void deleteAttendance(Long clubId, Long scheduleId) throws Exception{
+        if(attendanceNumMap.containsKey(clubId)) {
+            if(attendanceNumMap.get(clubId).containsKey(scheduleId))
+                attendanceNumMap.get(clubId).remove(scheduleId);
+            else
+                throw new Exception("출석이 진행중이지 않습니다.");
+        }else{
+            throw new Exception("출석이 진행중이지 않습니다.");
+        }
+    }
 }
+
