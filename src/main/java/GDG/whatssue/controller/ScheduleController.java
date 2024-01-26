@@ -6,6 +6,7 @@ import GDG.whatssue.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{clubId}/schedule")
+@RequestMapping("/api/{clubId}/schedules")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -23,19 +24,25 @@ public class ScheduleController {
     @PostMapping
     public ResponseEntity addSchedule(@PathVariable Long clubId, @RequestBody AddScheduleRequestDto requestDto) {
 
-        scheduleService.createSchedule(clubId, requestDto);
+        scheduleService.saveSchedule(clubId, requestDto);
         return ResponseEntity.status(200).body("ok");
     }
 
     @GetMapping("/{scheduleId}")
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleResponseDto scheduleDto = scheduleService.findSchedule(scheduleId);
+        GetScheduleResponseDto scheduleDto = scheduleService.findSchedule(clubId, scheduleId);
 
         if (scheduleDto != null) {
             return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Schedule Id");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
+    }
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
+        scheduleService.deleteSchedule(clubId, scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
 }
 

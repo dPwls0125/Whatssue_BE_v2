@@ -6,6 +6,7 @@ import GDG.whatssue.entity.Club;
 import GDG.whatssue.entity.Schedule;
 import GDG.whatssue.repository.ClubRepository;
 import GDG.whatssue.repository.ScheduleRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +16,16 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ClubRepository clubRepository;
 
-    public void createSchedule(Long clubId, AddScheduleRequestDto scheduleRequestDto) {
-        Club findClub = clubRepository.findById(clubId).get();
-        scheduleRepository.save(scheduleRequestDto.toEntity(findClub));
+    public void saveSchedule(Long clubId, AddScheduleRequestDto scheduleRequestDto) {
+        Club club = clubRepository.findById(clubId).get();
+        Schedule saveSchedule = scheduleRequestDto.toEntity(club);
+        scheduleRepository.save(saveSchedule);
     }
 
-    public GetScheduleResponseDto findSchedule(Long scheduleId) {
+    /***
+     clubId 필요 여부
+     ***/
+    public GetScheduleResponseDto findSchedule(Long clubId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
 
         if (schedule != null) {
@@ -35,6 +40,15 @@ public class ScheduleService {
         }
 
         return null;
+    }
+
+    /***
+     존재하지 않는 일정 처리
+     clubId 필요 여부
+     hard / soft delete 여부
+    ***/
+    public void deleteSchedule(Long clubId, Long scheduleId) {
+        scheduleRepository.deleteById(scheduleId);
     }
 }
 
