@@ -5,10 +5,14 @@ import GDG.whatssue.entity.Schedule;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class AddScheduleRequestDto {
 
     private String scheduleName;
