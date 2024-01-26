@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Schedule extends BaseEntity {
     @Id

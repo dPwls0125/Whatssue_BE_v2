@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/{clubId}/schedule")
 public class ScheduleController {
 
-    private final ScheduleService scheduleService;
+    private final ScheduleService attendanceSchedule;
 
     @PostMapping
     public ResponseEntity addSchedule(@PathVariable Long clubId, @RequestBody ScheduleAddRequestDto scheduleRequestDto) {
 
-        scheduleService.createSchedule(clubId, scheduleRequestDto);
+        attendanceSchedule.createSchedule(clubId, scheduleRequestDto);
 
         return ResponseEntity.status(200).body("");
     }

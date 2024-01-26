@@ -16,14 +16,14 @@ public class AttendanceService {
         Random random = new Random();
         int randomInt = random.nextInt(1,1001);
         try {
-            if (!attendanceNumMap.containsKey(clubId)) {
+            if(!attendanceNumMap.containsKey(clubId)) {
                 attendanceNumMap.put(clubId, new HashMap<>());
             }
             Map<Long, Integer> innerMap = attendanceNumMap.get(clubId);
             innerMap.put(scheduleId, randomInt);
             randomInt = attendanceNumMap.get(clubId).get(scheduleId);
         }catch(Exception e){
-            System.out.println("예외 발생 : " + e);
+            System.out.println("예외 발생 : "+e);
         }
         AttendanceNumResponseDto attendanceNumResponseDto = AttendanceNumResponseDto.builder()
                 .AttendanceNum(randomInt)
