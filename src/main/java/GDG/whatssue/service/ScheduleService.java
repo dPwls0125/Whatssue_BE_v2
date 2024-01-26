@@ -9,10 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ScheduleService {
+public class AttendanceSchedule {
     private ScheduleRepository scheduleRepository;
     private final ClubRepository clubRepository;
-
     public void createSchedule(Long clubId, ScheduleAddRequestDto scheduleRequestDto) {
         Club findClub = clubRepository.findById(clubId).get();
         scheduleRepository.save(scheduleRequestDto.toEntity(findClub));
