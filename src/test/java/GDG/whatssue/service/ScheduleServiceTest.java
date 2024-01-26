@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
 import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
+import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
 import GDG.whatssue.entity.Club;
 import GDG.whatssue.entity.Schedule;
 import GDG.whatssue.repository.ClubRepository;
@@ -15,6 +16,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,21 @@ class ScheduleServiceTest {
     @InjectMocks
     ScheduleService scheduleService;
 
+    Schedule schedule;
+
+    @BeforeEach
+    void init() {
+        schedule = Schedule.builder()
+            .id(1L)
+            .club(null)
+            .scheduleName("test")
+            .scheduleContent("test")
+            .scheduleDate(LocalDate.now())
+            .scheduleTime(LocalTime.now())
+            .isChecked(false)
+            .attendanceResultList(new ArrayList<>())
+            .officialAbsenceRequestList(new ArrayList<>()).build();
+    }
 
     @Test
     @DisplayName("일정 추가 성공")
@@ -90,17 +107,6 @@ class ScheduleServiceTest {
         //given
         long scheduleId = 1L;
 
-        Schedule schedule = Schedule.builder()
-            .id(1L)
-            .club(null)
-            .scheduleName("test")
-            .scheduleContent("test")
-            .scheduleDate(LocalDate.now())
-            .scheduleTime(LocalTime.now())
-            .isChecked(false)
-            .attendanceResultList(new ArrayList<>())
-            .officialAbsenceRequestList(new ArrayList<>()).build();
-
         //stub
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
 
@@ -125,13 +131,54 @@ class ScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("일정 수정 성공")
+    void updateScheduleSuccessTest() {
+        //given
+        long scheduleId = 1L;
+        ModifyScheduleRequestDto requestDto = ModifyScheduleRequestDto.builder()
+            .scheduleName("modify")
+            .scheduleContent("modify")
+            .scheduleDate(LocalDate.now())
+            .scheduleTime(LocalTime.now()).build();
+
+        //stub
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
+
+        //when
+        scheduleService.updateSchedule(scheduleId, requestDto);
+
+        //then
+        verify(scheduleRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 일정 id로 수정 실패")
+    void updateScheduleFailTest() {
+        //given
+        long scheduleId = 1L;
+        ModifyScheduleRequestDto requestDto = ModifyScheduleRequestDto.builder()
+            .scheduleName("modify")
+            .scheduleContent("modify")
+            .scheduleDate(LocalDate.now())
+            .scheduleTime(LocalTime.now()).build();
+
+        //stub
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.empty());
+
+        //when, then
+        assertThrows(NoSuchElementException.class,
+            () -> scheduleService.updateSchedule(scheduleId, requestDto));
+
+    }
+
+    @Test
     @DisplayName("일정 삭제 성공")
     void deleteScheduleSuccessTest() {
         //given
         long scheduleId = 1L;
 
         //stub
-        doNothing().when(scheduleRepository).deleteById(scheduleId);
+        doNothing().when(scheduleRepository).deleteById(any());
 
         //when
         scheduleService.deleteSchedule(scheduleId);

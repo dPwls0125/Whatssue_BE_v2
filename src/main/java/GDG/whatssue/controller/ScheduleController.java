@@ -52,7 +52,7 @@ public class ScheduleController {
     @PatchMapping("/{scheduleId}")
     public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,@RequestBody ModifyScheduleRequestDto requestDto) {
         try{
-            scheduleService.updateSchedule(clubId, scheduleId, requestDto);
+            scheduleService.updateSchedule(scheduleId, requestDto);
         } catch (NoSuchElementException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
         }

@@ -46,7 +46,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void  updateSchedule(Long clubId, Long scheduleId, ModifyScheduleRequestDto requestDto) {
+    public void updateSchedule(Long scheduleId, ModifyScheduleRequestDto requestDto) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
             () -> new NoSuchElementException());
 
@@ -55,6 +55,8 @@ public class ScheduleService {
             requestDto.getScheduleContent(),
             requestDto.getScheduleDate(),
             requestDto.getScheduleTime());
+
+        scheduleRepository.save(schedule);
     }
 
     /***
