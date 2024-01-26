@@ -2,12 +2,15 @@ package GDG.whatssue.controller;
 
 import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
 import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
+import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
 import GDG.whatssue.service.ScheduleService;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,18 +33,36 @@ public class ScheduleController {
 
     @GetMapping("/{scheduleId}")
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleResponseDto scheduleDto = scheduleService.findSchedule(clubId, scheduleId);
-
-        if (scheduleDto != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
+        GetScheduleResponseDto scheduleDto;
+        try{
+             scheduleDto = scheduleService.findSchedule(clubId, scheduleId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
+    }
+
+    @PatchMapping("/{scheduleId}")
+    public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,@RequestBody ModifyScheduleRequestDto requestDto) {
+        try{
+            scheduleService.updateSchedule(clubId, scheduleId, requestDto);
+        } catch (NoSuchElementException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("ok");
+
     }
 
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        scheduleService.deleteSchedule(clubId, scheduleId);
+        try{
+            scheduleService.deleteSchedule(clubId, scheduleId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
 }

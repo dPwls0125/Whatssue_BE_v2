@@ -54,4 +54,11 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> officialAbsenceRequestList;
 
+    public void update(String scheduleName, String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime) {
+        this.scheduleName = scheduleName;
+        this.scheduleContent = scheduleContent;
+        this.scheduleDate = scheduleDate;
+        this.scheduleTime = scheduleTime;
+    }
+
 }
