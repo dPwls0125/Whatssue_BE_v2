@@ -12,8 +12,8 @@ import lombok.Getter;
 public class OfficialAbsenceGetRequestDto {
 
     private Long id;
-    private ClubMember clubMember;
-    private Schedule schedule;
+    private Long clubMemberId;
+    private Long scheduleId;
     private String officialAbsenceContent;
 
 }

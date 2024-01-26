@@ -11,8 +11,8 @@ import lombok.Getter;
 @Builder
 public class OfficialAbsenceAddRequestDto {
 
-    private ClubMember clubMember;
-    private Schedule schedule;
+    private Long clubMemberId;
+    private Long scheduleId;
     private String officialAbsenceContent;
 
 }
