@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @RequestMapping("/api/schedule")
 @Slf4j
-public class Schedule {
+public class AttendanceController {
     @Operation(summary = "출석 열기_ADMIN")
     @PostMapping("/{scheduleId}/attendance/start")
     public ResponseEntity<?> openAttendance(@PathVariable Long scheduleId) {
