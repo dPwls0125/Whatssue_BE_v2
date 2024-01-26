@@ -13,9 +13,15 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Schedule extends BaseEntity {
     @Id
@@ -47,4 +53,12 @@ public class Schedule extends BaseEntity {
 
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> officialAbsenceRequestList;
+
+    public void update(String scheduleName, String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime) {
+        this.scheduleName = scheduleName;
+        this.scheduleContent = scheduleContent;
+        this.scheduleDate = scheduleDate;
+        this.scheduleTime = scheduleTime;
+    }
+
 }
