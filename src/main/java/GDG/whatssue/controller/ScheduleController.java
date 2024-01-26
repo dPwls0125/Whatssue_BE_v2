@@ -35,11 +35,10 @@ public class ScheduleController {
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         GetScheduleResponseDto scheduleDto;
         try{
-             scheduleDto = scheduleService.findSchedule(clubId, scheduleId);
+            scheduleDto = scheduleService.findSchedule(clubId, scheduleId);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
     }
 
@@ -50,11 +49,9 @@ public class ScheduleController {
         } catch (NoSuchElementException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
         }
-
         return ResponseEntity.status(HttpStatus.OK).body("ok");
 
     }
-
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         try{
