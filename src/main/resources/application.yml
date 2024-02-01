@@ -7,3 +7,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+loggin:
+  level:
+    org:
+      apache:
+        coyote:
+          http11: debug
