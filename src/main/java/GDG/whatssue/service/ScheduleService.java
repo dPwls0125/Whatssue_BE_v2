@@ -87,7 +87,6 @@ public class ScheduleService {
 
         return responseDtoList;
     }
-
     public List<GetScheduleResponseDto> ScheduleListToResponseDtoList(List<Schedule> scheduleList, String pattern, String filter) {
 
         if (pattern==null || filter==null) { //전체 조회
@@ -109,6 +108,5 @@ public class ScheduleService {
             .collect(Collectors.toList());
         }
     }
-
 }
 

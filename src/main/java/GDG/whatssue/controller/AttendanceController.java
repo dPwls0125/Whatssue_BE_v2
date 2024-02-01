@@ -1,24 +1,21 @@
 package GDG.whatssue.controller;
 
-import GDG.whatssue.dto.schedule.AttendanceNumResponseDto;
+import GDG.whatssue.dto.Attendance.AttendanceNumResponseDto;
+import GDG.whatssue.dto.Attendance.ScheduleAttendanceMemberDto;
 import GDG.whatssue.entity.ScheduleAttendanceResult;
 import GDG.whatssue.service.AttendanceService;
-import GDG.whatssue.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.*;
 
-@Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/{clubId}/schedules/{scheduleId}")
+@RestController
 @Slf4j
 public class AttendanceController {
     private final AttendanceService attendanceService;
@@ -38,7 +35,7 @@ public class AttendanceController {
     }
     @Operation(summary = "출석 종료")
     @PostMapping("/attendance-end")
-    public ResponseEntity<?> offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
+    public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
             attendanceService.deleteAttendance(clubId, scheduleId);
         } catch (Exception e) {
@@ -48,13 +45,8 @@ public class AttendanceController {
     }
     @Operation(summary = "출석한 멤버 리스트 조회")
     @GetMapping("/attendance-list")
-    public ResponseEntity getAttendanceList(@PathVariable Long clubId, @PathVariable Long scheduleId) {
-        List<ScheduleAttendanceResult>list;
-        try{
-            list = attendanceService.getAttendanceList(scheduleId);
-        }catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("출석한 멤버가 존재하지 않습니다.");
-        }
+    public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) throws Exception {
+        List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 }
