@@ -1,12 +1,14 @@
 package GDG.whatssue.service;
 
-import GDG.whatssue.dto.schedule.AttendanceNumResponseDto;
+import GDG.whatssue.dto.Attendance.AttendanceNumResponseDto;
+import GDG.whatssue.dto.Attendance.ScheduleAttendanceMemberDto;
 import GDG.whatssue.entity.ScheduleAttendanceResult;
 import GDG.whatssue.repository.ScheduleAttendanceResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,19 +46,24 @@ public class AttendanceService {
             throw new Exception("출석이 진행중이지 않습니다.");
         }
     }
-
-    public List<ScheduleAttendanceResult> getAttendanceList(Long scheduleId)throws Exception {
+    public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId)throws Exception {
         List<ScheduleAttendanceResult> attendanceList;
         attendanceList = scheduleAttendanceResultRepository.findByScheduleId(scheduleId);
-        List<ScheduleAttendanceResult>attendedMembers = new ArrayList();
+
         if(attendanceList.isEmpty()) throw new Exception("출석한 멤버가 존재하지 않습니다.");
-        for (ScheduleAttendanceResult scheduleAttendanceResult : attendanceList) {
-            String attendanceType = scheduleAttendanceResult.getAttendanceType().toString();
-            if (attendanceType.equals("ATTENDANCE")) {
-                attendedMembers.add(scheduleAttendanceResult);
+
+        List<ScheduleAttendanceMemberDto>attendedMembers = attendanceList.stream().map(m -> {
+            if(m.getAttendanceType().toString().equals("ATTENDANCE")) {
+                return ScheduleAttendanceMemberDto.builder()
+                        .clubId(clubId)
+                        .scheduleId(scheduleId)
+                        .clubMemberId(m.getClubMember().getId())
+                        .attendanceType(m.getAttendanceType())
+                        .build();
             }
-        }
+            else return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList()).reversed();
+
         return attendedMembers;
     }
-
 }

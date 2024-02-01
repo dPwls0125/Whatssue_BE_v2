@@ -1,4 +1,4 @@
-package GDG.whatssue.dto.schedule;
+package GDG.whatssue.dto.Attendance;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
