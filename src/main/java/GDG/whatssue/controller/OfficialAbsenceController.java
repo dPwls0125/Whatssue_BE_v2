@@ -17,6 +17,7 @@ public class OfficialAbsenceController {
 
     @PostMapping(value="/{scheduleId}/request")
     public ResponseEntity addOfficialAbsenceRequest(
+            @PathVariable String clubId,
             @PathVariable Long scheduleId,
             @RequestBody OfficialAbsenceAddRequestDto officialAbsenceAddRequestDto) {
 
@@ -25,17 +26,17 @@ public class OfficialAbsenceController {
 
     }
     @GetMapping(value="/list")
-    public ResponseEntity<List<OfficialAbsenceGetRequestDto>> getOfficialAbsenceRequest(){
+    public ResponseEntity<List<OfficialAbsenceGetRequestDto>> getOfficialAbsenceRequest(@PathVariable String clubId){
         List<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getOfficialAbsenceRequests();
         return ResponseEntity.ok(officialAbsenceRequests);
     }
     @PostMapping(value="/accept/{officialAbsenceId}")
-    public ResponseEntity acceptOfficialAbsence(@PathVariable Long officialAbsenceId){
+    public ResponseEntity acceptOfficialAbsence(@PathVariable Long officialAbsenceId,@PathVariable String clubId){
         officialAbsenceService.acceptResponse(officialAbsenceId);
         return ResponseEntity.status(200).body("공결 신청 수락 완료");
     }
     @PostMapping(value="/deny/{officialAbsenceId}")
-    public ResponseEntity denyOfficialAbsence(@PathVariable Long officialAbsenceId){
+    public ResponseEntity denyOfficialAbsence(@PathVariable Long officialAbsenceId,@PathVariable String clubId){
         officialAbsenceService.denyResponse(officialAbsenceId);
         return ResponseEntity.status(200).body("공결 신청 거절 완료");
     }

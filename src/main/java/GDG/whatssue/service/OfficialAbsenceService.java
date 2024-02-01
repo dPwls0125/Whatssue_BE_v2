@@ -10,10 +10,14 @@ import GDG.whatssue.repository.ClubMemberRepository;
 import GDG.whatssue.repository.OfficialAbsenceRequestRepository;
 import GDG.whatssue.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.repository.ScheduleRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Member;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -28,10 +32,16 @@ public class OfficialAbsenceService {
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
+    private static final Logger logger = LoggerFactory.getLogger(OfficialAbsenceService.class);
 
     public void createOfficialAbsenceRequest(Long scheduleId, OfficialAbsenceAddRequestDto officialAbsenceAddRequestDto) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
-        ClubMember clubMember = clubMemberRepository.findById(officialAbsenceAddRequestDto.getClubMemberId()).get();
+        Optional<Schedule> optionalSchedule = scheduleRepository.findById(scheduleId);
+
+        Schedule schedule = optionalSchedule.orElseThrow(() ->
+                new NoSuchElementException("No schedule found for scheduleId: " + scheduleId));
+
+        ClubMember clubMember = clubMemberRepository.findById(officialAbsenceAddRequestDto.getClubMemberId())
+                .orElseThrow(() -> new NoSuchElementException("No club member found for memberId: " + officialAbsenceAddRequestDto.getClubMemberId()));
         String officialAbsenceContent = officialAbsenceAddRequestDto.getOfficialAbsenceContent();
 
         ClubMember clubMemberEntity = clubMemberRepository.findById(clubMember.getId()).get();
@@ -45,6 +55,7 @@ public class OfficialAbsenceService {
         officialAbsenceRequestRepository.save(officialAbsenceRequest);
 
     }
+
     public List<OfficialAbsenceGetRequestDto> getOfficialAbsenceRequests() { //공결 신청 List 조회
         List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll();
 
@@ -61,22 +72,61 @@ public class OfficialAbsenceService {
                 .officialAbsenceContent(officialAbsenceRequest.getOfficialAbsenceContent())
                 .build();
     }
-    public void acceptResponse(Long officialAbsenceId){ // 공결 신청 수락
-        OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findById(officialAbsenceId).get();
-        Long scheduleId = scheduleRepository.findById(officialAbsenceRequest.getId()).get().getId();
-        Long clubMemberId = clubMemberRepository.findById(officialAbsenceRequest.getId()).get().getId();
 
-        ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId,clubMemberId);
+    @Transactional
+    public void acceptResponse(Long officialAbsenceId) {
+        try {
+            OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findById(officialAbsenceId)
+                    .orElseThrow(() -> new NoSuchElementException("No OfficialAbsenceRequest found for officialAbsenceId: " + officialAbsenceId));
 
-        scheduleAttendanceResult.setAttendanceType(OFFICIAL_ABSENCE);
+            Schedule schedule = scheduleRepository.findById(officialAbsenceRequest.getSchedule().getId())
+                    .orElseThrow(() -> new NoSuchElementException("No Schedule found for scheduleId: " + officialAbsenceRequest.getSchedule().getId()));
+
+            ClubMember clubMember = clubMemberRepository.findById(officialAbsenceRequest.getClubMember().getId())
+                    .orElseThrow(() -> new NoSuchElementException("No ClubMember found for clubMemberId: " + officialAbsenceRequest.getClubMember().getId()));
+
+            Long scheduleId = schedule.getId();
+            Long clubMemberId = clubMember.getId();
+
+            ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository
+                    .findByScheduleIdAndClubMemberId(scheduleId, clubMemberId);
+
+            if (scheduleAttendanceResult != null) {
+                scheduleAttendanceResult.setAttendanceType(OFFICIAL_ABSENCE);
+                logger.warn("AttendanceType changed.");
+            } else {
+                logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
+            }
+        } catch (NoSuchElementException e) {
+            logger.warn("Error processing acceptResponse: {}", e.getMessage());
+        }
     }
-    public void denyResponse(Long officialAbsenceId){ // 공결 신청 거절
-        OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findById(officialAbsenceId).get();
-        Long scheduleId = scheduleRepository.findById(officialAbsenceRequest.getId()).get().getId();
-        Long clubMemberId = clubMemberRepository.findById(officialAbsenceRequest.getId()).get().getId();
+    @Transactional
+    public void denyResponse(Long officialAbsenceId) { // 공결 신청 거절
+        try {
+            OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findById(officialAbsenceId)
+                    .orElseThrow(() -> new NoSuchElementException("No OfficialAbsenceRequest found for officialAbsenceId: " + officialAbsenceId));
 
-        ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId,clubMemberId);
+            Schedule schedule = scheduleRepository.findById(officialAbsenceRequest.getSchedule().getId())
+                    .orElseThrow(() -> new NoSuchElementException("No Schedule found for scheduleId: " + officialAbsenceRequest.getSchedule().getId()));
 
-        scheduleAttendanceResult.setAttendanceType(ABSENCE);
+            ClubMember clubMember = clubMemberRepository.findById(officialAbsenceRequest.getClubMember().getId())
+                    .orElseThrow(() -> new NoSuchElementException("No ClubMember found for clubMemberId: " + officialAbsenceRequest.getClubMember().getId()));
+
+            Long scheduleId = schedule.getId();
+            Long clubMemberId = clubMember.getId();
+
+            ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository
+                    .findByScheduleIdAndClubMemberId(scheduleId, clubMemberId);
+
+            if (scheduleAttendanceResult != null) {
+                scheduleAttendanceResult.setAttendanceType(ABSENCE);
+                logger.warn("AttendanceType changed.");
+            } else {
+                logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
+            }
+        } catch (NoSuchElementException e) {
+            logger.warn("Error processing acceptResponse: {}", e.getMessage());
+        }
     }
 }
