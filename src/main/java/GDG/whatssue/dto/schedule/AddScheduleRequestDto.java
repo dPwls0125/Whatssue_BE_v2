@@ -2,7 +2,9 @@ package GDG.whatssue.dto.schedule;
 
 import GDG.whatssue.entity.Club;
 import GDG.whatssue.entity.Schedule;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,16 +19,16 @@ public class AddScheduleRequestDto {
 
     private String scheduleName;
     private String scheduleContent;
-    private LocalDate scheduleDate;
-    private LocalTime scheduleTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime scheduleDateTime;
 
     public Schedule toEntity(Club club) {
         return Schedule.builder()
             .club(club)
             .scheduleName(scheduleName)
             .scheduleContent(scheduleContent)
-            .scheduleDate(scheduleDate)
-            .scheduleTime(scheduleTime)
+            .scheduleDateTime(scheduleDateTime)
             .isChecked(false).build();
     }
 }

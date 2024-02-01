@@ -4,6 +4,7 @@ import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
 import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
 import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
 import GDG.whatssue.service.ScheduleService;
+import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -37,18 +39,6 @@ public class ScheduleController {
 
     }
 
-    @GetMapping("/{scheduleId}")
-    public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleResponseDto scheduleDto;
-        try{
-             scheduleDto = scheduleService.findSchedule(scheduleId);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
-    }
-
     @PatchMapping("/{scheduleId}")
     public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,@RequestBody ModifyScheduleRequestDto requestDto) {
         try{
@@ -67,5 +57,29 @@ public class ScheduleController {
 
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
+
+    @GetMapping("/{scheduleId}")
+    public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
+        GetScheduleResponseDto scheduleDto;
+        try{
+            scheduleDto = scheduleService.findSchedule(scheduleId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Schedule Id");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
+    }
+
+    //전체조회
+    @GetMapping
+    public ResponseEntity getScheduleAll(
+        @PathVariable(name = "clubId") Long clubId,
+        @RequestParam(name = "date", required = false) String date,
+        @RequestParam(name = "month", required = false) String month) {
+        List<GetScheduleResponseDto> responseDtoList = scheduleService.findScheduleAllByFilter(clubId, date, month);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
+
+
 }
 
