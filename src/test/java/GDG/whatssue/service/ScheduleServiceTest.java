@@ -11,8 +11,7 @@ import GDG.whatssue.entity.Club;
 import GDG.whatssue.entity.Schedule;
 import GDG.whatssue.repository.ClubRepository;
 import GDG.whatssue.repository.ScheduleRepository;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -45,8 +44,7 @@ class ScheduleServiceTest {
             .club(null)
             .scheduleName("test")
             .scheduleContent("test")
-            .scheduleDate(LocalDate.now())
-            .scheduleTime(LocalTime.now())
+            .scheduleDateTime(LocalDateTime.now())
             .isChecked(false)
             .attendanceResultList(new ArrayList<>())
             .officialAbsenceRequestList(new ArrayList<>()).build();
@@ -60,8 +58,8 @@ class ScheduleServiceTest {
             AddScheduleRequestDto.builder()
                 .scheduleName("test")
                 .scheduleContent("test")
-                .scheduleDate(LocalDate.now())
-                .scheduleTime(LocalTime.now()).build();
+                .scheduleDateTime(LocalDateTime.now())
+                .build();
 
         Club club = new Club(
             1L,
@@ -91,8 +89,7 @@ class ScheduleServiceTest {
             AddScheduleRequestDto.builder()
                 .scheduleName("test")
                 .scheduleContent("test")
-                .scheduleDate(LocalDate.now())
-                .scheduleTime(LocalTime.now()).build();
+                .scheduleDateTime(LocalDateTime.now()).build();
 
         //stub
         when(clubRepository.findById(any())).thenReturn(Optional.empty());
@@ -138,8 +135,7 @@ class ScheduleServiceTest {
         ModifyScheduleRequestDto requestDto = ModifyScheduleRequestDto.builder()
             .scheduleName("modify")
             .scheduleContent("modify")
-            .scheduleDate(LocalDate.now())
-            .scheduleTime(LocalTime.now()).build();
+            .scheduleDateTime(LocalDateTime.now()).build();
 
         //stub
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
@@ -159,8 +155,7 @@ class ScheduleServiceTest {
         ModifyScheduleRequestDto requestDto = ModifyScheduleRequestDto.builder()
             .scheduleName("modify")
             .scheduleContent("modify")
-            .scheduleDate(LocalDate.now())
-            .scheduleTime(LocalTime.now()).build();
+            .scheduleDateTime(LocalDateTime.now()).build();
 
         //stub
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.empty());
