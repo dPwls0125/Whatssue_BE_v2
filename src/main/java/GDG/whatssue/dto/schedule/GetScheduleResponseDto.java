@@ -10,6 +10,5 @@ public class GetScheduleResponseDto {
     private Long scheduleId;
     private String scheduleName;
     private String scheduleContent;
-    private String scheduleDate;
-    private String scheduleTime;
+    private String scheduleDateTime;
 }

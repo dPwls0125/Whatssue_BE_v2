@@ -8,10 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,10 +38,7 @@ public class Schedule extends BaseEntity {
     private String scheduleContent;
 
     @Column(nullable = false)
-    private LocalDate scheduleDate;
-
-    @Column(nullable = false)
-    private LocalTime scheduleTime;
+    private LocalDateTime scheduleDateTime;
     
     @Column(nullable = false)
     private boolean isChecked;
@@ -54,11 +49,10 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> officialAbsenceRequestList;
 
-    public void update(String scheduleName, String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime) {
+    public void update(String scheduleName, String scheduleContent, LocalDateTime scheduleDateTime) {
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
-        this.scheduleDate = scheduleDate;
-        this.scheduleTime = scheduleTime;
+        this.scheduleDateTime = scheduleDateTime;
     }
 
 }
