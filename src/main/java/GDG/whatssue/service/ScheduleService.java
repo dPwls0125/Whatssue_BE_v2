@@ -20,7 +20,9 @@ public class ScheduleService {
     private final ClubRepository clubRepository;
 
     public void saveSchedule(Long clubId, AddScheduleRequestDto requestDto) {
-        Club club = clubRepository.findById(clubId).get();
+        Club club = clubRepository.findById(clubId).orElseThrow(
+            () -> new NoSuchElementException());
+
         Schedule saveSchedule = requestDto.toEntity(club);
         scheduleRepository.save(saveSchedule);
     }
@@ -28,7 +30,7 @@ public class ScheduleService {
     /***
      clubId 필요 여부
      ***/
-    public GetScheduleResponseDto findSchedule(Long clubId, Long scheduleId) {
+    public GetScheduleResponseDto findSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
             () -> new NoSuchElementException());
 
@@ -44,7 +46,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void  updateSchedule(Long clubId, Long scheduleId, ModifyScheduleRequestDto requestDto) {
+    public void updateSchedule(Long scheduleId, ModifyScheduleRequestDto requestDto) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
             () -> new NoSuchElementException());
 
@@ -53,13 +55,15 @@ public class ScheduleService {
             requestDto.getScheduleContent(),
             requestDto.getScheduleDate(),
             requestDto.getScheduleTime());
+
+        scheduleRepository.save(schedule);
     }
 
     /***
      clubId 필요 여부
      hard / soft delete 여부
     ***/
-    public void deleteSchedule(Long clubId, Long scheduleId) throws NoSuchElementException {
+    public void deleteSchedule(Long scheduleId) {
         scheduleRepository.deleteById(scheduleId);
     }
 }
