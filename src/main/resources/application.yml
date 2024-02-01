@@ -6,4 +6,10 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+loggin:
+  level:
+    org:
+      apache:
+        coyote:
+          http11: debug
