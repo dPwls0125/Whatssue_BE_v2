@@ -2,6 +2,7 @@ package GDG.whatssue.controller;
 
 import GDG.whatssue.dto.Attendance.AttendanceNumResponseDto;
 import GDG.whatssue.dto.Attendance.ScheduleAttendanceMemberDto;
+import GDG.whatssue.dto.Attendance.ScheduleAttendanceRequestDto;
 import GDG.whatssue.entity.ScheduleAttendanceResult;
 import GDG.whatssue.service.AttendanceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +25,6 @@ public class AttendanceController {
     @GetMapping("/attendance-start")
     public ResponseEntity openAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         AttendanceNumResponseDto dto;
-
         try {
             dto = attendanceService.openAttendance(clubId, scheduleId);
         } catch (Exception e) {
@@ -48,6 +48,17 @@ public class AttendanceController {
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) throws Exception {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
+    @Operation(summary = "출석하기 _ user")
+    @PostMapping("/attendance")
+    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @RequestBody ScheduleAttendanceRequestDto requestDto) {
+        try {
+            attendanceService.doAttendance(clubId, scheduleId, requestDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("출석이 완료되었습니다.");
     }
 }
 
