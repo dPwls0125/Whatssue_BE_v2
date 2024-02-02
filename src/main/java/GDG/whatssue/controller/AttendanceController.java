@@ -1,23 +1,22 @@
 package GDG.whatssue.controller;
 
-import GDG.whatssue.dto.schedule.AttendanceNumResponseDto;
+import GDG.whatssue.dto.Attendance.AttendanceNumResponseDto;
+import GDG.whatssue.dto.Attendance.ScheduleAttendanceMemberDto;
+import GDG.whatssue.dto.Attendance.ScheduleAttendanceRequestDto;
+import GDG.whatssue.entity.ScheduleAttendanceResult;
 import GDG.whatssue.service.AttendanceService;
-import GDG.whatssue.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.*;
 
-@Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/{clubId}/schedules/{scheduleId}")
+@RestController
 @Slf4j
 public class AttendanceController {
     private final AttendanceService attendanceService;
@@ -34,10 +33,9 @@ public class AttendanceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
-
     @Operation(summary = "출석 종료")
     @PostMapping("/attendance-end")
-    public ResponseEntity<?> offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
+    public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
             attendanceService.deleteAttendance(clubId, scheduleId);
         } catch (Exception e) {
@@ -45,11 +43,22 @@ public class AttendanceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
+    @Operation(summary = "출석한 멤버 리스트 조회")
+    @GetMapping("/attendance-list")
+    public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) throws Exception {
+        List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
+        return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
 
-    @Operation(summary = "출석 재시작")
-    @PostMapping("/attendance-restart")
-    public ResponseEntity<?> restartAttendance(@PathVariable Long scheduleId) {
-        return null;
+    @Operation(summary = "출석하기 _ user")
+    @PostMapping("/attendance")
+    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @RequestBody ScheduleAttendanceRequestDto requestDto) {
+        try {
+            attendanceService.doAttendance(clubId, scheduleId, requestDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("출석이 완료되었습니다.");
     }
 }
 
