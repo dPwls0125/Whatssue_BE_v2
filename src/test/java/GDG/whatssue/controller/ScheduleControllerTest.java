@@ -8,14 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
 import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
 import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
-import GDG.whatssue.entity.Schedule;
 import GDG.whatssue.service.ScheduleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,8 +52,8 @@ class ScheduleControllerTest {
         AddScheduleRequestDto dto = AddScheduleRequestDto.builder()
             .scheduleName("test")
             .scheduleContent("testSchedule")
-            .scheduleDate(LocalDate.now())
-            .scheduleTime(LocalTime.now()).build();
+            .scheduleDateTime(LocalDateTime.now())
+            .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -81,8 +78,8 @@ class ScheduleControllerTest {
         AddScheduleRequestDto dto = AddScheduleRequestDto.builder()
             .scheduleName("test")
             .scheduleContent("testSchedule")
-            .scheduleDate(LocalDate.now())
-            .scheduleTime(LocalTime.now()).build();
+            .scheduleDateTime(LocalDateTime.now())
+            .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -139,8 +136,8 @@ class ScheduleControllerTest {
             ModifyScheduleRequestDto.builder()
                 .scheduleName("modifyTest")
                 .scheduleContent("test")
-                .scheduleDate(LocalDate.now())
-                .scheduleTime(LocalTime.now()).build();
+                .scheduleDateTime(LocalDateTime.now())
+                .build();
 
         //stub
         doNothing().when(scheduleService).updateSchedule(anyLong(), any(ModifyScheduleRequestDto.class));
@@ -162,8 +159,8 @@ class ScheduleControllerTest {
             ModifyScheduleRequestDto.builder()
                 .scheduleName("modifyTest")
                 .scheduleContent("test")
-                .scheduleDate(LocalDate.now())
-                .scheduleTime(LocalTime.now()).build();
+                .scheduleDateTime(LocalDateTime.now())
+                .build();
 
         //stub
         doThrow(NoSuchElementException.class)
