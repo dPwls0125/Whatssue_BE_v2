@@ -27,6 +27,7 @@ public class WebSecurityConfig {
             "/v2/api-docs",
             "/webjars/**",
             "/signUp",
+            "/"
     };
 
     @Bean
@@ -36,7 +37,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(AUTH_WHITELIST).permitAll()
 //                        .requestMatchers(HttpMethod.POST,"/board/get/list").hasRole("USER") // prefixed with ROLE_
-                        .requestMatchers(HttpMethod.POST,"/board/create/list").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.GET,"/manager/**").hasAnyRole("MANAGER")
 //                        .requestMatchers(HttpMethod.DELETE,"/board/delete/{id}").hasRole("MANAGER")
 //                        .requestMatchers(HttpMethod.POST,"/board/update/list").hasRole("ADMIN")
                         .anyRequest().authenticated())
@@ -46,7 +47,7 @@ public class WebSecurityConfig {
 //                        .loginProcessingUrl("/login") // 로그인 요청시, 스프링 시큐리티가 낚아체 로그인 처리하는 URL
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        .permitAll()
+                        .defaultSuccessUrl("/")
                 )
                 .logout((logout) -> logout.permitAll());
         return http.build();
