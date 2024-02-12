@@ -31,6 +31,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String userPhone;
 
+    @Column(nullable = false)
+    private String role;
     @OneToMany(mappedBy = "user")
     private List<ClubJoinRequest> clubJoinRequestList;
 
