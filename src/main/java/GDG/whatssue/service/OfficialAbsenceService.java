@@ -92,8 +92,13 @@ public class OfficialAbsenceService {
                     .findByScheduleIdAndClubMemberId(scheduleId, clubMemberId);
 
             if (scheduleAttendanceResult != null) {
+                //공결 수락
                 scheduleAttendanceResult.setAttendanceType(OFFICIAL_ABSENCE);
                 logger.warn("AttendanceType changed.");
+                //공결 신청 삭제
+                /**hard or soft delete??**/
+                officialAbsenceRequestRepository.delete(officialAbsenceRequest);
+                logger.warn("OfficialAbsenceRequest deleted.");
             } else {
                 logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
             }
@@ -120,8 +125,13 @@ public class OfficialAbsenceService {
                     .findByScheduleIdAndClubMemberId(scheduleId, clubMemberId);
 
             if (scheduleAttendanceResult != null) {
+                //공결 거부
                 scheduleAttendanceResult.setAttendanceType(ABSENCE);
                 logger.warn("AttendanceType changed.");
+                //공결 신청 삭제
+                /**hard or soft delete??**/
+                officialAbsenceRequestRepository.delete(officialAbsenceRequest);
+                logger.warn("OfficialAbsenceRequest deleted.");
             } else {
                 logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
             }

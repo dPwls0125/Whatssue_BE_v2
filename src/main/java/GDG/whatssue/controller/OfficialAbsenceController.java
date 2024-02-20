@@ -15,7 +15,7 @@ import java.util.List;
 public class OfficialAbsenceController {
     private final OfficialAbsenceService officialAbsenceService;
 
-    @PostMapping(value="/{scheduleId}/request")
+    @PostMapping(value="/request/{scheduleId}")
     public ResponseEntity addOfficialAbsenceRequest(
             @PathVariable String clubId,
             @PathVariable Long scheduleId,
