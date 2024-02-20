@@ -7,7 +7,7 @@ spring:
   jpa:
     hibernate:
       dialect: org.hibernate.dialect.MySQL8Dialect
-      ddl-auto: create
+      ddl-auto: update
 loggin:
   level:
     org:
