@@ -3,6 +3,7 @@ import GDG.whatssue.dto.User.UserDto;
 import GDG.whatssue.entity.PrincipalDetails;
 import GDG.whatssue.entity.User;
 import GDG.whatssue.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@Transactional
 //시큐리티 설정에서 loginProcessingUrl("/login");
 //login 요청이 오면 자동으로 UserDetailsService 타입으로 IoC되어있는 loadUserByUsername 함수가 실행
 public class UserService implements UserDetailsService {
@@ -35,6 +37,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String userName) {
         User user = userRepository.findByUserNick(userName);
 

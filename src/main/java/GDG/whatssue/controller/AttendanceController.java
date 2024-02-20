@@ -7,6 +7,7 @@ import GDG.whatssue.entity.ScheduleAttendanceResult;
 import GDG.whatssue.service.AttendanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class AttendanceController {
 
     @Operation(summary = "출석 열기_ADMIN")
     @GetMapping("/attendance-start")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity openAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         AttendanceNumResponseDto dto;
         try {

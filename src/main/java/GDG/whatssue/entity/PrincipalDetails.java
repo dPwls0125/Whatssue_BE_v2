@@ -1,11 +1,14 @@
 package GDG.whatssue.entity;
 
+import jakarta.transaction.Transactional;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /*
 * 시큐리티가 /login 주소 요청이 오면 낚아채서 로그인을 진행시킨다.
@@ -17,22 +20,30 @@ import java.util.Collection;
 * Security Session => Authentication => UserDetails(PrincipalDetails)
  */
 @Getter
+@Transactional
 public class PrincipalDetails implements UserDetails {
+
     private User user;
 
     public PrincipalDetails(User user) {
         this.user = user;
+        // 추가: 세션을 열고 연관된 엔티티를 즉시 로딩
+        this.user.getClubMemberList().size();
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> collect = new ArrayList<>();
-        collect.add(new GrantedAuthority(){
-            @Override
-            public String getAuthority() {
-                return user.getRole();
-            }
-        });
-        return collect;
+        List<ClubMember> clubMemberList = user.getClubMemberList();
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        for (ClubMember clubMember : clubMemberList) {
+            authorities.add((GrantedAuthority) () -> {
+                Long clubId = clubMember.getClub().getId();
+                Role role = clubMember.getRole();
+                System.out.println("ROLE_" + clubId + role);
+                return "ROLE_" + clubId + role;
+            });
+        }
+        return authorities;
     }
 
     @Override
