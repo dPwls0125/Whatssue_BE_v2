@@ -1,5 +1,6 @@
-package GDG.whatssue.dto.schedule;
+package GDG.whatssue.dto.schedule.request;
 
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,9 +11,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModifyScheduleRequestDto {
+public class ModifyScheduleRequest {
 
+    @NotBlank
     private String scheduleName;
+
+    @NotBlank
     private String scheduleContent;
+
+    @NotBlank
     private LocalDateTime scheduleDateTime;
 }

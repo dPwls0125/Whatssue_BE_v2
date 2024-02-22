@@ -1,6 +1,8 @@
 package GDG.whatssue.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class WebSecurityConfig {
             "/webjars/**",
             "/signUp",
             "/api/**",
-
+        "/**"
     };
 
     @Bean
@@ -40,7 +43,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(AUTH_WHITELIST).permitAll()
 //                        .requestMatchers(HttpMethod.POST,"/board/get/list").hasRole("USER") // prefixed with ROLE_
-                        .requestMatchers(HttpMethod.GET,"/manager/**").hasAnyRole("MANAGER")
+//                        .requestMatchers(HttpMethod.GET,"/manager/**").hasAnyRole("MANAGER")
 //                        .requestMatchers(HttpMethod.DELETE,"/board/delete/{id}").hasRole("MANAGER")
 //                        .requestMatchers(HttpMethod.POST,"/board/update/list").hasRole("ADMIN")
                         .anyRequest().authenticated())
@@ -59,5 +62,10 @@ public class WebSecurityConfig {
     @Bean // 해당 메서드의 리턴되는 오브젝트를 IoC로 등록해준다.
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @PostConstruct
+    void init() {
+        log.info("Security Config init");
     }
 }

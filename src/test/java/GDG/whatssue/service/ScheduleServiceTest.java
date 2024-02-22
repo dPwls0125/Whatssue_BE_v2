@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
-import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
-import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
+import GDG.whatssue.dto.schedule.request.AddScheduleRequest;
+import GDG.whatssue.dto.schedule.reponse.GetScheduleResponse;
+import GDG.whatssue.dto.schedule.request.ModifyScheduleRequest;
 import GDG.whatssue.entity.Club;
 import GDG.whatssue.entity.Schedule;
 import GDG.whatssue.repository.ClubRepository;
@@ -54,8 +54,8 @@ class ScheduleServiceTest {
     @DisplayName("일정 추가 성공")
     void saveScheduleSuccessTest() {
         //given
-        AddScheduleRequestDto requestDto =
-            AddScheduleRequestDto.builder()
+        AddScheduleRequest requestDto =
+            AddScheduleRequest.builder()
                 .scheduleName("test")
                 .scheduleContent("test")
                 .scheduleDateTime(LocalDateTime.now())
@@ -85,8 +85,8 @@ class ScheduleServiceTest {
     @DisplayName("존재하지 않는 clubId로 일정 추가 실패")
     void saveScheduleFailTest() {
         //given
-        AddScheduleRequestDto requestDto =
-            AddScheduleRequestDto.builder()
+        AddScheduleRequest requestDto =
+            AddScheduleRequest.builder()
                 .scheduleName("test")
                 .scheduleContent("test")
                 .scheduleDateTime(LocalDateTime.now()).build();
@@ -108,7 +108,7 @@ class ScheduleServiceTest {
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
 
         //when
-        GetScheduleResponseDto responseDto = scheduleService.findSchedule(scheduleId);
+        GetScheduleResponse responseDto = scheduleService.findSchedule(scheduleId);
 
         //then
         assertThat(schedule.getScheduleName()).isEqualTo(responseDto.getScheduleName());
@@ -132,7 +132,7 @@ class ScheduleServiceTest {
     void updateScheduleSuccessTest() {
         //given
         long scheduleId = 1L;
-        ModifyScheduleRequestDto requestDto = ModifyScheduleRequestDto.builder()
+        ModifyScheduleRequest requestDto = ModifyScheduleRequest.builder()
             .scheduleName("modify")
             .scheduleContent("modify")
             .scheduleDateTime(LocalDateTime.now()).build();
@@ -152,7 +152,7 @@ class ScheduleServiceTest {
     void updateScheduleFailTest() {
         //given
         long scheduleId = 1L;
-        ModifyScheduleRequestDto requestDto = ModifyScheduleRequestDto.builder()
+        ModifyScheduleRequest requestDto = ModifyScheduleRequest.builder()
             .scheduleName("modify")
             .scheduleContent("modify")
             .scheduleDateTime(LocalDateTime.now()).build();

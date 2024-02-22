@@ -1,11 +1,11 @@
-package GDG.whatssue.dto.schedule;
+package GDG.whatssue.dto.schedule.reponse;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class GetScheduleResponseDto {
+public class GetScheduleResponse {
 
     private Long scheduleId;
     private String scheduleName;

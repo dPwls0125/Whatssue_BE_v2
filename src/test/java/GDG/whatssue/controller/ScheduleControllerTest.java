@@ -1,13 +1,12 @@
 package GDG.whatssue.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
-import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
-import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
+import GDG.whatssue.dto.schedule.request.AddScheduleRequest;
+import GDG.whatssue.dto.schedule.reponse.GetScheduleResponse;
+import GDG.whatssue.dto.schedule.request.ModifyScheduleRequest;
 import GDG.whatssue.service.ScheduleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -49,7 +48,7 @@ class ScheduleControllerTest {
     @DisplayName("일정 추가 성공 컨트롤러 테스트")
     public void addScheduleSuccessTest() throws Exception {
         //given
-        AddScheduleRequestDto dto = AddScheduleRequestDto.builder()
+        AddScheduleRequest dto = AddScheduleRequest.builder()
             .scheduleName("test")
             .scheduleContent("testSchedule")
             .scheduleDateTime(LocalDateTime.now())
@@ -60,7 +59,7 @@ class ScheduleControllerTest {
 
         //stub
         doNothing().when(scheduleService)
-            .saveSchedule(anyLong(), any(AddScheduleRequestDto.class));
+            .saveSchedule(anyLong(), any(AddScheduleRequest.class));
 
         //when, then
         mvc.perform(post("/api/1/schedules")
@@ -68,14 +67,14 @@ class ScheduleControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
 
-        verify(scheduleService).saveSchedule(eq(1L), any(AddScheduleRequestDto.class));
+        verify(scheduleService).saveSchedule(eq(1L), any(AddScheduleRequest.class));
     }
     
     @Test
     @DisplayName("일정 추가 실패 컨트롤러 테스트")
     void addScheduleFailTest() throws Exception{
         //given
-        AddScheduleRequestDto dto = AddScheduleRequestDto.builder()
+        AddScheduleRequest dto = AddScheduleRequest.builder()
             .scheduleName("test")
             .scheduleContent("testSchedule")
             .scheduleDateTime(LocalDateTime.now())
@@ -86,7 +85,7 @@ class ScheduleControllerTest {
 
         //stub
         doThrow(NoSuchElementException.class).
-            when(scheduleService).saveSchedule(anyLong(), any(AddScheduleRequestDto.class));
+            when(scheduleService).saveSchedule(anyLong(), any(AddScheduleRequest.class));
 
         //when, then
         mvc.perform(post("/api/1/schedules")
@@ -94,7 +93,7 @@ class ScheduleControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound());
 
-        verify(scheduleService).saveSchedule(eq(1L), any(AddScheduleRequestDto.class));
+        verify(scheduleService).saveSchedule(eq(1L), any(AddScheduleRequest.class));
     }
 
     @Test
@@ -103,7 +102,7 @@ class ScheduleControllerTest {
         //given
 
         //stub
-        when(scheduleService.findSchedule(eq(1L))).thenReturn(any(GetScheduleResponseDto.class));
+        when(scheduleService.findSchedule(eq(1L))).thenReturn(any(GetScheduleResponse.class));
 
         //when, then
         mvc.perform(get("/api/1/schedules/1"))
@@ -132,15 +131,15 @@ class ScheduleControllerTest {
     @DisplayName("일정 수정 성공 컨트롤러 테스트")
     void modifyScheduleSuccessTest() throws Exception {
         //given
-        ModifyScheduleRequestDto dto =
-            ModifyScheduleRequestDto.builder()
+        ModifyScheduleRequest dto =
+            ModifyScheduleRequest.builder()
                 .scheduleName("modifyTest")
                 .scheduleContent("test")
                 .scheduleDateTime(LocalDateTime.now())
                 .build();
 
         //stub
-        doNothing().when(scheduleService).updateSchedule(anyLong(), any(ModifyScheduleRequestDto.class));
+        doNothing().when(scheduleService).updateSchedule(anyLong(), any(ModifyScheduleRequest.class));
 
         //when, then
         mvc.perform(patch("/api/1/schedules/1")
@@ -148,15 +147,15 @@ class ScheduleControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isOk());
 
-        verify(scheduleService).updateSchedule(eq(1L), any(ModifyScheduleRequestDto.class));
+        verify(scheduleService).updateSchedule(eq(1L), any(ModifyScheduleRequest.class));
     }
     
     @Test
     @DisplayName("일정 수정 실패 컨트롤러 테스트")
     void modifyScheduleFailTest() throws Exception {
         //given
-        ModifyScheduleRequestDto dto =
-            ModifyScheduleRequestDto.builder()
+        ModifyScheduleRequest dto =
+            ModifyScheduleRequest.builder()
                 .scheduleName("modifyTest")
                 .scheduleContent("test")
                 .scheduleDateTime(LocalDateTime.now())
@@ -164,7 +163,7 @@ class ScheduleControllerTest {
 
         //stub
         doThrow(NoSuchElementException.class)
-            .when(scheduleService).updateSchedule(anyLong(), any(ModifyScheduleRequestDto.class));
+            .when(scheduleService).updateSchedule(anyLong(), any(ModifyScheduleRequest.class));
 
         //when, then
         mvc.perform(patch("/api/1/schedules/1")
@@ -172,7 +171,7 @@ class ScheduleControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isNotFound());
 
-        verify(scheduleService).updateSchedule(eq(1L), any(ModifyScheduleRequestDto.class));
+        verify(scheduleService).updateSchedule(eq(1L), any(ModifyScheduleRequest.class));
     }
     
     @Test

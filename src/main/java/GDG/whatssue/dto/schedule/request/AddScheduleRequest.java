@@ -1,8 +1,10 @@
-package GDG.whatssue.dto.schedule;
+package GDG.whatssue.dto.schedule.request;
 
 import GDG.whatssue.entity.Club;
 import GDG.whatssue.entity.Schedule;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,11 +17,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class AddScheduleRequestDto {
+public class AddScheduleRequest {
 
+    @NotBlank
     private String scheduleName;
+    @NotBlank
     private String scheduleContent;
 
+    @NotBlank
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime scheduleDateTime;
 
