@@ -33,7 +33,11 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String role;
+
     @OneToMany(mappedBy = "user")
     private List<ClubJoinRequest> clubJoinRequestList;
+
+    @OneToMany(mappedBy = "user")
+    private List<ClubMember> clubMemberList;
 
 }
