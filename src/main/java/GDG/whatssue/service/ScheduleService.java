@@ -15,6 +15,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+/**
+ * ScheduleInterceptor에서 존재하는 schedule인지, club에 유효한 schedule인지 체크.
+ * ScheduleInterceptor의 예외 처리 완료되면
+ * ScheduleService의 유효한 스케줄인지 체크 로직 제거 TODO
+ */
+
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
@@ -42,6 +49,10 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
+    /**
+     * now HardDelete
+     * SoftDelete TODO
+     */
     public void deleteSchedule(Long scheduleId) {
         scheduleRepository.deleteById(scheduleId);
     }
