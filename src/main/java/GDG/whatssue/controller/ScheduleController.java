@@ -1,9 +1,10 @@
 package GDG.whatssue.controller;
 
-import GDG.whatssue.dto.schedule.AddScheduleRequestDto;
-import GDG.whatssue.dto.schedule.GetScheduleResponseDto;
-import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
+import GDG.whatssue.dto.schedule.request.AddScheduleRequest;
+import GDG.whatssue.dto.schedule.reponse.GetScheduleResponse;
+import GDG.whatssue.dto.schedule.request.ModifyScheduleRequest;
 import GDG.whatssue.service.ScheduleService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,9 +30,17 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
+    /**
+     * Filter 또는 Interceptor를 통해 schedule이 club의 것인지 체크 필요 TODO
+     */
+
     @PostMapping
-    @Operation(summary = "스케줄 추가")
-    public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId, @RequestBody AddScheduleRequestDto requestDto) {
+    public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId,
+        @Valid @RequestBody AddScheduleRequest requestDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            //bean validation 처리 TODO
+        }
 
         try{
             scheduleService.saveSchedule(clubId, requestDto);
@@ -43,8 +53,13 @@ public class ScheduleController {
     }
 
     @PatchMapping("/{scheduleId}")
-    @Operation(summary = "스케줄 수정")
-    public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,@RequestBody ModifyScheduleRequestDto requestDto) {
+    public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,
+        @Valid @RequestBody ModifyScheduleRequest requestDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            //bean validation 처리 TODO
+        }
+
         try{
             scheduleService.updateSchedule(scheduleId, requestDto);
         } catch (NoSuchElementException e){
@@ -56,7 +71,6 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{scheduleId}")
-    @Operation(summary = "스케줄 삭제")
     public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         scheduleService.deleteSchedule(scheduleId);
 
@@ -65,7 +79,7 @@ public class ScheduleController {
 
     @GetMapping("/{scheduleId}")
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleResponseDto scheduleDto;
+        GetScheduleResponse scheduleDto;
         try{
             scheduleDto = scheduleService.findSchedule(scheduleId);
         } catch (NoSuchElementException e) {
@@ -77,11 +91,9 @@ public class ScheduleController {
 
     //전체조회
     @GetMapping
-    public ResponseEntity getScheduleAll(
-        @PathVariable(name = "clubId") Long clubId,
-        @RequestParam(name = "date", required = false) String date,
+    public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date,
         @RequestParam(name = "month", required = false) String month) {
-        List<GetScheduleResponseDto> responseDtoList = scheduleService.findScheduleAllByFilter(clubId, date, month);
+        List<GetScheduleResponse> responseDtoList = scheduleService.findScheduleAllByFilter(clubId, date, month);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
