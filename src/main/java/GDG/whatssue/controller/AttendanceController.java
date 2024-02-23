@@ -22,7 +22,7 @@ import java.util.*;
 public class AttendanceController {
     private final AttendanceService attendanceService;
 
-    @Operation(summary = "출석 열기_ADMIN")
+    @Operation(summary = "출석 열기_manager")
     @GetMapping("/attendance-start")
     @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity openAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {

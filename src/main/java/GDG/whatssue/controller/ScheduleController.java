@@ -6,6 +6,8 @@ import GDG.whatssue.dto.schedule.ModifyScheduleRequestDto;
 import GDG.whatssue.service.ScheduleService;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
+    @Operation(summary = "스케줄 추가")
     public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId, @RequestBody AddScheduleRequestDto requestDto) {
 
         try{
@@ -40,6 +43,7 @@ public class ScheduleController {
     }
 
     @PatchMapping("/{scheduleId}")
+    @Operation(summary = "스케줄 수정")
     public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,@RequestBody ModifyScheduleRequestDto requestDto) {
         try{
             scheduleService.updateSchedule(scheduleId, requestDto);
@@ -52,6 +56,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{scheduleId}")
+    @Operation(summary = "스케줄 삭제")
     public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         scheduleService.deleteSchedule(scheduleId);
 

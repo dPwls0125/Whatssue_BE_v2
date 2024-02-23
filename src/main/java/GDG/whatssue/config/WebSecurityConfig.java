@@ -40,7 +40,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(AUTH_WHITELIST).permitAll()
 //                        .requestMatchers(HttpMethod.POST,"/board/get/list").hasRole("USER") // prefixed with ROLE_
-                        .requestMatchers(HttpMethod.GET,"/manager/**").hasAnyRole("MANAGER")
+//                        .requestMatchers(HttpMethod.GET,"/manager/**").hasAnyRole("MANAGER")
 //                        .requestMatchers(HttpMethod.DELETE,"/board/delete/{id}").hasRole("MANAGER")
 //                        .requestMatchers(HttpMethod.POST,"/board/update/list").hasRole("ADMIN")
                         .anyRequest().authenticated())
