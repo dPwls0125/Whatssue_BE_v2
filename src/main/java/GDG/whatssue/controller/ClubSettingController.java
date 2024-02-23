@@ -5,6 +5,7 @@ import GDG.whatssue.service.ClubSettingService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 public class ClubSettingController {
     private final ClubSettingService clubSettingService;
 
-    @PostMapping(value="/create")@Operation(summary="모임 생성 api")
+    @PostMapping(value="/create")
+    @Operation(summary="모임 생성 api")
     public ResponseEntity addClub(
             @RequestBody SettingClubDto settingClubDto) {
 
@@ -21,7 +23,9 @@ public class ClubSettingController {
         return ResponseEntity.status(200).body("모임 생성 완료");
 
     }
-    @PatchMapping(value="/modify/{clubId}")@Operation(summary="모임 수정 api")
+    @PatchMapping(value="/modify/{clubId}")
+    @Operation(summary="모임 수정 api")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity modifyClub(
             @PathVariable Long clubId,
             @RequestBody SettingClubDto settingClubDto){
@@ -30,7 +34,9 @@ public class ClubSettingController {
         return ResponseEntity.status(200).body("모임 수정 완료");
 
     }
-    @DeleteMapping(value="/delete/{clubId}")@Operation(summary="모임 삭제 api")
+    @DeleteMapping(value="/delete/{clubId}")
+    @Operation(summary="모임 삭제 api")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity removeClub(
             @PathVariable Long clubId){
         clubSettingService.deleteClub(clubId);
