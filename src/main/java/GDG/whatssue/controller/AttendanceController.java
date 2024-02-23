@@ -37,6 +37,7 @@ public class AttendanceController {
     }
     @Operation(summary = "출석 종료")
     @PostMapping("/attendance-end")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
             attendanceService.deleteAttendance(clubId, scheduleId);
@@ -45,8 +46,9 @@ public class AttendanceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
-    @Operation(summary = "출석한 멤버 리스트 조회")
+    @Operation(summary = "일정별 출석한 멤버 리스트 조회")
     @GetMapping("/attendance-list")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) throws Exception {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
@@ -54,6 +56,7 @@ public class AttendanceController {
 
     @Operation(summary = "출석하기 _ user")
     @PostMapping("/attendance")
+    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MEMBER','ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @RequestBody ScheduleAttendanceRequestDto requestDto) {
         try {
             attendanceService.doAttendance(clubId, scheduleId, requestDto);

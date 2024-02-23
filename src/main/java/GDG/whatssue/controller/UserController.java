@@ -40,6 +40,7 @@ public class UserController {
     public String index() {
         return "index";
     }
+
     @GetMapping("/currentUser")
     public ResponseEntity currentUser(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         UserDto userDto = userService.getUserInfo(principalDetails);

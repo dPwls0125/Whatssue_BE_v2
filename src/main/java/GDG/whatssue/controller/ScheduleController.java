@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,7 @@ public class ScheduleController {
      */
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId,
         @Valid @RequestBody AddScheduleRequest requestDto, BindingResult bindingResult) {
 
@@ -53,6 +55,7 @@ public class ScheduleController {
     }
 
     @PatchMapping("/{scheduleId}")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,
         @Valid @RequestBody ModifyScheduleRequest requestDto, BindingResult bindingResult) {
 
@@ -71,6 +74,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{scheduleId}")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         scheduleService.deleteSchedule(scheduleId);
 
@@ -78,6 +82,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/{scheduleId}")
+    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MANAGER','ROLE_'+#clubId+'MEMBER')")
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         GetScheduleResponse scheduleDto;
         try{
@@ -91,6 +96,7 @@ public class ScheduleController {
 
     //전체조회
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MANAGER','ROLE_'+#clubId+'MEMBER')")
     public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date,
         @RequestParam(name = "month", required = false) String month) {
         List<GetScheduleResponse> responseDtoList = scheduleService.findScheduleAllByFilter(clubId, date, month);
