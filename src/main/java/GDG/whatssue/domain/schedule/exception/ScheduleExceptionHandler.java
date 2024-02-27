@@ -14,7 +14,11 @@ public class ScheduleExceptionHandler {
     @ExceptionHandler(NoScheduleException.class)
     public ResponseEntity<ErrorResult> noScheduleExHandle(NoScheduleException e, HttpServletRequest request) {
         ScheduleErrorCode errorCode = (ScheduleErrorCode) e.getErrorCode();
-        ErrorResult errorResult = new ErrorResult(errorCode.name(), errorCode.getMessage(e.getScheduleId()), request.getRequestURI());
+        ErrorResult errorResult = ErrorResult.builder()
+            .code(errorCode.name())
+            .message(errorCode.getMessage())
+            .path(request.getRequestURI())
+            .build();
 
         return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
     }
@@ -22,7 +26,11 @@ public class ScheduleExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResult> scheduleDateTimePatternExHandle(HttpMessageNotReadableException e, HttpServletRequest request) {
         ScheduleErrorCode errorCode = ScheduleErrorCode.SCHEDULE_DATETIME_PATTERN_ERROR;
-        ErrorResult errorResult = new ErrorResult(errorCode.name(), errorCode.getMessage(), request.getRequestURI());
+        ErrorResult errorResult = ErrorResult.builder()
+            .code(errorCode.name())
+            .message(errorCode.getMessage())
+            .path(request.getRequestURI())
+            .build();
 
         return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
     }

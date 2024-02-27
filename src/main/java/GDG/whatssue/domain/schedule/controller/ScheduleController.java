@@ -39,12 +39,7 @@ public class ScheduleController {
 
     @PostMapping
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
-    public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId,
-        @Valid @RequestBody AddScheduleRequest requestDto, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            //bean validation 처리 TODO
-        }
+    public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId, @Valid @RequestBody AddScheduleRequest requestDto) {
 
         scheduleService.saveSchedule(clubId, requestDto);
 
@@ -54,11 +49,7 @@ public class ScheduleController {
     @PatchMapping("/{scheduleId}")
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,
-        @Valid @RequestBody ModifyScheduleRequest requestDto, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            //bean validation 처리 TODO
-        }
+        @Valid @RequestBody ModifyScheduleRequest requestDto) {
 
         scheduleService.updateSchedule(scheduleId, requestDto);
 
