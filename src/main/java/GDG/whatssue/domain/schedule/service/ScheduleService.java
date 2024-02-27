@@ -73,32 +73,39 @@ public class ScheduleService {
         return scheduleDetailDto;
     }
 
-    public List<GetScheduleResponse> findScheduleAllByFilter(Long clubId, String date, String month) {
+    public List<GetScheduleResponse> findScheduleAll(Long clubId) {
         Club findClub = clubRepository.findById(clubId).get();
 
         List<Schedule> scheduleList = findClub.getScheduleList();
-        List<GetScheduleResponse> responseDtoList;
 
-        if(date==null && month==null ) { //전체조회
-            responseDtoList = ScheduleListToResponseDtoList(scheduleList, null, null);
-        } else if (date != null) { //일자별 조회
-            responseDtoList = ScheduleListToResponseDtoList(scheduleList, "yyyy-MM-dd", date);
-        } else { //월별 조회
-            responseDtoList = ScheduleListToResponseDtoList(scheduleList, "yyyy-MM", month);
-        }
-
-        return responseDtoList;
+        return ScheduleListToResponseDtoList(scheduleList, null, null);
     }
 
-    public List<GetScheduleResponse> ScheduleListToResponseDtoList(List<Schedule> scheduleList, String pattern, String filter) {
+    public List<GetScheduleResponse> findScheduleByDay(Long clubId, String date) {
+        Club findClub = clubRepository.findById(clubId).get();
 
-        if (pattern==null || filter==null) { //전체 조회
+        List<Schedule> scheduleList = findClub.getScheduleList();
+
+        return ScheduleListToResponseDtoList(scheduleList, "yyyy-MM-dd", date);
+    }
+
+    public List<GetScheduleResponse> findScheduleByMonth(Long clubId, String date) {
+        Club findClub = clubRepository.findById(clubId).get();
+
+        List<Schedule> scheduleList = findClub.getScheduleList();
+
+        return ScheduleListToResponseDtoList(scheduleList, "yyyy-MM", date);
+    }
+
+    public List<GetScheduleResponse> ScheduleListToResponseDtoList(List<Schedule> scheduleList, String pattern, String date) {
+
+        if (pattern==null || date==null) { //전체 조회
             return scheduleList.stream()
                 .map(s -> scheduleToGetScheduleResponse(s))
                 .collect(Collectors.toList());
         } else { //필터링 조회
         return scheduleList.stream()
-            .filter(s-> s.getScheduleDateTime().format(DateTimeFormatter.ofPattern(pattern)).equals(filter))
+            .filter(s-> s.getScheduleDateTime().format(DateTimeFormatter.ofPattern(pattern)).equals(date))
             .map(s -> scheduleToGetScheduleResponse(s))
             .collect(Collectors.toList());
         }

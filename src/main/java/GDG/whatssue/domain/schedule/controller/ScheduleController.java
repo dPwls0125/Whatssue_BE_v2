@@ -6,11 +6,13 @@ import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.exception.NoScheduleException;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
+import GDG.whatssue.global.error.CommonException;
 import GDG.whatssue.global.error.ErrorResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +45,6 @@ public class ScheduleController {
         ErrorResult errorResult = new ErrorResult(errorCode.name(), errorCode.getMessage(e.getScheduleId()), request.getRequestURI());
         return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
     }
-
-
 
     @PostMapping
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
@@ -94,12 +94,25 @@ public class ScheduleController {
     //전체조회
     @GetMapping
 //    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MANAGER','ROLE_'+#clubId+'MEMBER')")
-    public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date,
-        @RequestParam(name = "month", required = false) String month) {
-        List<GetScheduleResponse> responseDtoList = scheduleService.findScheduleAllByFilter(clubId, date, month);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date) {
+
+        List<GetScheduleResponse> responseDtoList;
+
+        if (date == null) { //전체 조회
+            responseDtoList = scheduleService.findScheduleAll(clubId);
+        } else {
+            boolean day_check = Pattern.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}", date);
+            boolean month_check = Pattern.matches("[0-9]{4}-[0-9]{2}", date);
+
+            if (day_check) { //일자별 조회
+                responseDtoList = scheduleService.findScheduleByDay(clubId, date);
+            } else if (month_check) { //월별 조회
+                responseDtoList = scheduleService.findScheduleByMonth(clubId, date);
+            } else { //지정 패턴과 맞지 않음
+                throw new CommonException(ScheduleErrorCode.SCHEDULE_DATE_PATTERN_ERROR);
+            }
+        }
+
+        return new ResponseEntity(responseDtoList, HttpStatus.OK);
     }
-
-
 }
-

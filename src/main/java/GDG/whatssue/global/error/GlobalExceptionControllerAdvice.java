@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-//@RestControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionControllerAdvice {
 
     @ExceptionHandler(CommonException.class)
-    public ResponseEntity<ErrorResult> commonExHandle(CommonException e, HttpServletRequest request) {
+        public ResponseEntity<ErrorResult> commonExHandle(CommonException e, HttpServletRequest request) {
         log.warn("common exception= ", e);
         ErrorCode errorCode = e.getErrorCode();
         ErrorResult errorResult = new ErrorResult(errorCode.name(), errorCode.getMessage(), request.getRequestURI());
