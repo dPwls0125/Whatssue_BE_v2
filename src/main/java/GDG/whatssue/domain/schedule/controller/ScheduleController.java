@@ -8,6 +8,8 @@ import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.error.CommonException;
 import GDG.whatssue.global.error.ErrorResult;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -38,13 +40,6 @@ public class ScheduleController {
     /**
      * Filter 또는 Interceptor를 통해 schedule이 club의 것인지 체크 필요 TODO
      */
-
-    @ExceptionHandler(NoScheduleException.class)
-    public ResponseEntity<ErrorResult> noScheduleExHandle(NoScheduleException e, HttpServletRequest request) {
-        ScheduleErrorCode errorCode = (ScheduleErrorCode) e.getErrorCode();
-        ErrorResult errorResult = new ErrorResult(errorCode.name(), errorCode.getMessage(e.getScheduleId()), request.getRequestURI());
-        return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
-    }
 
     @PostMapping
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
@@ -93,6 +88,7 @@ public class ScheduleController {
 
     //전체조회
     @GetMapping
+    @Parameter(name = "date", description = "쿼리 파라미터 미입력 시 전체 일정 조회 (날짜 패턴 : yyyy-MM-dd or yyyy-MM)", required = false, in = ParameterIn.QUERY)
 //    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MANAGER','ROLE_'+#clubId+'MEMBER')")
     public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date) {
 

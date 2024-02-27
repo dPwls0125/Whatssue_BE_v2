@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionControllerAdvice {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(CommonException.class)
         public ResponseEntity<ErrorResult> commonExHandle(CommonException e, HttpServletRequest request) {
