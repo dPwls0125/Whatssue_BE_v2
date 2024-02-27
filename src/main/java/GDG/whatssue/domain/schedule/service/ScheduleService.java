@@ -6,10 +6,12 @@ import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.club.repository.ClubRepository;
+import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
+import GDG.whatssue.domain.schedule.exception.NoScheduleException;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
+import GDG.whatssue.global.error.CommonException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 /**
- * ScheduleInterceptor에서 존재하는 schedule인지, club에 유효한 schedule인지 체크.
- * ScheduleInterceptor의 예외 처리 완료되면
- * ScheduleService의 유효한 스케줄인지 체크 로직 제거 TODO
+ * club에 유효한 schedule인지 체크. TODO
  */
 
 @Service
@@ -29,8 +29,7 @@ public class ScheduleService {
     private final ClubRepository clubRepository;
 
     public void saveSchedule(Long clubId, AddScheduleRequest requestDto) {
-        Club club = clubRepository.findById(clubId).orElseThrow(
-            () -> new NoSuchElementException());
+        Club club = clubRepository.findById(clubId).orElse(null);
 
         Schedule saveSchedule = requestDto.toEntity(club);
         scheduleRepository.save(saveSchedule);
@@ -38,15 +37,15 @@ public class ScheduleService {
 
     @Transactional
     public void updateSchedule(Long scheduleId, ModifyScheduleRequest requestDto) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-            () -> new NoSuchElementException());
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+            .orElseThrow(()-> new NoScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR, scheduleId));
 
         schedule.update(
             requestDto.getScheduleName(),
             requestDto.getScheduleContent(),
             requestDto.getScheduleDateTime());
 
-        scheduleRepository.save(schedule);
+        Schedule updatedSchedule = scheduleRepository.save(schedule);
     }
 
     /**
@@ -54,12 +53,15 @@ public class ScheduleService {
      * SoftDelete TODO
      */
     public void deleteSchedule(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+            .orElseThrow(()-> new NoScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR, scheduleId));
+
         scheduleRepository.deleteById(scheduleId);
     }
 
     public GetScheduleResponse findSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-            () -> new NoSuchElementException());
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+            .orElseThrow(()-> new NoScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR, scheduleId));
 
 
         GetScheduleResponse scheduleDetailDto = GetScheduleResponse.builder()
@@ -71,32 +73,39 @@ public class ScheduleService {
         return scheduleDetailDto;
     }
 
-    public List<GetScheduleResponse> findScheduleAllByFilter(Long clubId, String date, String month) {
+    public List<GetScheduleResponse> findScheduleAll(Long clubId) {
         Club findClub = clubRepository.findById(clubId).get();
 
         List<Schedule> scheduleList = findClub.getScheduleList();
-        List<GetScheduleResponse> responseDtoList;
 
-        if(date==null && month==null ) { //전체조회
-            responseDtoList = ScheduleListToResponseDtoList(scheduleList, null, null);
-        } else if (date != null) { //일자별 조회
-            responseDtoList = ScheduleListToResponseDtoList(scheduleList, "yyyy-MM-dd", date);
-        } else { //월별 조회
-            responseDtoList = ScheduleListToResponseDtoList(scheduleList, "yyyy-MM", month);
-        }
-
-        return responseDtoList;
+        return ScheduleListToResponseDtoList(scheduleList, null, null);
     }
 
-    public List<GetScheduleResponse> ScheduleListToResponseDtoList(List<Schedule> scheduleList, String pattern, String filter) {
+    public List<GetScheduleResponse> findScheduleByDay(Long clubId, String date) {
+        Club findClub = clubRepository.findById(clubId).get();
 
-        if (pattern==null || filter==null) { //전체 조회
+        List<Schedule> scheduleList = findClub.getScheduleList();
+
+        return ScheduleListToResponseDtoList(scheduleList, "yyyy-MM-dd", date);
+    }
+
+    public List<GetScheduleResponse> findScheduleByMonth(Long clubId, String date) {
+        Club findClub = clubRepository.findById(clubId).get();
+
+        List<Schedule> scheduleList = findClub.getScheduleList();
+
+        return ScheduleListToResponseDtoList(scheduleList, "yyyy-MM", date);
+    }
+
+    public List<GetScheduleResponse> ScheduleListToResponseDtoList(List<Schedule> scheduleList, String pattern, String date) {
+
+        if (pattern==null || date==null) { //전체 조회
             return scheduleList.stream()
                 .map(s -> scheduleToGetScheduleResponse(s))
                 .collect(Collectors.toList());
         } else { //필터링 조회
         return scheduleList.stream()
-            .filter(s-> s.getScheduleDateTime().format(DateTimeFormatter.ofPattern(pattern)).equals(filter))
+            .filter(s-> s.getScheduleDateTime().format(DateTimeFormatter.ofPattern(pattern)).equals(date))
             .map(s -> scheduleToGetScheduleResponse(s))
             .collect(Collectors.toList());
         }
