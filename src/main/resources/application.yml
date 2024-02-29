@@ -31,4 +31,8 @@ loggin:
       apache:
         coyote:
           http11: debug
-
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
