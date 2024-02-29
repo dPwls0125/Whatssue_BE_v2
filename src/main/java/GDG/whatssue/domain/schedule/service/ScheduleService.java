@@ -7,7 +7,6 @@ import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
-import GDG.whatssue.domain.schedule.exception.NoScheduleException;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import GDG.whatssue.global.error.CommonException;
 import java.time.format.DateTimeFormatter;
@@ -38,7 +37,7 @@ public class ScheduleService {
     @Transactional
     public void updateSchedule(Long scheduleId, ModifyScheduleRequest requestDto) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new NoScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR, scheduleId));
+            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
 
         schedule.update(
             requestDto.getScheduleName(),
@@ -54,14 +53,14 @@ public class ScheduleService {
      */
     public void deleteSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new NoScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR, scheduleId));
+            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
 
         scheduleRepository.deleteById(scheduleId);
     }
 
     public GetScheduleResponse findSchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new NoScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR, scheduleId));
+            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
 
 
         GetScheduleResponse scheduleDetailDto = GetScheduleResponse.builder()

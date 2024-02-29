@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.attendance.entity;
 
-import GDG.whatssue.domain.club.entity.ClubMember;
+import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.AttendanceType;
 import GDG.whatssue.global.common.BaseEntity;
