@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.officialAbsenceRequest.dto;
+package GDG.whatssue.domain.officialabsence.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

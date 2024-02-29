@@ -3,14 +3,12 @@ package GDG.whatssue.domain.schedule.controller;
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
-import GDG.whatssue.domain.schedule.exception.NoScheduleException;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.error.CommonException;
-import GDG.whatssue.global.error.ErrorResult;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 
@@ -18,9 +16,7 @@ import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,34 +37,28 @@ public class ScheduleController {
      * Filter 또는 Interceptor를 통해 schedule이 club의 것인지 체크 필요 TODO
      */
 
+    @Operation(summary = "일정 추가", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PostMapping
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
-    public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId,
-        @Valid @RequestBody AddScheduleRequest requestDto, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            //bean validation 처리 TODO
-        }
+    public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId, @Valid @RequestBody AddScheduleRequest requestDto) {
 
         scheduleService.saveSchedule(clubId, requestDto);
 
         return ResponseEntity.status(200).body("ok");
     }
 
+    @Operation(summary = "일정 수정", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PatchMapping("/{scheduleId}")
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,
-        @Valid @RequestBody ModifyScheduleRequest requestDto, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            //bean validation 처리 TODO
-        }
+        @Valid @RequestBody ModifyScheduleRequest requestDto) {
 
         scheduleService.updateSchedule(scheduleId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
 
+    @Operation(summary = "일정 삭제")
     @DeleteMapping("/{scheduleId}")
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
@@ -76,7 +66,8 @@ public class ScheduleController {
 
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
-
+    
+    @Operation(summary = "일정 상세조회")
     @GetMapping("/{scheduleId}")
 //    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MANAGER','ROLE_'+#clubId+'MEMBER')")
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
@@ -86,9 +77,9 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
     }
 
-    //전체조회
+    @Operation(summary = "일정 조회(전체/일별/월별)")
     @GetMapping
-    @Parameter(name = "date", description = "쿼리 파라미터 미입력 시 전체 일정 조회 (날짜 패턴 : yyyy-MM-dd or yyyy-MM)", required = false, in = ParameterIn.QUERY)
+    @Parameter(name = "date", description = "날짜 미입력 시 전체 일정 조회 (날짜 패턴 : yyyy-MM-dd or yyyy-MM)", required = false, in = ParameterIn.QUERY)
 //    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MANAGER','ROLE_'+#clubId+'MEMBER')")
     public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date) {
 
