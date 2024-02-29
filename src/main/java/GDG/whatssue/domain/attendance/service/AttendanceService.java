@@ -5,7 +5,7 @@ import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
 import GDG.whatssue.global.common.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
-import GDG.whatssue.domain.club.repository.ClubMemberRepository;
+import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;

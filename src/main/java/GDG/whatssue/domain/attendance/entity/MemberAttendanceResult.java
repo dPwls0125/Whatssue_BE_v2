@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.attendance.entity;
 
-import GDG.whatssue.domain.club.entity.ClubMember;
+import GDG.whatssue.domain.member.entity.ClubMember;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

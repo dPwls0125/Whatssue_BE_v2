@@ -1,8 +1,8 @@
-package GDG.whatssue.domain.officialAbsenceRequest.controller;
+package GDG.whatssue.domain.officialabsence.controller;
 
-import GDG.whatssue.domain.officialAbsenceRequest.dto.OfficialAbsenceAddRequestDto;
-import GDG.whatssue.domain.officialAbsenceRequest.dto.OfficialAbsenceGetRequestDto;
-import GDG.whatssue.domain.officialAbsenceRequest.service.OfficialAbsenceService;
+import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceAddRequestDto;
+import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceGetRequestDto;
+import GDG.whatssue.domain.officialabsence.service.OfficialAbsenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

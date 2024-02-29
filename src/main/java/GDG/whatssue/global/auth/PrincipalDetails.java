@@ -1,6 +1,6 @@
 package GDG.whatssue.global.auth;
 
-import GDG.whatssue.domain.club.entity.ClubMember;
+import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.Role;
 import jakarta.transaction.Transactional;
