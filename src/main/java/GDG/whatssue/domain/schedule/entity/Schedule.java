@@ -1,8 +1,8 @@
 package GDG.whatssue.domain.schedule.entity;
 
+import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.officialAbsenceRequest.entity.OfficialAbsenceRequest;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

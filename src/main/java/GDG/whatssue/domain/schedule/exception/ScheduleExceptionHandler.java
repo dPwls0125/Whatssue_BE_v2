@@ -12,21 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(assignableTypes = {ScheduleController.class})
 public class ScheduleExceptionHandler {
 
-    @ExceptionHandler(NoScheduleException.class)
-    public ResponseEntity<ErrorResult> noScheduleExHandle(NoScheduleException e, HttpServletRequest request) {
-        ErrorCode errorCode = e.getErrorCode();
-        ErrorResult errorResult = ErrorResult.builder()
-            .code(errorCode.name())
-            .message(errorCode.getMessage())
-            .path(request.getRequestURI())
-            .build();
-
-        return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
-    }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResult> scheduleDateTimePatternExHandle(HttpMessageNotReadableException e, HttpServletRequest request) {
-        ScheduleErrorCode errorCode = ScheduleErrorCode.SCHEDULE_DATETIME_PATTERN_ERROR;
+        ScheduleErrorCode errorCode = ScheduleErrorCode.INVALID_SCHEDULE_DATETIME_ERROR;
         ErrorResult errorResult = ErrorResult.builder()
             .code(errorCode.name())
             .message(errorCode.getMessage())

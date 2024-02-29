@@ -96,7 +96,7 @@ public class ScheduleController {
             } else if (month_check) { //월별 조회
                 responseDtoList = scheduleService.findScheduleByMonth(clubId, date);
             } else { //지정 패턴과 맞지 않음
-                throw new CommonException(ScheduleErrorCode.SCHEDULE_DATE_PATTERN_ERROR);
+                throw new CommonException(ScheduleErrorCode.INVALID_SCHEDULE_DATE_ERROR);
             }
         }
 
