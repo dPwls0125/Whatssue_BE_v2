@@ -18,6 +18,7 @@ import lombok.Builder;
 @Builder
 @AllArgsConstructor
 public class OfficialAbsenceRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "official_absence_id")
