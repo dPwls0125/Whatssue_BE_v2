@@ -4,6 +4,8 @@ import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.*;
@@ -19,28 +21,32 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(nullable = false, unique = true)
-    private String userNick;
+//    @Column( unique = true, nullable = false)
+//    private String userNick;
 
-    @Column(nullable = false)
-    private String userPw;
+//    @Column
+//    private String userPw;
 
-    @Column(nullable = false)
-    private String userEmail;
+//    @Column
+//    private String userEmail;
 
-    @Column(nullable = false)
+    @Column
     private String userName;
 
-    @Column(nullable = false)
-    private String userPhone;
+//    @Column
+//    private String userPhone;
 
-    @Column(nullable = false)
+    @Column
     private String role;
 
-    @OneToMany(mappedBy = "user")
-    private List<ClubJoinRequest> clubJoinRequestList;
+    @Column( nullable = false, unique = true)
+    private String oauth2Id;
+
 
     @OneToMany(mappedBy = "user")
-    private List<ClubMember> clubMemberList;
+    private List<ClubJoinRequest> clubJoinRequestList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<ClubMember> clubMemberList = new ArrayList<>();
 
 }
