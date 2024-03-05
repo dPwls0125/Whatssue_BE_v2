@@ -33,12 +33,12 @@ jobs:
           spring.security.oauth2.client.registration.Kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
 
       # Gradle의 사용권한 셋팅
-      - name: Grant Execute permission for gradlew
-        run: chmod +x gradlew
-        shell: bash
+      # - name: Grant Execute permission for gradlew
+      #   run: chmod +x gradlew
+      #   shell: bash
 
-      - name: Execute Gradle build
-        run: ./gradlew build
+      # - name: Execute Gradle build
+      #   run: ./gradlew build
 
       # Login to ghcr
       - name: Login to ghcr
