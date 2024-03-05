@@ -29,11 +29,8 @@ jobs:
           spring.datasource.url: ${{ secrets.DB_URL }}
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
-          spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
-          spring.jpa.properties.hibernate.ddl-auto: update
-          spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MariaDB103Dialect
-
-
+          spring.security.oauth2.client.registration.Kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
+          spring.security.oauth2.client.registration.Kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
       # Login to ghcr
       - name: Login to ghcr
         uses: docker/login-action@v1
