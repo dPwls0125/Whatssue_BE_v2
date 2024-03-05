@@ -37,10 +37,8 @@ jobs:
         run: chmod +x gradlew
         shell: bash
 
-      # 프로젝트 테스트 진행없이 빌드
-      - name: Build with Gradle
-        run: ./gradlew build -x test
-        shell: bash
+      - name: Execute Gradle build
+        run: ./gradlew build
 
       # Login to ghcr
       - name: Login to ghcr
