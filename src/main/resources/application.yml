@@ -1,23 +1,14 @@
 spring:
   datasource:
-    url: jdbc:mysql://13.209.192.24:3306/whatssuev2?serverTimezone=UTC&characterEncoding=UTF-8
     username: ${SPRING_DATASOURCE_USERNAME}
-    #jdbc:mysql://localhost:3306/whatssuev2?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/whatssuev2?serverTimezone=UTC&characterEncoding=UTF-8
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        show_sql: true
-        format_sql: true
-#      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
-
+        ddl-auto: update
+#        properties:
   security:
     oauth2:
       client:
@@ -47,4 +38,3 @@ server:
     encoding:
       charset: UTF-8
       force: true
-  port: 8080
