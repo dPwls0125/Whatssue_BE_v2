@@ -33,7 +33,10 @@ public class Club extends BaseEntity {
     private String clubCategory;
 
     @Column(nullable = false)
-    private String clubCode;
+    private boolean isPrivate;
+
+    @Column(nullable = false)
+    private String privateCode;
 
     @OneToMany(mappedBy = "club")
     private List<ClubMember> clubMemberList;
@@ -43,5 +46,4 @@ public class Club extends BaseEntity {
 
     @OneToMany(mappedBy = "club")
     private List<Schedule> scheduleList;
-
 }

@@ -22,12 +22,12 @@ public class ClubSettingService {
         String clubCode;
         do {
             clubCode = generateRandomClubCode();
-        } while (clubRepository.existsByClubCode(clubCode)); // 중복 체크
+        } while (clubRepository.existsByPrivateCode(clubCode)); // 중복 체크
         Club club = Club.builder()
                 .clubName(settingClubDto.getClubName())
                 .clubInfo(settingClubDto.getClubInfo())
                 .clubCategory(settingClubDto.getClubCategory())
-                .clubCode(clubCode) // 랜덤 클럽 코드 생성
+                .privateCode(clubCode) // 랜덤 클럽 코드 생성
                 .build();
         clubRepository.save(club);
     }
