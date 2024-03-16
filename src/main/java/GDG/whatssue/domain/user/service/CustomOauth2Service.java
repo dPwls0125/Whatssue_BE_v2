@@ -1,15 +1,17 @@
-package GDG.whatssue.global.auth;
+package GDG.whatssue.domain.user.service;
 
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.user.dto.UserDto;
+import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.common.Role;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -32,14 +34,13 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
 //        Role role = roleRepository.findByName(RoleName.TEMPORARY)
 //                .orElseThrow(() -> new OAuth2AuthenticationException("존재하지 않는 권한입니다."));
 
-
         return userRepository.findByOauth2Id(oauth2Id)
                 .orElseGet(() -> userRepository.save(User.builder()
                         .oauth2Id(oauth2Id)
                         .userName(name)
                                 .clubMemberList(new ArrayList<>())
                                 .clubJoinRequestList(new ArrayList<>())
-                        .role(Role.MEMBER.name())
+                        .role(String.valueOf(Role.MEMBER))
                         .build()));
     }
     @Override
@@ -69,5 +70,16 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         return kakaoDetails;
         // oauthPrincipal이 return이 되면 시큐리티 session의 Authentication의 내부에  저장이 된다.
         // Session(내부 Authentication(내부 oauthUserDetails))
+    }
+
+    public UserDto getUserInfo(KakaoDetails kakaoDetails) {
+        User user = kakaoDetails.getUser();
+        UserDto dto = UserDto.builder()
+                .userId(String.valueOf(user.getUserId()))
+                .userName(user.getUserName())
+                .role(user.getRole())
+                .oauth2Id(user.getOauth2Id())
+                .build();
+        return dto;
     }
 }

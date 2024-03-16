@@ -8,9 +8,9 @@ import lombok.*;
 @Setter
 @Getter
 public class UserDto {
-    private String userNick;
-    private String userPw;
-    private String userEmail;
+    private String userId;
     private String userName;
     private String userPhone;
+    private String role;
+    private String oauth2Id;
 }
