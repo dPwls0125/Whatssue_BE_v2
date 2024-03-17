@@ -1,12 +1,14 @@
 package GDG.whatssue.domain.user.service;
 
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.user.dto.SignUpRequestDto;
 import GDG.whatssue.domain.user.dto.UserDto;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.common.Role;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,11 +25,13 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Getter
 public class CustomOauth2Service extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
     /*
     Third party 접근을 위한 accessToken 발급 이후 실행됨
      */
+
     private User findOrSaveUser(OAuth2User oAuth2User, String registrationId, String name) {
         String oauth2Id = registrationId + ":" + oAuth2User.getName(); // name = ID값
         // 임시 유저로 역할 설정
@@ -38,11 +42,12 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                 .orElseGet(() -> userRepository.save(User.builder()
                         .oauth2Id(oauth2Id)
                         .userName(name)
-                                .clubMemberList(new ArrayList<>())
-                                .clubJoinRequestList(new ArrayList<>())
+                        .clubMemberList(new ArrayList<>())
+                        .clubJoinRequestList(new ArrayList<>())
                         .role(String.valueOf(Role.MEMBER))
                         .build()));
     }
+
     @Override
     public KakaoDetails loadUser(OAuth2UserRequest userRequest) {
         // accessToken으로 서드파티에 요청해서 사용자 정보를 얻어옴
@@ -50,7 +55,7 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-        User user = findOrSaveUser(oAuth2User, userRequest.getClientRegistration().getRegistrationId(),profile.get("nickname").toString());
+        User user = findOrSaveUser(oAuth2User, userRequest.getClientRegistration().getRegistrationId(), profile.get("nickname").toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         List<ClubMember> clubMemberList = user.getClubMemberList();
         for (ClubMember clubMember : clubMemberList) {
@@ -74,12 +79,29 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
 
     public UserDto getUserInfo(KakaoDetails kakaoDetails) {
         User user = kakaoDetails.getUser();
+        Long userId = user.getUserId();
+        user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+         // user정보를 Repository에서 가져와야 signup 이후의 정보(phone, name)를 가져올 수 있음.
         UserDto dto = UserDto.builder()
                 .userId(String.valueOf(user.getUserId()))
                 .userName(user.getUserName())
                 .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
+                .userPhone(user.getUserPhone())
                 .build();
         return dto;
+    }
+    public UserDto signUp(KakaoDetails kakaoDetails, SignUpRequestDto request){
+        User user = kakaoDetails.getUser();
+        user.setUserPhone(request.getUserPhone());
+        user.setUserName(request.getUserName());
+        userRepository.save(user);
+        return UserDto.builder()
+                .userId(String.valueOf(user.getUserId()))
+                .userName(request.getUserName())
+                .role(user.getRole())
+                .oauth2Id(user.getOauth2Id())
+                .userPhone(request.getUserPhone())
+                .build();
     }
 }
