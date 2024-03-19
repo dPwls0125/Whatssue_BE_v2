@@ -43,6 +43,15 @@ public class Club extends BaseEntity {
     @OneToOne(mappedBy = "club")
     private UploadFile profileImage;
 
+    @Column(nullable = false)
+    private boolean isActivateCode;
+
+    @Column(nullable = false)
+    private boolean isJoinStatus;
+
+    @Column(nullable = false)
+    private String privateCode;
+
     @OneToMany(mappedBy = "club")
     private List<ClubMember> clubMemberList;
 
@@ -51,4 +60,20 @@ public class Club extends BaseEntity {
 
     @OneToMany(mappedBy = "club")
     private List<Schedule> scheduleList;
+
+    // ActivateCode 값 update
+    public void updateActivateCode(boolean isActivateCode) {
+        this.isActivateCode = isActivateCode;
+    }
+
+    //PrivateCode 값 update
+    public void updatePrivateCode(String privateCode) {
+        this.privateCode = privateCode;
+    }
+
+    //isJoinStatus 값 update
+    public void updateIsJoinStatus(boolean isJoinStatus) {
+        this.isJoinStatus = isJoinStatus;
+    }
+
 }
