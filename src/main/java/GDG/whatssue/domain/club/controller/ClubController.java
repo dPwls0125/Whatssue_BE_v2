@@ -3,6 +3,7 @@ package GDG.whatssue.domain.club.controller;
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.service.ClubService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +25,15 @@ public class ClubController {
 
     @PostMapping
     public ResponseEntity createClub(@RequestBody ClubCreateRequest requestDto) {
+
+        //user id 받아오기 & 예외처리 TODO
+        long userId = 1L;
+
         //Validation 및 예외처리 TODO
 
-        Long clubId = clubService.createClub(requestDto);
+        Long clubId = clubService.createClub(userId, requestDto);
 
-        //return 처리 schedule controller참고하고 비슷하게
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(clubId);
     }
 
 //    @DeleteMapping
