@@ -16,23 +16,23 @@ import static GDG.whatssue.domain.user.entity.SMSsecret.apiSecret;
 @Service
 public class MyMessageService {
     private final DefaultMessageService defalutMessageService;
-    @Value("${coolsms.api.key}")
-    private String apiKey;
+//    @Value("${coolsms.api.key}")
+//    private String apiKey;
+//
+//    @Value("${coolsms.api.secret}")
+//    private String apiSecret;
+//
+//    @Value("${coolsms.from.number}")
+//    private String fromNumber;
 
-    @Value("${coolsms.api.secret}")
-    private String apiSecret;
-
-    @Value("${coolsms.from.number}")
-    private String fromNumber;
-
-//    public MyMessageService() {
-//        this.defalutMessageService = NurigoApp.INSTANCE.initialize(SMSsecret.apiKey, apiSecret, "https://api.coolsms.co.kr");
-//        System.out.println("messageService : " + defalutMessageService);
-//    }
     public MyMessageService() {
-        this.defalutMessageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
+        this.defalutMessageService = NurigoApp.INSTANCE.initialize(SMSsecret.apiKey, SMSsecret.apiSecret, "https://api.coolsms.co.kr");
         System.out.println("messageService : " + defalutMessageService);
     }
+//    public MyMessageService() {
+//        this.defalutMessageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
+//        System.out.println("messageService : " + defalutMessageService);
+//    }
     /*
       단일 메시지 발송 예제
      */
@@ -40,10 +40,9 @@ public class MyMessageService {
         Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
 
-//        message.setFrom(SMSsecret.fromNumber);
-        message.setFrom(fromNumber);
-        message.setTo("01063138063");
-        message.setText("인증번호"+ randomNumber() + "입니다. 정확히 입력해주세요.");
+        message.setFrom(SMSsecret.fromNumber);
+        message.setTo(toNumber);
+        message.setText("인증번호:"+ randomNumber() + "입니다. 정확히 입력해주세요.");
 
         SingleMessageSentResponse response = this.defalutMessageService.sendOne(new SingleMessageSendingRequest(message));
         System.out.println(response);

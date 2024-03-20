@@ -11,26 +11,20 @@ import net.nurigo.sdk.message.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/certification")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 public class CertificationController {
-
-
-    private final MyMessageService messageService;
-
-//    public CertificationController(MessageService messageService) {
-//        this.messageService = messageService;
-//    }
+    private final MyMessageService myMessageService;
     @PostMapping("/send-one")
     @Operation(summary = "단일 메시지 발송")
-    public SingleMessageSentResponse sendOne() {
-            return null;
+    public ResponseEntity sendOne(@RequestParam String toNumber) {
+        SingleMessageSentResponse response = myMessageService.sendOne(toNumber);
+        return ResponseEntity.status(200).body(response);
     }
 
 }
