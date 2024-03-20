@@ -61,16 +61,16 @@ public class ClubSettingService {
     public ResponseEntity renewalClubCode(Long cludId) {
         Club club = clubRepository.findById(cludId)
                 .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
-        String clubCode = club.getPrivateCode();
+        String privateCode = club.getPrivateCode();
         if (club != null) {
             do {
-                clubCode = generateRandomClubCode();
-            } while (clubRepository.existsByPrivateCode(clubCode)); // 중복 체크
+                privateCode = generateRandomClubCode();
+            } while (clubRepository.existsByPrivateCode(privateCode)); // 중복 체크
 
-            club.updatePrivateCode(clubCode);
+            club.updatePrivateCode(privateCode);
             clubRepository.save(club);
             //가입 코드를 return
-            return ResponseEntity.status(200).body(clubCode);
+            return ResponseEntity.status(200).body(privateCode);
 
         } else {
             logger.warn("모임을 찾을 수 없습니다.");
