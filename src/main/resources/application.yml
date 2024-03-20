@@ -13,8 +13,8 @@ spring:
         format_sql: true
 #      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
     hibernate:
-      ddl-auto: create
-    show-sql: true
+      ddl-auto: update
+    show-sql: false
 
 
   security:
