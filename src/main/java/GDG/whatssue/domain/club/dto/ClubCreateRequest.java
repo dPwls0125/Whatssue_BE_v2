@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.club.dto;
 
+import GDG.whatssue.domain.club.entity.Club;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +19,13 @@ public class ClubCreateRequest {
     private MultipartFile profileImage; //대표 사진
     private int memberMaxValue; //최대 인원
     private String contactMeans; //연락수단
+
+    public Club toEntity() {
+        return Club.builder()
+            .clubName(this.clubName)
+            .clubInfo(this.clubInfo)
+            .isPrivate(this.isPrivate)
+            .memberMaxValue(memberMaxValue)
+            .contactMeans(contactMeans).build();
+    }
 }

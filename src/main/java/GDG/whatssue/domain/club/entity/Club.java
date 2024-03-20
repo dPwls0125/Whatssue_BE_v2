@@ -40,9 +40,6 @@ public class Club extends BaseEntity {
     @Column
     private String contactMeans;
 
-    @OneToOne(mappedBy = "club")
-    private UploadFile profileImage;
-
     @Column(nullable = false)
     private boolean isActivateCode;
 
@@ -51,6 +48,9 @@ public class Club extends BaseEntity {
 
     @Column(nullable = false)
     private String privateCode;
+
+    @OneToOne(mappedBy = "club")
+    private UploadFile profileImage;
 
     @OneToMany(mappedBy = "club")
     private List<ClubMember> clubMemberList;
