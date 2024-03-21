@@ -15,9 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class UploadFile {
 
     @Id
@@ -34,4 +32,11 @@ public class UploadFile {
 
     @Column(nullable = false)
     private String storeFileName;
+
+    @Builder
+    public UploadFile(Club club, String uploadFileName, String storeFileName) {
+        this.club = club;
+        this.uploadFileName = uploadFileName;
+        this.storeFileName = storeFileName;
+    }
 }

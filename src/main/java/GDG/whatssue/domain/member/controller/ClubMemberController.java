@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 모임 가입 신청 : [POST] - /api/clubs/join
- * 가입된 모임 조회 : [GET] - /api/clubs/join
  * 신청 내역 조회 : [GET] - /api/clubs/join_request
  * 신청 취소 : [DELETE] - /api/clubs/join_request
- * 전체 일정 조회 :
- * 일정 상세 조회
+ *
  */
 
 @RestController
@@ -29,9 +27,10 @@ public class ClubMemberController {
 
     @PostMapping("/join")
     public ResponseEntity joinClub(@Valid @RequestBody ClubJoinRequestDto requestDto) {
-        //dto size 예외처리 TODO
-        //현재 로그인 id parameter로 받아오기 TODO
+        //현재 로그인 id parameter로 받아오기 & 예외처리 TODO
         Long userId = 1L;
+
+        //validation 예외처리 TODO
 
         clubMemberService.addClubJoinRequest(userId, requestDto);
 
