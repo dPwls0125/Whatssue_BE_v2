@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 삭제할 컨트롤러.
+ * api 살릴 것이 있으면
+ * 해당하는 적절한 컨트롤러로 이동.
+ * 컨트롤러 뿐 아니라 다른 dto 등등도
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/{clubId}/member_join")
