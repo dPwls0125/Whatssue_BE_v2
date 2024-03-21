@@ -11,10 +11,10 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         show_sql: true
         format_sql: true
-    #      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
+#      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
     hibernate:
-      ddl-auto: update
-    show-sql: false
+      ddl-auto: create
+    show-sql: true
 
 
   security:
@@ -34,8 +34,7 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token #토큰 받기 항목
             user-info-uri: https://kapi.kakao.com/v2/user/me #유저 정보 받기 항목
             user-name-attribute: id #식별자 카카오의 경우 "id" 이용
-
-loggin:
+logging:
   level:
     org:
       apache:
@@ -47,6 +46,14 @@ server:
       charset: UTF-8
       force: true
   port: 8080
+
+coolsms:
+  api:
+    number: ${FROMNUMBER}
+    secret: ${COOLSMS_API_SECRET}
+    key: ${COOLSMS_API_KEY}
+
+
 
 cloud:
   aws:
