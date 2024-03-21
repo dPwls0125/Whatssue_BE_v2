@@ -44,7 +44,7 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                         .userName(name)
                         .clubMemberList(new ArrayList<>())
                         .clubJoinRequestList(new ArrayList<>())
-                        .role(String.valueOf(Role.MEMBER))
+                        .role(Role.MEMBER)
                         .build()));
     }
 
@@ -83,11 +83,12 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
          // user정보를 Repository에서 가져와야 signup 이후의 정보(phone, name)를 가져올 수 있음.
         UserDto dto = UserDto.builder()
-                .userId(String.valueOf(user.getUserId()))
+                .userId(user.getUserId())
                 .userName(user.getUserName())
                 .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .userPhone(user.getUserPhone())
+                .userEmail(user.getUserEmail())
                 .build();
         return dto;
     }
@@ -95,13 +96,39 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         User user = kakaoDetails.getUser();
         user.setUserPhone(request.getUserPhone());
         user.setUserName(request.getUserName());
+        user.setUserEmail(request.getUserEmail());
         userRepository.save(user);
         return UserDto.builder()
-                .userId(String.valueOf(user.getUserId()))
-                .userName(request.getUserName())
+                .userId(user.getUserId())
+                .userName(user.getUserName())
                 .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
+                .userEmail(user.getUserEmail())
                 .userPhone(request.getUserPhone())
                 .build();
+    }
+
+    public UserDto modifyUserInfo(KakaoDetails kakaoDetails, UserDto request){
+        User user = kakaoDetails.getUser();
+        if(request.getUserId() != user.getUserId()){
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
+        user = User.builder()
+                .userId(user.getUserId())
+                .userPhone(request.getUserPhone())
+                .userName(request.getUserName())
+                .userEmail(request.getUserEmail())
+                .role(request.getRole())
+                .oauth2Id(user.getOauth2Id())
+                .build();
+        userRepository.save(user);
+        UserDto dto = UserDto.builder()
+                .userId(user.getUserId())
+                .userName(user.getUserName())
+                .role(user.getRole())
+                .oauth2Id(user.getOauth2Id())
+                .userPhone(user.getUserPhone())
+                .build();
+        return dto;
     }
 }

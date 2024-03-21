@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.user.dto;
 
+import GDG.whatssue.global.common.Role;
 import lombok.*;
 
 @Builder
@@ -8,9 +9,10 @@ import lombok.*;
 @Setter
 @Getter
 public class UserDto {
-    private String userId;
+    private Long userId;
     private String userName;
     private String userPhone;
-    private String role;
+    private String userEmail;
+    private Role role;
     private String oauth2Id;
 }
