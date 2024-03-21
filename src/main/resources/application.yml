@@ -50,7 +50,7 @@ server:
 coolsms:
   api:
     number: ${FROMNUMBER}
-    secret: ${APISECRET}
+    secret: ${COOLSMS_API_SECRET}
     key: ${COOLSMS_API_KEY}
 
 
