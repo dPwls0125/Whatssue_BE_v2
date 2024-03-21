@@ -12,11 +12,8 @@ import java.util.List;
 import lombok.*;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Builder
-@Setter
+@NoArgsConstructor
 public class Club extends BaseEntity {
 
     @Id
@@ -40,6 +37,15 @@ public class Club extends BaseEntity {
     @Column
     private String contactMeans;
 
+    @Column
+    private boolean isActivateCode;
+
+    @Column
+    private boolean isJoinStatus;
+
+    @Column(nullable = false)
+    private String privateCode;
+
     @OneToOne(mappedBy = "club")
     private UploadFile profileImage;
 
@@ -51,4 +57,30 @@ public class Club extends BaseEntity {
 
     @OneToMany(mappedBy = "club")
     private List<Schedule> scheduleList;
+
+    // ActivateCode 값 update
+    public void updateActivateCode(boolean isActivateCode) {
+        this.isActivateCode = isActivateCode;
+    }
+
+    //PrivateCode 값 update
+    public void updatePrivateCode(String privateCode) {
+        this.privateCode = privateCode;
+    }
+
+    //isJoinStatus 값 update
+    public void updateIsJoinStatus(boolean isJoinStatus) {
+        this.isJoinStatus = isJoinStatus;
+    }
+
+    @Builder
+    public Club(String clubName, String clubInfo, boolean isPrivate, Integer memberMaxValue,
+        String contactMeans, String privateCode) {
+        this.clubName = clubName;
+        this.clubInfo = clubInfo;
+        this.isPrivate = isPrivate;
+        this.memberMaxValue = memberMaxValue;
+        this.contactMeans = contactMeans;
+        this.privateCode = privateCode;
+    }
 }

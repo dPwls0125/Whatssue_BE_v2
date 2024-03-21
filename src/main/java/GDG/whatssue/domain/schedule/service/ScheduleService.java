@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * club에 유효한 schedule인지 체크. TODO
+ * schedule 생성 시 scheduleId 반환처리
  */
 
 @Service
