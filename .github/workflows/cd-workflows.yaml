@@ -35,7 +35,7 @@ jobs:
       - name: Grant Execute permission for gradlew
         run: chmod +x gradlew
         shell: bash
-        
+
       - name: Execute Gradle build
         run: ./gradlew build
 
@@ -47,13 +47,12 @@ jobs:
           username: pinetree2
           password: ${{ secrets.GHCR_TOKEN }}
 
-       # Docker 빌드 생성 및 푸시
+      # Docker 빌드 생성 및 푸시
       - name: dev Docker build & push
         if: contains(github.ref, 'main') || contains(github.ref, 'develop')
         run: |
           docker build -f Dockerfile -t ghcr.io/onion-city/whatssue_be_v2/whatssue:latest .
           docker push ghcr.io/onion-city/whatssue_be_v2/whatssue:latest
-      
       # 개발서버 SSH접속 및 배포
       - name: Deploy
         uses: appleboy/ssh-action@master
