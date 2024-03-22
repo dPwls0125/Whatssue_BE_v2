@@ -2,6 +2,7 @@ package GDG.whatssue.domain.club.controller;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubUpdateRequest;
+import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.service.ClubService;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,9 @@ public class ClubController {
         //Validation 및 예외처리 TODO
         Long clubId = clubServiceImpl.createClub(userId, request, profileImage);
 
-        return ResponseEntity.status(HttpStatus.OK).body("ok");
+        ClubCreateResponse clubCreateResponse = new ClubCreateResponse();
+        clubCreateResponse.setClubId(clubId);
+        return ResponseEntity.status(HttpStatus.OK).body(clubCreateResponse);
     }
 
     @PatchMapping(value = "/{clubId}",
