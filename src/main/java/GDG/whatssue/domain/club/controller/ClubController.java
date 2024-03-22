@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 모임 생성 : [POST] - /api/clubs
- * 모임 삭제 : [DELETE] - /api/clubs/{clubId}
+ * 가입한 클럽 조회 : [GET] - /api/clubs TODO
+ * 클럽 생성 : [POST] - /api/clubs TODO
+ * 클럽 정보 수정  [PATCH] - /api/clubs/{clubId}/info
+ * 클럽 삭제 : [DELETE] - /api/clubs/{clubId}
+ * 클럽 초대코드 갱신 : [POST] - /api/clubs/{clubId}/private-code
+ * 클럽 초대코드 조회 : [GET] - /api/clubs/{clubId}/private-code
  */
 @RestController
 @RequestMapping("/api/clubs")

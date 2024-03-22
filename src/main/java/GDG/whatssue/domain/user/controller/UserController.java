@@ -19,10 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class UserController {
+public class  UserController {
 
     private final CustomOauth2Service customOauth2Service;
-
 
     @GetMapping({ "", "/" })
     @Operation(summary = "메인 페이지")
@@ -30,15 +29,21 @@ public class UserController {
         return "index";
     }
 
-    @GetMapping("/api/get/user")
+    @GetMapping("/api/user/getInfo")
     public ResponseEntity getUserProfile(@AuthenticationPrincipal KakaoDetails kakaoDetails) {
         UserDto userDto  = customOauth2Service.getUserInfo(kakaoDetails);
         return ResponseEntity.status(200).body(userDto);
     }
 
-    @PostMapping ("/api/signUp")
+    @PostMapping ("/api/user/signUp")
     public ResponseEntity signUpWithPhoneNumAndName(@AuthenticationPrincipal KakaoDetails kakaoDetails, SignUpRequestDto request) {
         UserDto userDto = customOauth2Service.signUp(kakaoDetails,request);
+        return ResponseEntity.status(200).body(userDto);
+    }
+
+    @PostMapping("/api/user/modification")
+    public ResponseEntity modifyUserInfo(@AuthenticationPrincipal KakaoDetails kakaoDetails, UserDto request) {
+        UserDto userDto = customOauth2Service.modifyUserInfo(kakaoDetails,request);
         return ResponseEntity.status(200).body(userDto);
     }
 }
