@@ -35,6 +35,8 @@ public class ClubServiceImpl implements ClubService {
         //초대코드 추가하여 클럽 생성
         Club savedClub = clubRepository.save(createDtoToClubEntity(requestDto));
 
+        //profileImage를 첨부하지 않았을 시 기본 이미지 처리 TODO
+
         String originalFileName = profileImage.getOriginalFilename();
         //profileImage fileRepository 및 s3에 저장 처리
         String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
