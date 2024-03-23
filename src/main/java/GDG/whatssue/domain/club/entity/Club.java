@@ -7,6 +7,7 @@ import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.BaseEntity;
+import GDG.whatssue.global.common.NamePolicy;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -57,6 +58,10 @@ public class Club extends BaseEntity {
     @OneToMany(mappedBy = "club")
     private List<Schedule> scheduleList;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NamePolicy namePolicy;
+
     // ActivateCode 값 update
     public void updateActivateCode(boolean isActivateCode) {
         this.isActivateCode = isActivateCode;
@@ -79,10 +84,11 @@ public class Club extends BaseEntity {
     }
 
     @Builder
-    public Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans) {
+    public Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
         this.clubName = clubName;
         this.clubInfo = clubInfo;
         this.isPrivate = isPrivate;
         this.contactMeans = contactMeans;
+        this.namePolicy = namePolicy;
     }
 }
