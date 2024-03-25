@@ -39,7 +39,9 @@ jobs:
           cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           cloud.aws.region.static: ap-northeast-2
 
+
       - name: Grant execute permission for gradlew
+
         run: chmod +x gradlew
 
       - name: Build with Gradle
