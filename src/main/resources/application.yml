@@ -27,11 +27,8 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         show_sql: true
         format_sql: true
-#      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-
+#        jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
+        ddl-auto: update
 
   security:
     oauth2:
@@ -55,7 +52,8 @@ logging:
     org:
       apache:
         coyote:
-          http11: debug
+#          http11: debug
+
 server:
   servlet:
     encoding:
