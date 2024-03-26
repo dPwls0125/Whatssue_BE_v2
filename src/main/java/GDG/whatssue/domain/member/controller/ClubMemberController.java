@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.member.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 멤버 목록 조회 : [GET] - /api/clubs/{clubId}/members
  */
 
+@Tag(name = "ClubMemberController", description = "모임의 멤버에 관련된 api")
 @Slf4j
 @RestController
 @RequiredArgsConstructor

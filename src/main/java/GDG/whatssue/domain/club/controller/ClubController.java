@@ -5,6 +5,7 @@ import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.service.ClubService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
  * 모임 가입신청 활성/비활성화 : [PATCH] - /api/clubs/{clubId}/private
  * 모임 정보 조회 : [GET] - /api/clubs/{clubId}/info
  */
+
+@Tag(name = "ClubController", description = "모임 생성/수정 등 모임에 관련된 api")
 @RestController
 @RequestMapping("/api/clubs")
 @RequiredArgsConstructor
