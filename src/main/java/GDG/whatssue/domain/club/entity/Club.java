@@ -1,7 +1,7 @@
 package GDG.whatssue.domain.club.entity;
 
 
-import GDG.whatssue.domain.club.dto.ClubUpdateRequest;
+import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
@@ -63,10 +63,9 @@ public class Club extends BaseEntity {
         this.privateCode = UUID.randomUUID().toString().substring(0, 6);
     }
 
-    public void updateClub(ClubUpdateRequest requestDto) {
+    public void updateClubInfo(UpdateClubInfoRequest requestDto) {
         this.clubName = requestDto.getClubName();
         this.clubIntro = requestDto.getClubIntro();
-        this.isPrivate = requestDto.getIsPrivate();
         this.contactMeans = requestDto.getContactMeans();
     }
 

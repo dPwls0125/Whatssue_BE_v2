@@ -1,8 +1,8 @@
 package GDG.whatssue.domain.club.service.impl;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
-import GDG.whatssue.domain.club.dto.ClubUpdateRequest;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
+import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubRepository;
@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ClubServiceImpl implements ClubService {
 
+    private static String DEFAULT_PROFILE_IMAGE = "https://whatssue.s3.ap-northeast-2.amazonaws.com/clubProfileImage/default.png";
+
     private static String PROFILE_IMAGE_DIRNAME = "clubProfileImage";
     private final ClubRepository clubRepository;
     private final FileRepository fileRepository;
@@ -36,15 +38,15 @@ public class ClubServiceImpl implements ClubService {
         //초대코드 추가하여 클럽 생성
         Club savedClub = clubRepository.save(createDtoToClubEntity(requestDto));
 
-        //profileImage를 첨부하지 않았을 시 기본 이미지 처리 TODO
-
-        String originalFileName = profileImage.getOriginalFilename();
-        //profileImage fileRepository 및 s3에 저장 처리
-        String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
-        fileRepository.save(UploadFile.builder()
-            .club(savedClub)
-            .uploadFileName(originalFileName)
-            .storeFileName(storeFileName).build());
+        if (profileImage != null) {
+            String originalFileName = profileImage.getOriginalFilename();
+            //profileImage fileRepository 및 s3에 저장 처리
+            String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
+            fileRepository.save(UploadFile.builder()
+                .club(savedClub)
+                .uploadFileName(originalFileName)
+                .storeFileName(storeFileName).build());
+        }
 
         //클럽을 생성한 유저 관리자로 추가
         //따로 메서드로 뺄것. + 추가하면서 관련 테이블 생성도 해야함. TODO
@@ -59,23 +61,28 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public void updateClubInfo(Long clubId, ClubUpdateRequest requestDto, MultipartFile profileImage) throws IOException {
+    public void updateClubInfo(Long clubId, UpdateClubInfoRequest requestDto, MultipartFile profileImage) throws IOException {
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
-        //값 업데이트
-        club.updateClub(requestDto);
+        club.updateClubInfo(requestDto);
         clubRepository.save(club);
 
         //만약 프로필 사진도 변경되었다면 변경처리 TODO
-/*
         if (profileImage != null) {
-            fileUploadService.deleteFile();
-            String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
-            //FileRepo에 저장 TODO
-        }
-*/
+            if (club.getProfileImage() != null) { //기본 이미지가 아니라면
+                fileUploadService.deleteFile(club.getProfileImage().getUploadFileName());
+                fileRepository.delete(club.getProfileImage());
+            }
 
+            //변경된 profileImage fileRepository 및 s3에 저장 처리
+            String originalFileName = profileImage.getOriginalFilename();
+            String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
+            fileRepository.save(UploadFile.builder()
+                .club(club)
+                .uploadFileName(originalFileName)
+                .storeFileName(storeFileName).build());
+        }
     }
 
     @Override
@@ -91,8 +98,17 @@ public class ClubServiceImpl implements ClubService {
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
-        String uploadFileName = club.getProfileImage().getUploadFileName();
-        String fullPath = fileUploadService.getFullPath(uploadFileName);
+        String fullPath = "";
+        UploadFile profileImage = club.getProfileImage();
+
+        if (profileImage != null) {
+            String uploadFileName = profileImage.getUploadFileName();
+            fullPath = fileUploadService.getFullPath(uploadFileName);
+        }
+
+        if (profileImage == null) {
+            fullPath = DEFAULT_PROFILE_IMAGE;
+        }
 
         return GetClubInfoResponse.builder()
             .clubName(club.getClubName())

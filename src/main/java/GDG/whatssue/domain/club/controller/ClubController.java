@@ -1,8 +1,8 @@
 package GDG.whatssue.domain.club.controller;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
-import GDG.whatssue.domain.club.dto.ClubUpdateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
+import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.service.ClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
  * 모임 삭제 : [DELETE] - /api/clubs/{clubId} TODO
  * 모임 초대코드 갱신 : [PATCH] - /api/clubs/{clubId}/private-code
  * 모임 가입신청 활성/비활성화 : [PATCH] - /api/clubs/{clubId}/private
- * 모임 정보 조회 : [GET] - /api/clubs/{clubId}/info TODO
+ * 모임 정보 조회 : [GET] - /api/clubs/{clubId}/info
  */
 @RestController
 @RequestMapping("/api/clubs")
@@ -56,7 +56,7 @@ public class ClubController {
     @PatchMapping(value = "/{clubId}/info",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity updateClubInfo(@PathVariable Long clubId,
-        @RequestPart("request")ClubUpdateRequest request,
+        @RequestPart("request") UpdateClubInfoRequest request,
         @RequestPart("profileImage") MultipartFile profileImage) throws IOException {
 
         clubService.updateClubInfo(clubId, request, profileImage);
