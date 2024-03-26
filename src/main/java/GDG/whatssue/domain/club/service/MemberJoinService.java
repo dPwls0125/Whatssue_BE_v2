@@ -1,10 +1,10 @@
-package GDG.whatssue.domain.member.service;
+package GDG.whatssue.domain.club.service;
 
-import GDG.whatssue.domain.member.entity.ClubJoinRequest;
+import GDG.whatssue.domain.club.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.member.repository.ClubJoinRequestRepository;
+import GDG.whatssue.domain.club.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-import GDG.whatssue.domain.member.entity.ClubJoinRequestGetDto;
+import GDG.whatssue.domain.club.dto.ClubJoinRequestGetDto;
 import GDG.whatssue.domain.member.entity.Role;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,9 @@
-package GDG.whatssue.domain.member.controller;
+package GDG.whatssue.domain.club.controller;
 
-import GDG.whatssue.domain.member.dto.ClubJoinRequestDto;
-import GDG.whatssue.domain.member.entity.ClubJoinRequestGetDto;
-import GDG.whatssue.domain.member.service.ClubMemberService;
-import GDG.whatssue.domain.member.service.MemberJoinService;
+import GDG.whatssue.domain.club.dto.ClubJoinRequestDto;
+import GDG.whatssue.domain.club.dto.ClubJoinRequestGetDto;
+import GDG.whatssue.domain.club.service.ClubJoinService;
+import GDG.whatssue.domain.club.service.MemberJoinService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/clubs/{clubId}")
 public class ClubJoinController {
 
-    private final ClubMemberService clubMemberService;
+    private final ClubJoinService clubJoinService;
     private final MemberJoinService memberJoinService;
 
     @Operation(summary = "모임 가입신청")
@@ -43,8 +43,7 @@ public class ClubJoinController {
         Long userId = 1L;
 
         //validation 예외처리 TODO
-
-        clubMemberService.addClubJoinRequest(userId, requestDto);
+        clubJoinService.joinClub(userId, requestDto);
 
         return new ResponseEntity("ok", HttpStatus.OK);
     }
