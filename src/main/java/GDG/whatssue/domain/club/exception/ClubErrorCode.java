@@ -8,7 +8,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ClubErrorCode implements ErrorCode {
-    CLUB_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "Club Not Found");
+    CLUB_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "Club Not Found"),
+    INVALID_PRIVATE_CODE_PATTERN_ERROR(HttpStatus.BAD_REQUEST, "Invalid Private Code Pattern [FFFFFF]"),
+    INVALID_PRIVATE_CODE_ERROR(HttpStatus.BAD_REQUEST, "Invalid Private Code"),
+    DUPLICATE_CLUB_JOIN_ERROR(HttpStatus.BAD_REQUEST, "Club That Has Already Joined");
+
     private final HttpStatus httpStatus;
     private final String message;
 

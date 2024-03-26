@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.memberJoin.dto;
+package GDG.whatssue.domain.club.dto;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.user.entity.User;

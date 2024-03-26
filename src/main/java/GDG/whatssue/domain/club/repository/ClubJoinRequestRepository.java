@@ -1,6 +1,6 @@
-package GDG.whatssue.domain.member.repository;
+package GDG.whatssue.domain.club.repository;
 
-import GDG.whatssue.domain.member.entity.ClubJoinRequest;
+import GDG.whatssue.domain.club.entity.ClubJoinRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
