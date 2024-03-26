@@ -18,17 +18,16 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-
-
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        show_sql: true
-        format_sql: true
-#        jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
-        ddl-auto: create
+
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL8Dialect
+      show_sql: true
+      generate-ddl: true
+      ddl-auto: create
+  #      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
+
 
   security:
     oauth2:
