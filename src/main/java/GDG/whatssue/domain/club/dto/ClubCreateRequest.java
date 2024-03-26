@@ -1,7 +1,7 @@
 package GDG.whatssue.domain.club.dto;
 
 import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.global.common.NamePolicy;
+import GDG.whatssue.domain.club.entity.NamePolicy;
 import lombok.Getter;
 import lombok.ToString;
 

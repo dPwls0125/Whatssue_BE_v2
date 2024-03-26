@@ -2,7 +2,7 @@
 //
 //import GDG.whatssue.domain.member.entity.ClubMember;
 //import GDG.whatssue.domain.user.entity.User;
-//import GDG.whatssue.domain.club.entity.Role;
+//import GDG.whatssue.domain.member.entity.Role;
 //import jakarta.transaction.Transactional;
 //import lombok.Getter;
 //import org.springframework.security.core.GrantedAuthority;

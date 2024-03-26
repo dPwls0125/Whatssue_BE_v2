@@ -7,7 +7,6 @@ import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.BaseEntity;
-import GDG.whatssue.global.common.NamePolicy;
 import jakarta.persistence.*;
 import java.util.List;
 

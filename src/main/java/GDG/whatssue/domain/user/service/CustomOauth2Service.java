@@ -6,7 +6,7 @@ import GDG.whatssue.domain.user.dto.UserDto;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.domain.club.entity.Role;
+import GDG.whatssue.domain.member.entity.Role;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

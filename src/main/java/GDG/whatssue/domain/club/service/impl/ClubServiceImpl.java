@@ -12,7 +12,7 @@ import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.domain.club.entity.Role;
+import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
