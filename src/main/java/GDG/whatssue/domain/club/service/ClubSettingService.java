@@ -30,10 +30,11 @@ public class ClubSettingService {
     }*/
 
 
+/*
     public ResponseEntity isActivateCode(Long clubId) {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
-        boolean isActivateCode = club.isActivateCode();
+        boolean isActivateCode = club.isPrivate();
 
         if (club != null) {
             //isActivatecode 가 false 일 경우 true로, true일 경우 false로 변경
@@ -57,6 +58,7 @@ public class ClubSettingService {
         }
 
     }
+*/
 
 /*    public ResponseEntity renewalClubCode(Long cludId) {
         Club club = clubRepository.findById(cludId)
@@ -83,24 +85,21 @@ public class ClubSettingService {
                 .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
         if (club != null) {
             //isJoinStatus 가 false 일 경우 true로, true일 경우 false로 변경
-            if (!club.isJoinStatus()) {
+            if (!club.isPrivate()) {
                 // update 메소드 사용
                 // 활성화
-                club.updateIsJoinStatus(true);
+                club.updateIsPrivate(true);
                 clubRepository.save(club);
                 //response
                 return ResponseEntity.status(200).body("모임 가입 신청 여닫기 완료");
             } else {
                 // 비활성화
-                club.updateIsJoinStatus(false);
+                club.updateIsPrivate(false);
                 clubRepository.save(club);
                 return ResponseEntity.status(200).body("모임 가입 신청 여닫기 완료");
 
             }
-        } else {
-            logger.warn("모임을 찾을 수 없습니다.");
-            return ResponseEntity.status(404).body("모임을 찾을 수 없습니다.");
         }
-
+        return ResponseEntity.status(404).body("모임을 찾을 수 없습니다.");
     }
 }

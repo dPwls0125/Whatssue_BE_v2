@@ -1,4 +1,4 @@
-package GDG.whatssue.global.common;
+package GDG.whatssue.domain.club.entity;
 
 public enum Role {
     MEMBER,

@@ -3,7 +3,7 @@ package GDG.whatssue.domain.user.entity;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.global.common.Role;
+import GDG.whatssue.domain.club.entity.Role;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;

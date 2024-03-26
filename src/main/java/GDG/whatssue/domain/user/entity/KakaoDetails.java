@@ -1,17 +1,11 @@
 package GDG.whatssue.domain.user.entity;
 
-import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.user.entity.User;
-import GDG.whatssue.global.common.Role;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @Getter

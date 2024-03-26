@@ -29,19 +29,13 @@ public class Club extends BaseEntity {
     private String clubName;
 
     @Column(nullable = false)
-    private String clubInfo;
+    private String clubIntro;
 
     @Column(nullable = false)
     private boolean isPrivate;
 
     @Column
     private String contactMeans;
-
-    @Column
-    private boolean isActivateCode;
-
-    @Column
-    private boolean isJoinStatus;
 
     @Column(nullable = false)
     private String privateCode;
@@ -62,14 +56,8 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private NamePolicy namePolicy;
 
-    // ActivateCode 값 update
-    public void updateActivateCode(boolean isActivateCode) {
-        this.isActivateCode = isActivateCode;
-    }
-
-    //isJoinStatus 값 update
-    public void updateIsJoinStatus(boolean isJoinStatus) {
-        this.isJoinStatus = isJoinStatus;
+    public void updateIsPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 
     public void createNewPrivateCode() {
@@ -78,7 +66,7 @@ public class Club extends BaseEntity {
 
     public void updateClub(ClubUpdateRequest requestDto) {
         this.clubName = requestDto.getClubName();
-        this.clubInfo = requestDto.getClubInfo();
+        this.clubIntro = requestDto.getClubIntro();
         this.isPrivate = requestDto.getIsPrivate();
         this.contactMeans = requestDto.getContactMeans();
     }
@@ -86,7 +74,7 @@ public class Club extends BaseEntity {
     @Builder
     public Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
         this.clubName = clubName;
-        this.clubInfo = clubInfo;
+        this.clubIntro = clubInfo;
         this.isPrivate = isPrivate;
         this.contactMeans = contactMeans;
         this.namePolicy = namePolicy;

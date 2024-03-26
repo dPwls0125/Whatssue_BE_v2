@@ -12,7 +12,7 @@ import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.global.common.Role;
+import GDG.whatssue.domain.club.entity.Role;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,8 @@ public class ClubServiceImpl implements ClubService {
             ClubMember.builder()
             .club(savedClub)
             .user(userRepository.findById(userId).get())
-            .role(Role.MANAGER).build());
+            .role(Role.MANAGER)
+            .isFirstVisit(true).build());
 
         return savedClub.getId();
     }
