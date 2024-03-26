@@ -2,6 +2,7 @@ package GDG.whatssue.domain.club.service.impl;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubUpdateRequest;
+import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubRepository;
@@ -16,7 +17,6 @@ import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +47,7 @@ public class ClubServiceImpl implements ClubService {
             .storeFileName(storeFileName).build());
 
         //클럽을 생성한 유저 관리자로 추가
+        //따로 메서드로 뺄것. + 추가하면서 관련 테이블 생성도 해야함. TODO
         clubMemberRepository.save(
             ClubMember.builder()
             .club(savedClub)
@@ -83,6 +84,24 @@ public class ClubServiceImpl implements ClubService {
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
         club.updateIsPrivate();
+    }
+
+    @Override
+    public GetClubInfoResponse getClubInfo(Long clubId) {
+        Club club = clubRepository.findById(clubId)
+            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+
+        String uploadFileName = club.getProfileImage().getUploadFileName();
+        String fullPath = fileUploadService.getFullPath(uploadFileName);
+
+        return GetClubInfoResponse.builder()
+            .clubName(club.getClubName())
+            .clubIntro(club.getClubIntro())
+            .contactMeans(club.getContactMeans())
+            .namePolicy(club.getNamePolicy())
+            .privateCode(club.getPrivateCode())
+            .profileImage(fullPath)
+            .isPrivate(club.isPrivate()).build();
     }
 
     @Override
