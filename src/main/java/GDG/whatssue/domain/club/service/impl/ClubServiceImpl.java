@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ClubServiceImpl implements ClubService {
 
-    private static String DEFAULT_PROFILE_IMAGE = "https://whatssue.s3.ap-northeast-2.amazonaws.com/clubProfileImage/default.png";
+    private static String DEFAULT_PROFILE_IMAGE = "clubProfileImage/default.png";
 
     private static String PROFILE_IMAGE_DIRNAME = "clubProfileImage";
     private final ClubRepository clubRepository;
@@ -37,6 +37,7 @@ public class ClubServiceImpl implements ClubService {
     public Long createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
         //초대코드 추가하여 클럽 생성
         Club savedClub = clubRepository.save(createDtoToClubEntity(requestDto));
+
 
         if (profileImage != null) {
             String originalFileName = profileImage.getOriginalFilename();
@@ -68,7 +69,7 @@ public class ClubServiceImpl implements ClubService {
         club.updateClubInfo(requestDto);
         clubRepository.save(club);
 
-        //만약 프로필 사진도 변경되었다면 변경처리 TODO
+        //근데 사진이 안온게 변경을 안한건지, 삭제를 한건지 어떻게 알아 삭제를 따로 구분..?TODO
         if (profileImage != null) {
             if (club.getProfileImage() != null) { //기본 이미지가 아니라면
                 fileUploadService.deleteFile(club.getProfileImage().getUploadFileName());
@@ -98,17 +99,18 @@ public class ClubServiceImpl implements ClubService {
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
-        String fullPath = "";
+        String uploadFileName = "";
         UploadFile profileImage = club.getProfileImage();
 
         if (profileImage != null) {
-            String uploadFileName = profileImage.getUploadFileName();
-            fullPath = fileUploadService.getFullPath(uploadFileName);
+            uploadFileName = profileImage.getUploadFileName();
         }
 
         if (profileImage == null) {
-            fullPath = DEFAULT_PROFILE_IMAGE;
+            uploadFileName = DEFAULT_PROFILE_IMAGE;
         }
+
+        String fullPath = fileUploadService.getFullPath(uploadFileName);
 
         return GetClubInfoResponse.builder()
             .clubName(club.getClubName())
