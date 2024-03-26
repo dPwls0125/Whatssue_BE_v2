@@ -6,7 +6,7 @@ import lombok.Getter;
 public class ClubUpdateRequest {
 
     String clubName;
-    String clubInfo;
+    String clubIntro;
     Boolean isPrivate;
     String contactMeans;
 }
