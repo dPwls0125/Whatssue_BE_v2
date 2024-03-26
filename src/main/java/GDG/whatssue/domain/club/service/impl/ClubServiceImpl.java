@@ -24,9 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ClubServiceImpl implements ClubService {
 
-    private static String DEFAULT_PROFILE_IMAGE = "clubProfileImage/default.png";
-
     private static String PROFILE_IMAGE_DIRNAME = "clubProfileImage";
+    private static String DEFAULT_PROFILE_IMAGE = PROFILE_IMAGE_DIRNAME + "/default.png";
     private final ClubRepository clubRepository;
     private final FileRepository fileRepository;
     private final ClubMemberRepository clubMemberRepository;
