@@ -39,7 +39,7 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private String scheduleName;
 
-    @Column(nullable = false)
+    @Column
     private String scheduleContent;
 
     @Column(nullable = false)

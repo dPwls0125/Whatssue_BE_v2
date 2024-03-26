@@ -16,6 +16,7 @@ import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -57,7 +58,7 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public void updateClub(Long clubId, ClubUpdateRequest requestDto, MultipartFile profileImage) throws IOException {
+    public void updateClubInfo(Long clubId, ClubUpdateRequest requestDto, MultipartFile profileImage) throws IOException {
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
@@ -74,6 +75,14 @@ public class ClubServiceImpl implements ClubService {
         }
 */
 
+    }
+
+    @Override
+    public void updateClubPrivateStatus(Long clubId) {
+        Club club = clubRepository.findById(clubId)
+            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+
+        club.updateIsPrivate();
     }
 
     @Override

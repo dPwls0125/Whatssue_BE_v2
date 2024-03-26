@@ -4,11 +4,13 @@ import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubUpdateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.service.ClubService;
+import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,18 +52,27 @@ public class ClubController {
 
     @PatchMapping(value = "/{clubId}",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity updateClub(@PathVariable Long clubId,
+    public ResponseEntity updateClubInfo(@PathVariable Long clubId,
         @RequestPart("request")ClubUpdateRequest request,
         @RequestPart("profileImage") MultipartFile profileImage) throws IOException {
 
-        clubServiceImpl.updateClub(clubId, request, profileImage);
+        clubServiceImpl.updateClubInfo(clubId, request, profileImage);
 
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
-    @PostMapping("/{clubId}/private-code")
-    public ResponseEntity updatePrivateCode(@PathVariable Long clubId) {
+    @PatchMapping("/{clubId}/private-code")
+    public ResponseEntity updateClubPrivateCode(@PathVariable Long clubId) {
         clubServiceImpl.updateClubCode(clubId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("OK");
+    }
+
+    @PatchMapping(value = "/{clubId}/private")
+    @Operation(summary = "모임 가입 신청 여닫기")
+    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
+    public ResponseEntity updateClubPrivateStatus(@PathVariable Long clubId ){
+        clubServiceImpl.updateClubPrivateStatus(clubId);
 
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }

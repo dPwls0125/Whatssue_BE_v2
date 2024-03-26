@@ -55,8 +55,8 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private NamePolicy namePolicy;
 
-    public void updateIsPrivate(boolean isPrivate) {
-        this.isPrivate = isPrivate;
+    public void updateIsPrivate() {
+        this.isPrivate = !this.isPrivate;
     }
 
     public void createNewPrivateCode() {
