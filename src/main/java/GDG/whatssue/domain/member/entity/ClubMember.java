@@ -48,7 +48,7 @@ public class ClubMember extends BaseEntity {
     @Column
     private String memberIntro;
 
-    @Column(nullable = false)
+    @Column
     private String memberName;
 
     @Column(nullable = false)

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FileRepository extends JpaRepository<UploadFile, Long> {
 
+    public void deleteById(Long uploadFileId);
 }
