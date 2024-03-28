@@ -63,4 +63,12 @@ public class ClubJoinController {
 
         return ResponseEntity.status(200).body("가입 신청 거절 완료");
     }
+
+    @Operation(summary = "멤버 가입요청 목록 조회")
+    @GetMapping("/clubs/{clubId}/join-requests")
+    public ResponseEntity<List<ClubJoinRequestGetDto>> getClubJoinRequest(@PathVariable Long clubId){
+        List<ClubJoinRequestGetDto>ClubJoinRequests = memberJoinService.getClubJoinRequests(clubId);
+
+        return ResponseEntity.ok(ClubJoinRequests);
+    }
 }
