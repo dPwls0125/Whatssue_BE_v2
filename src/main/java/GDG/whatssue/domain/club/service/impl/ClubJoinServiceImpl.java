@@ -1,17 +1,20 @@
 package GDG.whatssue.domain.club.service.impl;
 
 import GDG.whatssue.domain.club.dto.ClubJoinRequestDto;
+import GDG.whatssue.domain.club.dto.GetJoinRequestsResponse;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.entity.ClubJoinRequest;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.club.service.ClubJoinService;
-import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.error.CommonException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +44,23 @@ public class ClubJoinServiceImpl implements ClubJoinService {
             ClubJoinRequest.builder()
             .user(loginUser)
             .club(club).build());
+    }
+
+    @Override
+    public List<GetJoinRequestsResponse> getJoinRequests(Long userId) {
+        List<ClubJoinRequest> joinRequests = clubJoinRequestRepository.findByUserId(userId);
+
+        if (joinRequests.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<GetJoinRequestsResponse> responseList = joinRequests.stream()
+            .map(r -> GetJoinRequestsResponse.builder()
+                .clubName(r.getClub().getClubName())
+                .createdAt(r.getCreateAt()).build())
+            .collect(Collectors.toList());
+
+        return responseList;
     }
 
     private void checkJoinRequestDuplicate(Long userId, Club club) {
