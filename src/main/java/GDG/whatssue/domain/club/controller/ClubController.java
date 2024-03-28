@@ -68,7 +68,8 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @Operation(summary = "모임 정보 수정")
+    @Operation(summary = "모임 정보 수정",
+        description = "최종 프로필 사진이 기본 사진일 시 profileImage 헤더 x")
     @PatchMapping(value = "/{clubId}/info",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity updateClubInfo(@PathVariable("clubId") Long clubId,
