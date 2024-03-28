@@ -1,7 +1,9 @@
 package GDG.whatssue.domain.club.service.impl;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
+import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
+import GDG.whatssue.domain.club.dto.GetJoinClubListResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
@@ -15,7 +17,11 @@ import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.error.CommonException;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,22 +39,33 @@ public class ClubServiceImpl implements ClubService {
     private final FileUploadService fileUploadService;
 
     @Override
-    public Long createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
+    public List<GetJoinClubListResponse> getJoinClubList(Long userId) {
+        List<ClubMember> clubMembers = clubMemberRepository.findByUser_UserId(userId);
+        if (clubMembers.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<GetJoinClubListResponse> responseList = clubMembers.stream()
+            .map(c -> GetJoinClubListResponse.builder()
+                .clubId(c.getClub().getId())
+                .clubName(c.getClub().getClubName())
+                .profileImage(c.getClub().getProfileImage().getStoreFileName())
+                .createdAt(c.getCreateAt())
+                .role(c.getRole()).build())
+            .collect(Collectors.toList());
+
+        return responseList;
+    }
+    @Override
+    public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
         //초대코드 추가하여 클럽 생성
         Club savedClub = clubRepository.save(createDtoToClubEntity(requestDto));
 
-
         if (profileImage != null) {
-            String originalFileName = profileImage.getOriginalFilename();
-            //profileImage fileRepository 및 s3에 저장 처리
-            String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
-            fileRepository.save(UploadFile.builder()
-                .club(savedClub)
-                .uploadFileName(originalFileName)
-                .storeFileName(storeFileName).build());
+            saveProfileImage(profileImage, savedClub);
         }
 
-        //클럽을 생성한 유저 관리자로 추가
+        //클럽을 생성한 멤버(관리자)로 추가
         //따로 메서드로 뺄것. + 추가하면서 관련 테이블 생성도 해야함. TODO
         clubMemberRepository.save(
             ClubMember.builder()
@@ -57,7 +74,8 @@ public class ClubServiceImpl implements ClubService {
             .role(Role.MANAGER)
             .isFirstVisit(true).build());
 
-        return savedClub.getId();
+        return ClubCreateResponse.builder()
+            .clubId(savedClub.getId()).build();
     }
 
     @Override
@@ -68,24 +86,17 @@ public class ClubServiceImpl implements ClubService {
         club.updateClubInfo(requestDto);
         clubRepository.save(club);
 
-        //근데 사진이 안온게 변경을 안한건지, 삭제를 한건지 어떻게 알아 삭제를 따로 구분..?TODO
-        if (profileImage != null) {
-            if (club.getProfileImage() != null) { //기본 이미지가 아니라면
-                fileUploadService.deleteFile(club.getProfileImage().getUploadFileName());
-                fileRepository.delete(club.getProfileImage());
-            }
+        if (club.getProfileImage() != null) { //기존 프사 있는 경우 삭제
+            deleteProfileImage(club);
+        }
 
-            //변경된 profileImage fileRepository 및 s3에 저장 처리
-            String originalFileName = profileImage.getOriginalFilename();
-            String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
-            fileRepository.save(UploadFile.builder()
-                .club(club)
-                .uploadFileName(originalFileName)
-                .storeFileName(storeFileName).build());
+        if (profileImage != null) { //헤더가 있는 경우 업로드 -> 사진 ㄴ유지 또는 변경
+            saveProfileImage(profileImage, club);
         }
     }
 
     @Override
+    @Transactional
     public void updateClubPrivateStatus(Long clubId) {
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
@@ -98,18 +109,18 @@ public class ClubServiceImpl implements ClubService {
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
-        String uploadFileName = "";
+        String storeFileName = "";
         UploadFile profileImage = club.getProfileImage();
 
         if (profileImage != null) {
-            uploadFileName = profileImage.getUploadFileName();
+            storeFileName = profileImage.getStoreFileName();
         }
 
         if (profileImage == null) {
-            uploadFileName = DEFAULT_PROFILE_IMAGE;
+            storeFileName = DEFAULT_PROFILE_IMAGE;
         }
 
-        String fullPath = fileUploadService.getFullPath(uploadFileName);
+        String fullPath = fileUploadService.getFullPath(storeFileName);
 
         return GetClubInfoResponse.builder()
             .clubName(club.getClubName())
@@ -122,11 +133,29 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
+    @Transactional
     public void updateClubCode(Long clubId) {
         Club club = clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
         club.createNewPrivateCode();
+    }
+
+    @Transactional
+    private void saveProfileImage(MultipartFile profileImage, Club savedClub) throws IOException {
+        String originalFileName = profileImage.getOriginalFilename();
+        //profileImage fileRepository 및 s3에 저장 처리
+        String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
+
+        fileRepository.save(UploadFile.builder()
+            .club(savedClub)
+            .uploadFileName(originalFileName)
+            .storeFileName(storeFileName).build());
+    }
+
+    private void deleteProfileImage(Club club) {
+        fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
+        fileRepository.deleteById(club.getProfileImage().getId()); //레포에서 삭제
     }
 
     private Club createDtoToClubEntity(ClubCreateRequest requestDto) {

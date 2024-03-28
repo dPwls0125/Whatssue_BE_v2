@@ -41,15 +41,15 @@ public class S3UploadService implements FileUploadService {
     }
 
     @Override
-    public String downloadFile(String uploadFileName) {
+    public String downloadFile(String storeFileName) {
         //TODO
         return null;
     }
 
     @Override
-    public void deleteFile(String uploadFileName) {
+    public void deleteFile(String storeFileName) {
         //TODO
-        amazonS3.deleteObject(bucket, uploadFileName);
+        amazonS3.deleteObject(bucket, storeFileName);
     }
 
     public String getFullPath(String fileName) {
