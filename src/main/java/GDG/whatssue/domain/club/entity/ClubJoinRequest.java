@@ -17,9 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class ClubJoinRequest extends BaseEntity {
 
     @Id
@@ -34,4 +32,10 @@ public class ClubJoinRequest extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Builder
+    public ClubJoinRequest(Club club, User user) {
+        this.club = club;
+        this.user = user;
+    }
 }
