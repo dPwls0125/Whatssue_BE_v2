@@ -86,15 +86,12 @@ public class ClubServiceImpl implements ClubService {
         club.updateClubInfo(requestDto);
         clubRepository.save(club);
 
-        if (profileImage != null) { //삭제 또는 삭제 후 재업
-            if (club.getProfileImage() != null) { //기본 이미지가 아니라면
-                deleteProfileImage(club);
-            }
+        if (club.getProfileImage() != null) { //기존 프사 있는 경우 삭제
+            deleteProfileImage(club);
+        }
 
-            if (!profileImage.isEmpty()) { //재업인 경우
-                //변경된 profileImage fileRepository 및 s3에 저장 처리
-                saveProfileImage(profileImage, club);
-            }
+        if (profileImage != null) { //헤더가 있는 경우 업로드 -> 사진 ㄴ유지 또는 변경
+            saveProfileImage(profileImage, club);
         }
     }
 
