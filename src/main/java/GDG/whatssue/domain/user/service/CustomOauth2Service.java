@@ -43,7 +43,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                         .userName(name)
                         .clubMemberList(new ArrayList<>())
                         .clubJoinRequestList(new ArrayList<>())
-                        .role(Role.MEMBER)
                         .build()));
     }
 
@@ -84,7 +83,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         UserDto dto = UserDto.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
-                .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .userPhone(user.getUserPhone())
                 .userEmail(user.getUserEmail())
@@ -100,7 +98,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         return UserDto.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
-                .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .userEmail(user.getUserEmail())
                 .userPhone(request.getUserPhone())
@@ -117,14 +114,12 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                 .userPhone(request.getUserPhone())
                 .userName(request.getUserName())
                 .userEmail(request.getUserEmail())
-                .role(request.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .build();
         userRepository.save(user);
         UserDto dto = UserDto.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
-                .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .userPhone(user.getUserPhone())
                 .build();
