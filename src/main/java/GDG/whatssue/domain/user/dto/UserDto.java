@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.user.dto;
 
-import GDG.whatssue.global.common.Role;
+import GDG.whatssue.domain.member.entity.Role;
 import lombok.*;
 
 @Builder

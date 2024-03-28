@@ -6,12 +6,11 @@ import GDG.whatssue.domain.user.dto.UserDto;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.global.common.Role;
+import GDG.whatssue.domain.member.entity.Role;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -44,7 +43,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                         .userName(name)
                         .clubMemberList(new ArrayList<>())
                         .clubJoinRequestList(new ArrayList<>())
-                        .role(Role.MEMBER)
                         .build()));
     }
 
@@ -85,7 +83,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         UserDto dto = UserDto.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
-                .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .userPhone(user.getUserPhone())
                 .userEmail(user.getUserEmail())
@@ -101,7 +98,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         return UserDto.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
-                .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .userEmail(user.getUserEmail())
                 .userPhone(request.getUserPhone())
@@ -118,14 +114,12 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                 .userPhone(request.getUserPhone())
                 .userName(request.getUserName())
                 .userEmail(request.getUserEmail())
-                .role(request.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .build();
         userRepository.save(user);
         UserDto dto = UserDto.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
-                .role(user.getRole())
                 .oauth2Id(user.getOauth2Id())
                 .userPhone(user.getUserPhone())
                 .build();

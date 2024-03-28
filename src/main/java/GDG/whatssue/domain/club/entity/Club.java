@@ -1,13 +1,12 @@
 package GDG.whatssue.domain.club.entity;
 
 
-import GDG.whatssue.domain.club.dto.ClubUpdateRequest;
+import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.BaseEntity;
-import GDG.whatssue.global.common.NamePolicy;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -29,19 +28,13 @@ public class Club extends BaseEntity {
     private String clubName;
 
     @Column(nullable = false)
-    private String clubInfo;
+    private String clubIntro;
 
     @Column(nullable = false)
     private boolean isPrivate;
 
     @Column
     private String contactMeans;
-
-    @Column
-    private boolean isActivateCode;
-
-    @Column
-    private boolean isJoinStatus;
 
     @Column(nullable = false)
     private String privateCode;
@@ -62,31 +55,24 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private NamePolicy namePolicy;
 
-    // ActivateCode 값 update
-    public void updateActivateCode(boolean isActivateCode) {
-        this.isActivateCode = isActivateCode;
-    }
-
-    //isJoinStatus 값 update
-    public void updateIsJoinStatus(boolean isJoinStatus) {
-        this.isJoinStatus = isJoinStatus;
+    public void updateIsPrivate() {
+        this.isPrivate = !this.isPrivate;
     }
 
     public void createNewPrivateCode() {
         this.privateCode = UUID.randomUUID().toString().substring(0, 6);
     }
 
-    public void updateClub(ClubUpdateRequest requestDto) {
+    public void updateClubInfo(UpdateClubInfoRequest requestDto) {
         this.clubName = requestDto.getClubName();
-        this.clubInfo = requestDto.getClubInfo();
-        this.isPrivate = requestDto.getIsPrivate();
+        this.clubIntro = requestDto.getClubIntro();
         this.contactMeans = requestDto.getContactMeans();
     }
 
     @Builder
     public Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
         this.clubName = clubName;
-        this.clubInfo = clubInfo;
+        this.clubIntro = clubInfo;
         this.isPrivate = isPrivate;
         this.contactMeans = contactMeans;
         this.namePolicy = namePolicy;

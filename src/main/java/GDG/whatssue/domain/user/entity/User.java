@@ -3,7 +3,7 @@ package GDG.whatssue.domain.user.entity;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.global.common.Role;
+import GDG.whatssue.domain.member.entity.Role;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -37,9 +37,6 @@ public class User extends BaseEntity {
 //    @Column
 //    private String userPhone;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
 
     @Column( nullable = false, unique = true)
     private String oauth2Id;

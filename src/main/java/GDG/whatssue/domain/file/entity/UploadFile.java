@@ -1,6 +1,7 @@
 package GDG.whatssue.domain.file.entity;
 
 import GDG.whatssue.domain.club.entity.Club;
+import GDG.whatssue.domain.member.entity.ClubMember;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +30,7 @@ public class UploadFile {
 
     @OneToOne
     @JoinColumn(name = "club_member_id")
-    private Club clubMember;
+    private ClubMember clubMember;
 
     @Column(nullable = false)
     private String uploadFileName;

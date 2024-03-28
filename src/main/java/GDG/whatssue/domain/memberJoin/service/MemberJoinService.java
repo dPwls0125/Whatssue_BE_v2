@@ -5,7 +5,7 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.memberJoin.dto.ClubJoinRequestGetDto;
-import GDG.whatssue.global.common.Role;
+import GDG.whatssue.domain.member.entity.Role;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
