@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.member.controller;
 
-import GDG.whatssue.domain.member.service.ClubMemberService;
+import GDG.whatssue.domain.member.service.ClubMemberManagingService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/clubs/{clubId}/members")
 public class ClubMemberController {
 
-    private final ClubMemberService clubMemberService;
+    private final ClubMemberManagingService clubMemberService;
     @DeleteMapping("/{memberId}/manager")
     @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MANAGER')")
     @Operation(summary = "멤버 추방", description = "멤버를 클럽에서 추방합니다.(매니저만 이용 가능한 기능)")
