@@ -37,9 +37,6 @@ public class User extends BaseEntity {
 //    @Column
 //    private String userPhone;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
 
     @Column( nullable = false, unique = true)
     private String oauth2Id;

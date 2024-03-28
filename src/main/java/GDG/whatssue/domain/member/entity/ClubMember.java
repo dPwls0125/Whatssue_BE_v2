@@ -6,26 +6,19 @@ import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+
 import java.util.List;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
 @NoArgsConstructor
+@Setter
 public class ClubMember extends BaseEntity {
 
     @Id
@@ -60,13 +53,13 @@ public class ClubMember extends BaseEntity {
     @Column(nullable = false)
     private boolean isFirstVisit;
 
-    @OneToOne(mappedBy = "clubMember")
+    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
     private UploadFile profileImage;
 
-    @OneToOne(mappedBy = "clubMember")
+    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
     private MemberAttendanceResult memberAttendanceResult;
 
-    @OneToMany(mappedBy = "clubMember")
+    @OneToMany(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList;
 
     @Builder
