@@ -48,7 +48,7 @@ public class ClubJoinServiceImpl implements ClubJoinService {
 
     @Override
     public List<GetJoinRequestsResponse> getJoinRequests(Long userId) {
-        List<ClubJoinRequest> joinRequests = clubJoinRequestRepository.findByUserId(userId);
+        List<ClubJoinRequest> joinRequests = clubJoinRequestRepository.findByUser_UserId(userId);
 
         if (joinRequests.isEmpty()) {
             return new ArrayList<>();
@@ -65,7 +65,7 @@ public class ClubJoinServiceImpl implements ClubJoinService {
 
     private void checkJoinRequestDuplicate(Long userId, Club club) {
         //이미 가입 신청한 모임
-        boolean result = clubJoinRequestRepository.findByUserId(userId)
+        boolean result = clubJoinRequestRepository.findByUser_UserId(userId)
             .stream()
             .anyMatch(r -> r.getClub().equals(club));
 

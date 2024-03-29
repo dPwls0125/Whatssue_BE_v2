@@ -48,7 +48,7 @@ public class MemberJoinService {
 
     @Transactional
     public List<ClubJoinRequestGetDto> getClubJoinRequests(Long clubId) {
-        List<ClubJoinRequest> clubJoinRequests = clubJoinRequestRepository.findByClubId(clubId);
+        List<ClubJoinRequest> clubJoinRequests = clubJoinRequestRepository.findByClub_Id(clubId);
 
         // Dto 매핑
         List<ClubJoinRequestGetDto> dtos = clubJoinRequests.stream()
