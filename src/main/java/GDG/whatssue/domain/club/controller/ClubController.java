@@ -6,6 +6,7 @@ import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.GetJoinClubListResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.service.ClubService;
+import GDG.whatssue.global.common.ClubManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
@@ -70,6 +71,7 @@ public class ClubController {
 
     @Operation(summary = "모임 정보 수정",
         description = "최종 프로필 사진이 기본 사진일 시 profileImage 헤더 x")
+    @ClubManager
     @PatchMapping(value = "/{clubId}/info",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity updateClubInfo(@PathVariable("clubId") Long clubId,
@@ -81,6 +83,7 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @ClubManager
     @Operation(summary = "초대코드 갱신")
     @PatchMapping("/{clubId}/private-code")
     public ResponseEntity updateClubPrivateCode(@PathVariable("clubId") Long clubId) {
@@ -89,6 +92,7 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @ClubManager
     @Operation(summary = "모임 가입 신청 여닫기")
     @PatchMapping(value = "/{clubId}/private")
     public ResponseEntity updateClubPrivateStatus(@PathVariable("clubId") Long clubId){
@@ -97,6 +101,7 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @ClubManager
     @Operation(summary = "모임 정보 조회")
     @GetMapping("/{clubId}/info")
     public ResponseEntity getClubInfo(@PathVariable("clubId") Long clubId) {

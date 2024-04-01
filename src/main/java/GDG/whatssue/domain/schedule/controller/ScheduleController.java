@@ -5,6 +5,7 @@ import GDG.whatssue.domain.schedule.dto.GetScheduleResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
+import GDG.whatssue.global.common.ClubManager;
 import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +41,7 @@ public class ScheduleController {
      */
 
     @Operation(summary = "일정 추가", description = "날짜 패턴 yyyy-MM-dd HH:ss")
+    @ClubManager
     @PostMapping
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId, @Valid @RequestBody AddScheduleRequest requestDto) {
@@ -50,6 +52,7 @@ public class ScheduleController {
     }
 
     @Operation(summary = "일정 수정", description = "날짜 패턴 yyyy-MM-dd HH:ss")
+    @ClubManager
     @PatchMapping("/{scheduleId}")
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,
@@ -61,6 +64,7 @@ public class ScheduleController {
     }
 
     @Operation(summary = "일정 삭제")
+    @ClubManager
     @DeleteMapping("/{scheduleId}")
 //    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
