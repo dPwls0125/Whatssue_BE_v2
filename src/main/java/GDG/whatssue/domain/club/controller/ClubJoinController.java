@@ -5,6 +5,7 @@ import GDG.whatssue.domain.club.dto.ClubJoinRequestGetDto;
 import GDG.whatssue.domain.club.dto.GetJoinRequestsResponse;
 import GDG.whatssue.domain.club.service.ClubJoinService;
 import GDG.whatssue.domain.club.service.MemberJoinService;
+import GDG.whatssue.global.common.ClubManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -62,6 +63,7 @@ public class ClubJoinController {
     }
 
     @Operation(summary="멤버 가입요청 수락")
+    @ClubManager
     @PostMapping("/clubs/{clubId}/join-requests/{clubJoinRequestId}/accept")
     public ResponseEntity acceptClubJoinRequest(@PathVariable Long clubJoinRequestId){
         memberJoinService.acceptResponse(clubJoinRequestId);
@@ -70,6 +72,7 @@ public class ClubJoinController {
     }
 
     @Operation(summary="멤버 가입요청 거절")
+    @ClubManager
     @PostMapping("/clubs/{clubId}/join-requests/{clubJoinRequestId}/deny")
     public ResponseEntity denyClubJoinRequest(@PathVariable Long clubJoinRequestId){
         memberJoinService.denyResponse(clubJoinRequestId);
@@ -78,6 +81,7 @@ public class ClubJoinController {
     }
 
     @Operation(summary = "멤버 가입요청 목록 조회")
+    @ClubManager
     @GetMapping("/clubs/{clubId}/join-requests")
     public ResponseEntity<List<ClubJoinRequestGetDto>> getClubJoinRequest(@PathVariable Long clubId){
         List<ClubJoinRequestGetDto>ClubJoinRequests = memberJoinService.getClubJoinRequests(clubId);

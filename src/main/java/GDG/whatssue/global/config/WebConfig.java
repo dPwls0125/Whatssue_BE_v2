@@ -1,32 +1,27 @@
 package GDG.whatssue.global.config;
 
+import GDG.whatssue.global.interceptor.ClubCheckInterceptor;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Slf4j
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-/*    private final ScheduleInterceptor scheduleInterceptor;
+    @Autowired
+    ClubCheckInterceptor clubCheckInterceptor;
 
-    *//**
-     * PathMatcher를 따로 구현해서 HttpMethod 별로 excludePatterns 구현하기 TODO
-     *//*
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        log.info("add ScheduleInterceptor");
-        registry.addInterceptor(scheduleInterceptor)
+        registry.addInterceptor(clubCheckInterceptor)
             .order(1)
-            .addPathPatterns("/api/{clubId}/schedules/{scheduleId}");
+            .addPathPatterns("/api/clubs/{clubId}/**");
     }
-
-    @PostConstruct
-    void init() {
-        log.info("Web Config init");
-    }*/
 }
