@@ -1,14 +1,15 @@
 package GDG.whatssue.domain.club.entity;
 
 
+import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.file.entity.UploadFile;
-import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.*;
 import java.util.List;
 
+import java.util.UUID;
 import lombok.*;
 
 @Entity
@@ -26,22 +27,13 @@ public class Club extends BaseEntity {
     private String clubName;
 
     @Column(nullable = false)
-    private String clubInfo;
+    private String clubIntro;
 
     @Column(nullable = false)
     private boolean isPrivate;
 
     @Column
-    private Integer memberMaxValue;
-
-    @Column
     private String contactMeans;
-
-    @Column
-    private boolean isActivateCode;
-
-    @Column
-    private boolean isJoinStatus;
 
     @Column(nullable = false)
     private String privateCode;
@@ -58,29 +50,30 @@ public class Club extends BaseEntity {
     @OneToMany(mappedBy = "club")
     private List<Schedule> scheduleList;
 
-    // ActivateCode 값 update
-    public void updateActivateCode(boolean isActivateCode) {
-        this.isActivateCode = isActivateCode;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NamePolicy namePolicy;
+
+    public void updateIsPrivate() {
+        this.isPrivate = !this.isPrivate;
     }
 
-    //PrivateCode 값 update
-    public void updatePrivateCode(String privateCode) {
-        this.privateCode = privateCode;
+    public void createNewPrivateCode() {
+        this.privateCode = UUID.randomUUID().toString().substring(0, 6);
     }
 
-    //isJoinStatus 값 update
-    public void updateIsJoinStatus(boolean isJoinStatus) {
-        this.isJoinStatus = isJoinStatus;
+    public void updateClubInfo(UpdateClubInfoRequest requestDto) {
+        this.clubName = requestDto.getClubName();
+        this.clubIntro = requestDto.getClubIntro();
+        this.contactMeans = requestDto.getContactMeans();
     }
 
     @Builder
-    public Club(String clubName, String clubInfo, boolean isPrivate, Integer memberMaxValue,
-        String contactMeans, String privateCode) {
+    public Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
         this.clubName = clubName;
-        this.clubInfo = clubInfo;
+        this.clubIntro = clubInfo;
         this.isPrivate = isPrivate;
-        this.memberMaxValue = memberMaxValue;
         this.contactMeans = contactMeans;
-        this.privateCode = privateCode;
+        this.namePolicy = namePolicy;
     }
 }

@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository;
 
 public interface ClubRepository extends JpaRepository<Club, Long> {
 
+    Optional<Club> findByPrivateCode(String privateCode);
     boolean existsByPrivateCode(String privateCode);
+
 }
