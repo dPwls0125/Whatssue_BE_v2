@@ -3,7 +3,7 @@ package GDG.whatssue.global.interceptor;
 import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
-import GDG.whatssue.global.common.ClubManager;
+import GDG.whatssue.global.annotation.ClubManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
