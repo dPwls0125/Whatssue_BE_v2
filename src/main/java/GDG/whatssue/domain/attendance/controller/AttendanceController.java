@@ -6,6 +6,7 @@ import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
 import GDG.whatssue.domain.attendance.service.AttendanceService;
 import GDG.whatssue.domain.schedule.entity.Schedule;
+import GDG.whatssue.global.annotation.ClubManager;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,9 +24,9 @@ import java.util.*;
 public class AttendanceController {
     private final AttendanceService attendanceService;
 
+    @ClubManager
     @Operation(summary = "출석 열기_manager")
     @GetMapping("/schedules/{scheduleId}/attendance-start")
-    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity openAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         AttendanceNumResponseDto dto;
         try {
@@ -36,9 +37,9 @@ public class AttendanceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
+    @ClubManager
     @Operation(summary = "출석 종료")
     @PostMapping("/schedules/{scheduleId}/attendance-end")
-    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
             attendanceService.deleteAttendance(clubId, scheduleId);
@@ -48,17 +49,17 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
 
+    @ClubManager
     @Operation(summary = "일정별 출석한 멤버 리스트 조회")
     @GetMapping("/schedules/{scheduleId}/attendance-list")
-    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) throws Exception {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
+
     @Operation(summary = "출석하기 _ user")
     @PostMapping("/schedules/{scheduleId}/attendance")
-    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MEMBER','ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @RequestBody ScheduleAttendanceRequestDto requestDto) {
         try {
             attendanceService.doAttendance(clubId, scheduleId, requestDto);
