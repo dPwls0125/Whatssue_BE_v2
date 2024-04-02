@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -27,8 +28,7 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
     private ClubMemberService clubMemberService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-        Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         if (!(handler instanceof HandlerMethod)) {
             return true;
@@ -36,26 +36,32 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
 
         HandlerMethod hm = (HandlerMethod) handler;
 
-//        Long userId = extractUserIdFromRequest(request);
-        Long userId = 1L;
+        Long userId = extractUserIdFromKakao();
         Long clubId = extractClubIdFromRequest(request);
 
-        if (userId == null || clubId == null) {
-            log.warn("인터셉터 오류");
+        if (userId == null) {
+            log.warn("Kakao Oauth에서 userId 추출 오류");
             return false;
         }
+
+        if (clubId == null) {
+            log.warn("request에서 clubId 추출 오류");
+            return false;
+        }
+
+        log.info("userId: " + userId);
 
         // 클럽 존재여부 체크 TODO
         if (!clubService.isClubExist(clubId)) {
             //처리 TODO
-            log.info("존재하지 않는 클럽");
+            log.info("존재하지 않는 클럽입니다");
             return false;
         }
 
         // 클럽 멤버여부 체크 TODO
         if (!clubMemberService.isClubMember(clubId, userId)) {
             //처리 TODO
-            log.info("멤버가 아님");
+            log.info("멤버가 아닙니다");
             return false;
         }
 
@@ -67,7 +73,7 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         }
 
         if (!clubMemberService.isClubManager(clubId, userId)) {
-            log.info("관리자가 아님");
+            log.info("관리자가 아닙니다");
             return false;
         }
 
@@ -76,13 +82,11 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
 
 
     //동작하는지 체크 TODO
-    private static Long extractUserIdFromRequest(HttpServletRequest request) {
+    private static Long extractUserIdFromKakao() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        Object principal = auth.getPrincipal();
-
-        if (principal instanceof KakaoDetails) {
-            KakaoDetails userPrincipal = (KakaoDetails) request.getUserPrincipal();
+        if (auth != null || auth.getPrincipal() instanceof OAuth2User) {
+            KakaoDetails userPrincipal = (KakaoDetails) auth.getPrincipal();
 
             return userPrincipal.getUser().getUserId();
         }
