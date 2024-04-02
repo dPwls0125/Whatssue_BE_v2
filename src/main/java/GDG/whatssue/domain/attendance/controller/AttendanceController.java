@@ -56,8 +56,6 @@ public class AttendanceController {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
-
-
     @Operation(summary = "출석하기 _ user")
     @PostMapping("/schedules/{scheduleId}/attendance")
     public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @RequestBody ScheduleAttendanceRequestDto requestDto) {
@@ -68,7 +66,6 @@ public class AttendanceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body("출석이 완료되었습니다.");
     }
-
     @Operation(summary = "현재 출석 진행 중인 스케줄")
     @GetMapping("/attendance-list")
     public ResponseEntity currentAttendanceList(@PathVariable Long clubId) {

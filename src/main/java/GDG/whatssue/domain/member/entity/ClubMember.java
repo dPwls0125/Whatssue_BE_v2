@@ -62,7 +62,6 @@ public class ClubMember extends BaseEntity {
     @Builder
     public ClubMember(Club club, User user, Role role, String memberIntro,
         String memberName, boolean isEmailPublic, boolean isPhonePublic, boolean isFirstVisit) {
-
         this.club = club;
         this.user = user;
         this.role = role;

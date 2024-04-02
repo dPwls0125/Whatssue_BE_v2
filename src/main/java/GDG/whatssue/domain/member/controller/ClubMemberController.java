@@ -1,9 +1,11 @@
 package GDG.whatssue.domain.member.controller;
 
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
+import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
 import GDG.whatssue.domain.member.service.ClubMemberSerivce;
 import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.global.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +25,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/clubs/{clubId}/members")
+@RequestMapping("/api/clubs/{clubId}")
 public class ClubMemberController {
     private final ClubMemberSerivce clubMemberSerivce;
     private final ClubMemberManagingService clubMemberManagingService;
 
     @ClubManager
-    @DeleteMapping("/{memberId}/manager")
+    @DeleteMapping("/member/{memberId}/manager")
     @Operation(summary = "멤버 추방", description = "멤버를 클럽에서 추방합니다.(매니저만 이용 가능한 기능)")
     public ResponseEntity deleteMember(@PathVariable Long clubId, @PathVariable Long memberId) {
         clubMemberManagingService.deleteClubMember(memberId);
@@ -44,11 +46,18 @@ public class ClubMemberController {
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-    @PatchMapping("/{memberId}/member")
+    @PatchMapping("/member/{memberId}")
     @Operation(summary = "멤버 정보 수정")
     public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberDto dto) {
         clubMemberSerivce.modifyClubMember(memberId,dto);
         return new ResponseEntity("ok", HttpStatus.OK);
+    }
+
+    @GetMapping("/member/{memberId}/")
+    @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
+    public ResponseEntity getProfile(@PathVariable Long memberId, @LoginUser Long userId){
+        MemberProfileDto dto = clubMemberSerivce.getMemberProfile(memberId,userId);
+        return new ResponseEntity(dto, HttpStatus.OK);
     }
 
 }
