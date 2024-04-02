@@ -1,15 +1,81 @@
 spring:
+  redis:
+    data:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+#      timeout: 2000
+#      lettuce:
+#      pool:
+#        max-active: 8
+#        max-wait: -1
+#        max-idle: 8
+#        min-idle: 0
+
   datasource:
     username: ${SPRING_DATASOURCE_USERNAME}
     url: jdbc:mysql://localhost:3306/whatssuev2?serverTimezone=UTC&characterEncoding=UTF-8
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
+      dialect: org.hibernate.dialect.MySQL8Dialect
+      show_sql: true
+      generate-ddl: true
       ddl-auto: update
-loggin:
+  #      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          Kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/kakao" #로그인 성공 후 리다이렉트 될 주소
+            client-authentication-method: client_secret_post
+            client-name: Kakao
+        provider:
+          Kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize #인가코드 받기 항목
+            token-uri: https://kauth.kakao.com/oauth/token #토큰 받기 항목
+            user-info-uri: https://kapi.kakao.com/v2/user/me #유저 정보 받기 항목
+            user-name-attribute: id #식별자 카카오의 경우 "id" 이용
+logging:
   level:
     org:
       apache:
         coyote:
-          http11: debug
+#          http11: debug
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+  port: 8080
+
+coolsms:
+  api:
+    number: ${FROMNUMBER}
+    secret: ${COOLSMS_API_SECRET}
+    key: ${COOLSMS_API_KEY}
+
+
+
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET}
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    region:
+      static: ${S3_REGION}
+      auto: false
+    stack:
+      auto: false
