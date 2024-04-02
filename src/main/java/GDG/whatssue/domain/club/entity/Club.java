@@ -38,16 +38,16 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private String privateCode;
 
-    @OneToOne(mappedBy = "club")
+    @OneToOne(mappedBy = "club", cascade = CascadeType.REMOVE)
     private UploadFile profileImage;
 
-    @OneToMany(mappedBy = "club")
+    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
     private List<ClubMember> clubMemberList;
 
-    @OneToMany(mappedBy = "club")
+    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
     private List<ClubJoinRequest> clubJoinRequestList;
 
-    @OneToMany(mappedBy = "club")
+    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
     private List<Schedule> scheduleList;
 
     @Enumerated(EnumType.STRING)

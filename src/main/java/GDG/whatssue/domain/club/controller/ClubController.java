@@ -48,6 +48,7 @@ public class ClubController {
     @Operation(summary = "가입한 모임 조회")
     @GetMapping
     public ResponseEntity getJoinClubList(@LoginUser Long userId) {
+
         List<GetJoinClubListResponse> responseDto = clubService.getJoinClubList(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);

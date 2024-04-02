@@ -2,9 +2,6 @@ package GDG.whatssue.global.argumentresolver;
 
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.global.annotation.LoginUser;
-import GDG.whatssue.global.error.CommonErrorCode;
-import GDG.whatssue.global.error.CommonException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -34,6 +31,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || ! (auth.getPrincipal() instanceof OAuth2User)) {
+            //예외처리 TODO
             log.warn("argumentresolver - @LoginUser 오류");
         }
 

@@ -43,10 +43,10 @@ public class User extends BaseEntity {
     @Column
     private String userPhone;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<ClubJoinRequest> clubJoinRequestList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<ClubMember> clubMemberList = new ArrayList<>();
 
 }

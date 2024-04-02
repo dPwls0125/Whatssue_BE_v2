@@ -5,6 +5,7 @@ import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -48,10 +49,10 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private boolean isChecked;
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
     private List<ScheduleAttendanceResult> attendanceResultList;
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList;
 
     public void update(ModifyScheduleRequest request) {
