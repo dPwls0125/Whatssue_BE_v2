@@ -12,7 +12,6 @@ import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
-import GDG.whatssue.domain.file.service.impl.S3UploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.repository.UserRepository;
@@ -167,10 +166,10 @@ public class ClubServiceImpl implements ClubService {
         Club club = clubRepository.findById(clubId).orElse(null);
 
         if (club == null) {
-            return false;
-        } else {
-            return true;
+            throw new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR);
         }
+
+        return true;
     }
 
     @Transactional
