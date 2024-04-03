@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.schedule.service.impl;
 
+import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
@@ -30,7 +31,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public void saveSchedule(Long clubId, AddScheduleRequest requestDto) {
-        Club club = clubRepository.findById(clubId).orElse(null);
+        Club club = getClub(clubId);
 
         Schedule saveSchedule = requestDto.toEntity(club);
         scheduleRepository.save(saveSchedule);
@@ -39,8 +40,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public void updateSchedule(Long scheduleId, ModifyScheduleRequest requestDto) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
+        Schedule schedule = getSchedule(scheduleId);
 
         schedule.update(requestDto);
 
@@ -53,23 +53,19 @@ public class ScheduleServiceImpl implements ScheduleService {
      */
     @Override
     public void deleteSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
-
         scheduleRepository.deleteById(scheduleId);
     }
 
     @Override
     public GetScheduleResponse findSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
+        Schedule schedule = getSchedule(scheduleId);
 
         return scheduleToGetScheduleResponse(schedule);
     }
 
     @Override
     public List<GetScheduleResponse> findScheduleAll(Long clubId) {
-        Club findClub = clubRepository.findById(clubId).get();
+        Club findClub = getClub(clubId);
 
         List<Schedule> scheduleList = findClub.getScheduleList();
 
@@ -78,7 +74,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<GetScheduleResponse> findScheduleByDay(Long clubId, String date) {
-        Club findClub = clubRepository.findById(clubId).get();
+        Club findClub = getClub(clubId);
 
         List<Schedule> scheduleList = findClub.getScheduleList();
 
@@ -86,7 +82,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
     @Override
     public List<GetScheduleResponse> findScheduleByMonth(Long clubId, String date) {
-        Club findClub = clubRepository.findById(clubId).get();
+        Club findClub = getClub(clubId);
 
         List<Schedule> scheduleList = findClub.getScheduleList();
 
@@ -95,8 +91,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public boolean isClubSchedule(Long clubId, Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
+        Schedule schedule = getSchedule(scheduleId);
         if (schedule.getClub().getId() == clubId) {
             return true;
         } else {
@@ -125,6 +120,16 @@ public class ScheduleServiceImpl implements ScheduleService {
             .scheduleContent(schedule.getScheduleContent())
             .scheduleDateTime(schedule.getScheduleDateTime())
             .isChecked(schedule.isChecked()).build();
+    }
+
+    public Club getClub(Long clubId) {
+        return clubRepository.findById(clubId)
+            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+    }
+
+    public Schedule getSchedule(Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+            .orElseThrow(() -> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
     }
 }
 

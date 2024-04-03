@@ -163,11 +163,8 @@ public class ClubServiceImpl implements ClubService {
 
     @Override
     public boolean isClubExist(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElse(null);
-
-        if (club == null) {
-            throw new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR);
-        }
+        clubRepository.findById(clubId)
+            .orElseThrow(()-> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
         return true;
     }
