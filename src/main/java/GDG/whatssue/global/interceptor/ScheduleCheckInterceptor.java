@@ -1,33 +1,22 @@
 package GDG.whatssue.global.interceptor;
 
-import GDG.whatssue.domain.club.service.ClubService;
-import GDG.whatssue.domain.member.service.ClubMemberService;
-import GDG.whatssue.domain.user.entity.KakaoDetails;
-import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
 import GDG.whatssue.global.error.CommonErrorCode;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 
-@Slf4j
 @Component
-public class ClubCheckInterceptor implements HandlerInterceptor {
+public class ScheduleCheckInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private ClubService clubService;
-
-    @Autowired
-    private ClubMemberService clubMemberService;
+    private ScheduleServiceImpl scheduleService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -36,23 +25,11 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        HandlerMethod hm = (HandlerMethod) handler;
-
-        Long userId = getUserId();
         Long clubId = getClubId(request);
+        Long scheduleId = getScheduleId(request);
 
-        // 클럽 존재여부 체크
-        clubService.isClubExist(clubId);
-
-        // 클럽 멤버여부 체크
-        if (!clubMemberService.isClubMember(clubId, userId)) {
-            throw new CommonException(CommonErrorCode.INSUFFICIENT_PERMISSIONS);
-        }
-
-        // 클럽 관리자 체크
-        ClubManager clubManager = hm.getMethodAnnotation(ClubManager.class);
-
-        if (clubManager != null && !clubMemberService.isClubManager(clubId, userId)) {
+        //클럽의 스케줄 체크
+        if (!scheduleService.isClubSchedule(clubId, scheduleId)) {
             throw new CommonException(CommonErrorCode.INSUFFICIENT_PERMISSIONS);
         }
 
@@ -70,11 +47,11 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         }
     }
 
-    private Long getUserId() {
-        KakaoDetails kaKaoDetails = getKaKaoDetails();
+    private Long getScheduleId(HttpServletRequest request) {
+        String scheduleId = extractPathVariableFromRequest(request, "scheduleId");
 
         try {
-            return kaKaoDetails.getUser().getUserId();
+            return Long.parseLong(scheduleId);
         } catch (Exception e) {
             throw new CommonException(CommonErrorCode.BAD_REQUEST);
         }
@@ -85,14 +62,5 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
             .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
         return pathVariables.get(pathVariable);
-    }
-    private static KakaoDetails getKaKaoDetails() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !(auth.getPrincipal() instanceof OAuth2User)) {
-            throw new CommonException(CommonErrorCode.OAUTH_ERROR);
-        }
-
-        return (KakaoDetails) auth.getPrincipal();
     }
 }
