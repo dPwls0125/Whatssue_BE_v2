@@ -1,7 +1,8 @@
 package GDG.whatssue.global.interceptor;
 
+import static GDG.whatssue.global.error.CommonErrorCode.*;
+
 import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
-import GDG.whatssue.global.error.CommonErrorCode;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,7 +31,7 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
 
         //클럽의 스케줄 체크
         if (!scheduleService.isClubSchedule(clubId, scheduleId)) {
-            throw new CommonException(CommonErrorCode.INSUFFICIENT_PERMISSIONS);
+            throw new CommonException(FORBIDDEN_ACCESS_ERROR);
         }
 
         //인터셉터 통과
@@ -43,7 +44,7 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
         try {
             return Long.parseLong(clubId);
         } catch (Exception e) {
-            throw new CommonException(CommonErrorCode.BAD_REQUEST);
+            throw new CommonException(BAD_REQUEST);
         }
     }
 
@@ -53,7 +54,7 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
         try {
             return Long.parseLong(scheduleId);
         } catch (Exception e) {
-            throw new CommonException(CommonErrorCode.BAD_REQUEST);
+            throw new CommonException(BAD_REQUEST);
         }
     }
 
