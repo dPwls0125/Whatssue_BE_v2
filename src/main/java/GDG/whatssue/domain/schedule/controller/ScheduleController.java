@@ -5,7 +5,7 @@ import GDG.whatssue.domain.schedule.dto.GetScheduleResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
-import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

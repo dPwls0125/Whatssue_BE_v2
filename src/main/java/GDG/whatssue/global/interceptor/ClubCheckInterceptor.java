@@ -3,7 +3,7 @@ package GDG.whatssue.global.interceptor;
 import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
-import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.error.CommonErrorCode;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;

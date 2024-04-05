@@ -1,5 +1,7 @@
 package GDG.whatssue.domain.club.service.impl;
 
+import static GDG.whatssue.global.common.FileConst.*;
+
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
@@ -29,11 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class ClubServiceImpl implements ClubService {
-
-    private static String PROFILE_IMAGE_DIRNAME = "clubProfileImage";
-
-    //주소 앞에 s3 의존관계 없애야함 TODO
-    private static String DEFAULT_PROFILE_IMAGE =  "https://whatssue.s3.ap-northeast-2.amazonaws.com/" + PROFILE_IMAGE_DIRNAME + "/default.png";
     private final ClubRepository clubRepository;
     private final FileRepository fileRepository;
     private final ClubMemberRepository clubMemberRepository;
@@ -64,7 +61,7 @@ public class ClubServiceImpl implements ClubService {
         }
 
         //클럽을 생성한 멤버(관리자)로 추가
-        //따로 메서드로 뺄것. + 추가하면서 관련 테이블 생성도 해야함. TODO
+        //따로 메서드로 뺄것 TODO
         clubMemberRepository.save(
             ClubMember.builder()
             .club(savedClub)
@@ -87,7 +84,7 @@ public class ClubServiceImpl implements ClubService {
             deleteProfileImage(club);
         }
 
-        if (profileImage != null) { //헤더가 있는 경우 업로드 -> 사진 ㄴ유지 또는 변경
+        if (profileImage != null) { //헤더가 있는 경우 업로드 -> 사진 유지 또는 변경
             saveProfileImage(profileImage, club);
         }
     }
@@ -112,7 +109,7 @@ public class ClubServiceImpl implements ClubService {
         }
 
         if (profileImage == null) {
-            storeFileName = DEFAULT_PROFILE_IMAGE;
+            storeFileName = CLUB_PROFILE_IMAGE_DIRNAME + DEFAULT_IMAGE_NAME;
         }
 
         String fullPath = fileUploadService.getFullPath(storeFileName);
@@ -138,7 +135,7 @@ public class ClubServiceImpl implements ClubService {
         }
 
         if (profileImage == null) {
-            storeFileName = DEFAULT_PROFILE_IMAGE;
+            storeFileName = CLUB_PROFILE_IMAGE_DIRNAME + DEFAULT_IMAGE_NAME;
         }
 
         String fullPath = fileUploadService.getFullPath(storeFileName);
@@ -146,10 +143,9 @@ public class ClubServiceImpl implements ClubService {
         return GetJoinClubListResponse.builder()
             .clubId(club.getId())
             .clubName(club.getClubName())
-            .profileImage(storeFileName)
+            .profileImage(fullPath)
             .createdAt(clubMember.getCreateAt())
             .role(clubMember.getRole()).build();
-
     }
 
 
@@ -173,7 +169,7 @@ public class ClubServiceImpl implements ClubService {
     public void saveProfileImage(MultipartFile profileImage, Club savedClub) throws IOException {
         String originalFileName = profileImage.getOriginalFilename();
         //profileImage fileRepository 및 s3에 저장 처리
-        String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
+        String storeFileName = fileUploadService.saveFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
 
         fileRepository.save(UploadFile.builder()
             .club(savedClub)
