@@ -10,10 +10,7 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Entity
@@ -65,7 +62,6 @@ public class ClubMember extends BaseEntity {
     @Builder
     public ClubMember(Club club, User user, Role role, String memberIntro,
         String memberName, boolean isEmailPublic, boolean isPhonePublic, boolean isFirstVisit) {
-
         this.club = club;
         this.user = user;
         this.role = role;
