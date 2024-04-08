@@ -4,6 +4,7 @@ package GDG.whatssue.domain.club.entity;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -22,7 +23,6 @@ public class Club extends BaseEntity {
     @Column(name = "club_id")
     private Long id;
 
-
     @Column(nullable = false)
     private String clubName;
 
@@ -38,6 +38,10 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private String privateCode;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NamePolicy namePolicy;
+
     @OneToOne(mappedBy = "club")
     private UploadFile profileImage;
 
@@ -50,9 +54,8 @@ public class Club extends BaseEntity {
     @OneToMany(mappedBy = "club")
     private List<Schedule> scheduleList;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private NamePolicy namePolicy;
+    @OneToMany(mappedBy = "club")
+    private List<Post> postList;
 
     public void updateIsPrivate() {
         this.isPrivate = !this.isPrivate;
