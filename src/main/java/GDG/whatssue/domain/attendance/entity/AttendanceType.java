@@ -1,4 +1,4 @@
-package GDG.whatssue.global.common;
+package GDG.whatssue.domain.attendance.entity;
 
 public enum AttendanceType {
     ATTENDANCE,

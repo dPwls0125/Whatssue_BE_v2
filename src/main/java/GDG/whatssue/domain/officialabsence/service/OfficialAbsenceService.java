@@ -1,7 +1,7 @@
 package GDG.whatssue.domain.officialabsence.service;
 
-import static GDG.whatssue.global.common.AttendanceType.ABSENCE;
-import static GDG.whatssue.global.common.AttendanceType.OFFICIAL_ABSENCE;
+import static GDG.whatssue.domain.attendance.entity.AttendanceType.ABSENCE;
+import static GDG.whatssue.domain.attendance.entity.AttendanceType.OFFICIAL_ABSENCE;
 
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;

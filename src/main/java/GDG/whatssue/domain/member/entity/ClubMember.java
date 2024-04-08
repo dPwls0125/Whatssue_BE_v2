@@ -4,6 +4,7 @@ import GDG.whatssue.domain.attendance.entity.MemberAttendanceResult;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
+import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -58,6 +59,9 @@ public class ClubMember extends BaseEntity {
 
     @OneToMany(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList;
+
+    @OneToMany(mappedBy = "clubMember")
+    private List<Post> postList;
 
     @Builder
     public ClubMember(Club club, User user, Role role, String memberIntro,

@@ -22,8 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Schedule extends BaseEntity {
@@ -60,4 +58,13 @@ public class Schedule extends BaseEntity {
         this.scheduleDateTime = request.getScheduleDateTime();
     }
 
+    @Builder
+    public Schedule(Club club, String scheduleName, String scheduleContent,
+        LocalDateTime scheduleDateTime, boolean isChecked) {
+        this.club = club;
+        this.scheduleName = scheduleName;
+        this.scheduleContent = scheduleContent;
+        this.scheduleDateTime = scheduleDateTime;
+        this.isChecked = isChecked;
+    }
 }
