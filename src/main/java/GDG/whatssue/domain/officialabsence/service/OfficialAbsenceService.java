@@ -52,7 +52,7 @@ public class OfficialAbsenceService {
             .clubMember(clubMemberEntity)
             .schedule(schedule)
             .officialAbsenceContent(officialAbsenceContent)
-            .isChecked(false)
+            //.isChecked(false)
             .build();
 
         officialAbsenceRequestRepository.save(officialAbsenceRequest);
@@ -67,21 +67,21 @@ public class OfficialAbsenceService {
                 .collect(Collectors.toList());
     }
     public List<OfficialAbsenceGetRequestDto> getOfficialAbsenceRequests() { //공결 신청 현황 List 조회
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByIsChecked(false);
-        /**isChecked false 필터링(수락대기중)**/
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
+        //isChecked false 필터링(수락대기중)
         return officialAbsenceRequests.stream()
             .map(this::convertToDto)
             .collect(Collectors.toList());
     }
     public List<OfficialAbsenceGetRequestDto> getDoneOfficialAbsenceRequests() { //공결 신청 내역 List 조회
-        /**isChecked true 필터링(수락 승인 or거절 완료)**/
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByIsChecked(true);
+        //isChecked true 필터링(수락 승인 or거절 완료)
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
         return officialAbsenceRequests.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
     public OfficialAbsenceGetRequestDto getOfficialAbsenceRequestDetail(Long officialAbsenceId){
-        /**특정 단일 공결 신청 조회**/
+        //특정 단일 공결 신청 조회
         OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findById(officialAbsenceId).get();
         if (officialAbsenceRequest == null) {
             throw new NoSuchElementException("해당하는 공결 요청이 존재하지 않습니다.");
@@ -102,7 +102,7 @@ public class OfficialAbsenceService {
             throw new IllegalArgumentException("Invalid club member ID: " + clubMemberId);
         }
         //isChecked true 필터링(수락 승인 or거절 완료)
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByClubMemberIdAndIsChecked(clubMemberId, true);
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
         // 공결 신청 내역이 없는 경우
         if (officialAbsenceRequests.isEmpty()) {
             throw new NoSuchElementException("해당하는 공결 요청이 존재하지 않습니다.");
@@ -116,7 +116,7 @@ public class OfficialAbsenceService {
         if (clubMemberId == null || clubMemberId <= 0) {
             throw new IllegalArgumentException("Invalid club member ID: " + clubMemberId);
         }
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByClubMemberIdAndIsChecked(clubMemberId, false);
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
         // 공결 신청 내역이 없는 경우
         if (officialAbsenceRequests.isEmpty()) {
             throw new NoSuchElementException("해당하는 공결 요청이 존재하지 않습니다.");
@@ -171,8 +171,8 @@ public class OfficialAbsenceService {
                 scheduleAttendanceResult.setAttendanceType(OFFICIAL_ABSENCE);
                 logger.warn("AttendanceType changed.");
                 // isChecked 값을 true로 설정
-                officialAbsenceRequest.setChecked(true);
-                logger.warn("isChecked true.");
+                //officialAbsenceRequest.setChecked(true);
+                //logger.warn("isChecked true.");
             } else {
                 logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
             }
@@ -203,8 +203,8 @@ public class OfficialAbsenceService {
                 scheduleAttendanceResult.setAttendanceType(ABSENCE);
                 logger.warn("AttendanceType changed.");
                 // isChecked 값을 true로 설정
-                officialAbsenceRequest.setChecked(true);
-                logger.warn("isChecked true.");
+                //officialAbsenceRequest.setChecked(true);
+                //logger.warn("isChecked true.");
             } else {
                 logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
             }
