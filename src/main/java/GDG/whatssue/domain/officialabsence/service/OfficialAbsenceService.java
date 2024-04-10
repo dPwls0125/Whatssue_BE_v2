@@ -10,6 +10,7 @@ import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceAddRequestDto;
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceGetRequestDto;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
+import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType;
 import GDG.whatssue.domain.officialabsence.repository.OfficialAbsenceRequestRepository;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
@@ -52,7 +53,7 @@ public class OfficialAbsenceService {
             .clubMember(clubMemberEntity)
             .schedule(schedule)
             .officialAbsenceContent(officialAbsenceContent)
-            //.isChecked(false)
+            .officialAbsenceRequestType(OfficialAbsenceRequestType.NOT_CHECKED)
             .build();
 
         officialAbsenceRequestRepository.save(officialAbsenceRequest);
@@ -67,15 +68,15 @@ public class OfficialAbsenceService {
                 .collect(Collectors.toList());
     }
     public List<OfficialAbsenceGetRequestDto> getOfficialAbsenceRequests() { //공결 신청 현황 List 조회
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
-        //isChecked false 필터링(수락대기중)
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByOfficialAbsenceRequestType(OfficialAbsenceRequestType.NOT_CHECKED);
+        //Request_Type NOT_CHECKED 필터링 (수락 대기중)
         return officialAbsenceRequests.stream()
             .map(this::convertToDto)
             .collect(Collectors.toList());
     }
     public List<OfficialAbsenceGetRequestDto> getDoneOfficialAbsenceRequests() { //공결 신청 내역 List 조회
-        //isChecked true 필터링(수락 승인 or거절 완료)
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
+        //Request_Type NOT_CHECKED 필터링 (수락 or 거절 완료)
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByOfficialAbsenceRequestTypeNot(OfficialAbsenceRequestType.NOT_CHECKED);
         return officialAbsenceRequests.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -91,6 +92,7 @@ public class OfficialAbsenceService {
                 .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                 .scheduleId(officialAbsenceRequest.getSchedule().getId())
                 .officialAbsenceContent(officialAbsenceRequest.getOfficialAbsenceContent())
+                .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                 .build();
 
         return officialAbsenceGetRequestDto;
@@ -101,8 +103,8 @@ public class OfficialAbsenceService {
         if (clubMemberId == null || clubMemberId <= 0) {
             throw new IllegalArgumentException("Invalid club member ID: " + clubMemberId);
         }
-        //isChecked true 필터링(수락 승인 or거절 완료)
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
+        //isChecked true 필터링(수락 승인 or 거절 완료)
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByOfficialAbsenceRequestTypeNot(OfficialAbsenceRequestType.NOT_CHECKED);
         // 공결 신청 내역이 없는 경우
         if (officialAbsenceRequests.isEmpty()) {
             throw new NoSuchElementException("해당하는 공결 요청이 존재하지 않습니다.");
@@ -116,7 +118,7 @@ public class OfficialAbsenceService {
         if (clubMemberId == null || clubMemberId <= 0) {
             throw new IllegalArgumentException("Invalid club member ID: " + clubMemberId);
         }
-        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findAll(); /**수정**/
+        List<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByOfficialAbsenceRequestTypeNot(OfficialAbsenceRequestType.NOT_CHECKED);
         // 공결 신청 내역이 없는 경우
         if (officialAbsenceRequests.isEmpty()) {
             throw new NoSuchElementException("해당하는 공결 요청이 존재하지 않습니다.");
@@ -132,10 +134,11 @@ public class OfficialAbsenceService {
             .clubMemberId(officialAbsenceRequest.getClubMember().getId())
             .scheduleId(officialAbsenceRequest.getSchedule().getId())
             .officialAbsenceContent(officialAbsenceRequest.getOfficialAbsenceContent())
+            .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
             .build();
     }
     @Transactional
-    public void deleteOfficialAbsences(Long officialAbsenceId,Long clubMemberId) {
+    public void deleteOfficialAbsences(Long officialAbsenceId,Long clubMemberId) { //내 공결 신청 취소
         // clubMemberId 유효성 검사
         if (clubMemberId == null || clubMemberId <= 0) {
             throw new IllegalArgumentException("Invalid club member ID: " + clubMemberId);
@@ -154,28 +157,7 @@ public class OfficialAbsenceService {
             OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findById(officialAbsenceId)
                 .orElseThrow(() -> new NoSuchElementException("officialAbsenceId에 해당하는 공결신청이 없습니다.: " + officialAbsenceId));
 
-            Schedule schedule = scheduleRepository.findById(officialAbsenceRequest.getSchedule().getId())
-                .orElseThrow(() -> new NoSuchElementException("scheduleId에 해당하는 일정이 없습니다.: " + officialAbsenceRequest.getSchedule().getId()));
-
-            ClubMember clubMember = clubMemberRepository.findById(officialAbsenceRequest.getClubMember().getId())
-                .orElseThrow(() -> new NoSuchElementException("clubMemberId에 해당하는 멤버가 없습니다.: " + officialAbsenceRequest.getClubMember().getId()));
-
-            Long scheduleId = schedule.getId();
-            Long clubMemberId = clubMember.getId();
-
-            ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository
-                .findByScheduleIdAndClubMemberId(scheduleId, clubMemberId);
-
-            if (scheduleAttendanceResult != null) {
-                //공결 수락
-                scheduleAttendanceResult.setAttendanceType(OFFICIAL_ABSENCE);
-                logger.warn("AttendanceType changed.");
-                // isChecked 값을 true로 설정
-                //officialAbsenceRequest.setChecked(true);
-                //logger.warn("isChecked true.");
-            } else {
-                logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
-            }
+            officialAbsenceRequest.setOfficialAbsenceRequestType(OfficialAbsenceRequestType.ACCEPTED);
         } catch (NoSuchElementException e) {
             logger.warn("Error processing acceptResponse: {}", e.getMessage());
         }
@@ -186,28 +168,7 @@ public class OfficialAbsenceService {
             OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findById(officialAbsenceId)
                 .orElseThrow(() -> new NoSuchElementException("No OfficialAbsenceRequest found for officialAbsenceId: " + officialAbsenceId));
 
-            Schedule schedule = scheduleRepository.findById(officialAbsenceRequest.getSchedule().getId())
-                .orElseThrow(() -> new NoSuchElementException("No Schedule found for scheduleId: " + officialAbsenceRequest.getSchedule().getId()));
-
-            ClubMember clubMember = clubMemberRepository.findById(officialAbsenceRequest.getClubMember().getId())
-                .orElseThrow(() -> new NoSuchElementException("No ClubMember found for clubMemberId: " + officialAbsenceRequest.getClubMember().getId()));
-
-            Long scheduleId = schedule.getId();
-            Long clubMemberId = clubMember.getId();
-
-            ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository
-                .findByScheduleIdAndClubMemberId(scheduleId, clubMemberId);
-
-            if (scheduleAttendanceResult != null) {
-                //공결 거부
-                scheduleAttendanceResult.setAttendanceType(ABSENCE);
-                logger.warn("AttendanceType changed.");
-                // isChecked 값을 true로 설정
-                //officialAbsenceRequest.setChecked(true);
-                //logger.warn("isChecked true.");
-            } else {
-                logger.warn("No ScheduleAttendanceResult found for scheduleId: {} and clubMemberId: {}", scheduleId, clubMemberId);
-            }
+            officialAbsenceRequest.setOfficialAbsenceRequestType(OfficialAbsenceRequestType.DENIED);
         } catch (NoSuchElementException e) {
             logger.warn("Error processing acceptResponse: {}", e.getMessage());
         }
