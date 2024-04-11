@@ -41,11 +41,7 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
     private Long getClubId(HttpServletRequest request) {
         String clubId = extractPathVariableFromRequest(request, "clubId");
 
-        try {
-            return Long.parseLong(clubId);
-        } catch (Exception e) {
-            throw new CommonException(BAD_REQUEST);
-        }
+        return Long.parseLong(clubId);
     }
 
     private Long getScheduleId(HttpServletRequest request) {
