@@ -89,7 +89,6 @@ public class AttendanceService {
         return attendedMembers;
     }
     public void doAttendance(Long clubId, Long schduleId, ScheduleAttendanceRequestDto requestDto) throws Exception{
-
         int attendanceNum = attendanceNumMap.get(clubId).get(schduleId);
         int inputValue = requestDto.getAttendanceNum();
         if (attendanceNum == inputValue) {

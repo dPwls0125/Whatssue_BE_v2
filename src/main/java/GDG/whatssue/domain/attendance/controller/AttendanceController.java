@@ -6,7 +6,7 @@ import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
 import GDG.whatssue.domain.attendance.service.AttendanceService;
 import GDG.whatssue.domain.schedule.entity.Schedule;
-import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.ClubManager;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +25,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     @ClubManager
-    @Operation(summary = "출석 열기_manager")
+    @Operation(summary = "출석 열기_manager ",description = "출석을 시작하면 기존에 있던 출석 정보 모두 날아감. ")
     @GetMapping("/schedules/{scheduleId}/attendance-start")
     public ResponseEntity openAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         AttendanceNumResponseDto dto;
@@ -72,6 +72,7 @@ public class AttendanceController {
         List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
+
 }
 
 
