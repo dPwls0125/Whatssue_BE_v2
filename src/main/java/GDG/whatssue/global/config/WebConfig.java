@@ -1,5 +1,6 @@
 package GDG.whatssue.global.config;
 
+import GDG.whatssue.global.argumentresolver.LoginMemberArgumentResolver;
 import GDG.whatssue.global.argumentresolver.LoginUserArgumentResolver;
 import GDG.whatssue.global.interceptor.ClubCheckInterceptor;
 import GDG.whatssue.global.interceptor.ScheduleCheckInterceptor;
@@ -18,6 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final ClubCheckInterceptor clubCheckInterceptor;
     private final ScheduleCheckInterceptor scheduleCheckInterceptor;
+    private final LoginUserArgumentResolver loginUserArgumentResolver;
+    private final LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -32,6 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new LoginUserArgumentResolver());
+        resolvers.add(loginUserArgumentResolver);
+        resolvers.add(loginMemberArgumentResolver);
     }
 }
