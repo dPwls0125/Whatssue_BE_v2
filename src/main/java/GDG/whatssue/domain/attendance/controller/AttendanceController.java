@@ -72,7 +72,6 @@ public class AttendanceController {
         List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
-
 }
 
 

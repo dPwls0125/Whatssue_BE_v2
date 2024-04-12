@@ -4,14 +4,13 @@ import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
 import GDG.whatssue.domain.member.service.ClubMemberSerivce;
-import GDG.whatssue.global.annotation.ClubManager;
-import GDG.whatssue.global.annotation.LoginUser;
+import GDG.whatssue.global.common.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**

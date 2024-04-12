@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.attendance.dto;
 
-import GDG.whatssue.global.common.AttendanceType;
+import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
