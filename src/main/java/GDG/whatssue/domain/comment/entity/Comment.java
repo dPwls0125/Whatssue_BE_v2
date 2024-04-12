@@ -25,15 +25,14 @@ public class Comment extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @Column(name = "parent_id")
+    @JoinColumn(name = "parent_id")
     private Comment parentComment; // 부모 댓글
 
-    @OneToMany
-    @JoinColumn(name = "parent_id")
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
     private List<Comment> childComments; // 자식 댓글 리스트
 
-    @JoinColumn(name = "post_id", nullable = false)
     @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne
