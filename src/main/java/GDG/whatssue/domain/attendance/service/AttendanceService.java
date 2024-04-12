@@ -1,8 +1,8 @@
 package GDG.whatssue.domain.attendance.service;
 
+import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
-import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
@@ -88,17 +88,16 @@ public class AttendanceService {
         });
         return attendedMembers;
     }
-    public void doAttendance(Long clubId, Long schduleId, ScheduleAttendanceRequestDto requestDto) throws Exception{
-
+    public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) throws Exception{
         int attendanceNum = attendanceNumMap.get(clubId).get(schduleId);
         int inputValue = requestDto.getAttendanceNum();
         if (attendanceNum == inputValue) {
             ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
-                    .clubMember(clubMemberRepository.findById(requestDto.getClubMemberId()).get())
-                    .schedule(scheduleRepository.findById(schduleId).get())
+                    .clubMember(clubMemberRepository.findById(memberId).orElseThrow(() -> new Exception("해당 멤버가 존재하지 않습니다.")))
+                    .schedule(scheduleRepository.findById(schduleId).orElseThrow(() -> new Exception("해당 일정이 존재하지 않습니다.")))
                     .attendanceType(AttendanceType.ATTENDANCE)
                     .build();
             scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
-        }else throw new Exception("출석번호가 일치하지 않습니다.다시 시도해 주세요");
+        }else throw new Exception(" 출석번호가 일치하지 않습니다. 다시 시도해 주세요");
     }
 }

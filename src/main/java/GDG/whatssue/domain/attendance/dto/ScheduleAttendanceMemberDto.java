@@ -14,8 +14,11 @@ import lombok.NoArgsConstructor;
 public class ScheduleAttendanceMemberDto {
 
     private Long clubId;
+
     private Long scheduleId;
+
     private Long clubMemberId;
+
     private AttendanceType attendanceType;
 
 }

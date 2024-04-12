@@ -11,10 +11,17 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class ScheduleDto {
+
     Long scheduleId;
+
     Long clubId;
+
     String scheduleName;
+
     String scheduleContent;
+
     LocalDateTime scheduleDateTime;
+
     boolean isChecked;
+
 }
