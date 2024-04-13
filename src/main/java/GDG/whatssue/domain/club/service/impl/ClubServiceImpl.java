@@ -101,18 +101,8 @@ public class ClubServiceImpl implements ClubService {
     public GetClubInfoResponse getClubInfo(Long clubId) {
         Club club = getClub(clubId);
 
-        String storeFileName = "";
-        UploadFile profileImage = club.getProfileImage();
-
-        if (profileImage != null) {
-            storeFileName = profileImage.getStoreFileName();
-        }
-
-        if (profileImage == null) {
-            storeFileName = CLUB_PROFILE_IMAGE_DIRNAME + DEFAULT_IMAGE_NAME;
-        }
-
-        String fullPath = fileUploadService.getFullPath(storeFileName);
+        String profileImageFullPath = fileUploadService.getFullPath(
+            getStoreFileName(club.getProfileImage(), CLUB_PROFILE_IMAGE_DIRNAME));
 
         return GetClubInfoResponse.builder()
             .clubName(club.getClubName())
@@ -120,33 +110,24 @@ public class ClubServiceImpl implements ClubService {
             .contactMeans(club.getContactMeans())
             .namePolicy(club.getNamePolicy())
             .privateCode(club.getPrivateCode())
-            .profileImage(fullPath)
+            .profileImage(profileImageFullPath)
             .isPrivate(club.isPrivate()).build();
     }
 
     public GetJoinClubListResponse entityToJoinClubListResponse(ClubMember clubMember) {
         Club club = clubMember.getClub();
 
-        String storeFileName = "";
-        UploadFile profileImage = club.getProfileImage();
-
-        if (profileImage != null) {
-            storeFileName = profileImage.getStoreFileName();
-        }
-
-        if (profileImage == null) {
-            storeFileName = CLUB_PROFILE_IMAGE_DIRNAME + DEFAULT_IMAGE_NAME;
-        }
-
-        String fullPath = fileUploadService.getFullPath(storeFileName);
+        String profileImageFullPath = fileUploadService.getFullPath(
+            getStoreFileName(club.getProfileImage(), CLUB_PROFILE_IMAGE_DIRNAME));
 
         return GetJoinClubListResponse.builder()
             .clubId(club.getId())
             .clubName(club.getClubName())
-            .profileImage(fullPath)
+            .profileImage(profileImageFullPath)
             .createdAt(clubMember.getCreateAt())
             .role(clubMember.getRole()).build();
     }
+
 
 
     @Override
@@ -157,6 +138,17 @@ public class ClubServiceImpl implements ClubService {
         club.createNewPrivateCode();
     }
 
+    private static String getStoreFileName(UploadFile uploadFile, String dirName) {
+        String storeFileName;
+
+        if (uploadFile != null) {
+            storeFileName = uploadFile.getStoreFileName();
+        } else {
+            storeFileName = dirName + DEFAULT_IMAGE_NAME;
+        }
+
+        return storeFileName;
+    }
     @Override
     public boolean isClubExist(Long clubId) {
         clubRepository.findById(clubId)
