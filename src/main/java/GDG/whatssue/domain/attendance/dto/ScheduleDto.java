@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.attendance.dto;
 
+import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,6 @@ public class ScheduleDto {
 
     LocalDateTime scheduleDateTime;
 
-    boolean isChecked;
+    AttendanceStatus attendanceStatus;
 
 }

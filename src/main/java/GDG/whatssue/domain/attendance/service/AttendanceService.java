@@ -53,7 +53,7 @@ public class AttendanceService {
                         .scheduleName(schedule.getScheduleName())
                         .scheduleContent(schedule.getScheduleContent())
                         .scheduleDateTime(schedule.getScheduleDateTime())
-                        .isChecked(schedule.isChecked())
+                        .attendanceStatus(schedule.getAttendanceStatus())
                         .build();
                 scheduleIdList.add(dto);
             }
