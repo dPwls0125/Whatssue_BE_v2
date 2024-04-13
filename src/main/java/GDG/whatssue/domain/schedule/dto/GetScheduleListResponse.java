@@ -1,29 +1,27 @@
 package GDG.whatssue.domain.schedule.dto;
 
+import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class GetScheduleResponse {
+public class GetScheduleListResponse {
 
     private Long scheduleId;
     private String scheduleName;
-    private String scheduleContent;
-
-    @JsonFormat(pattern = "yyyy년 MM월 dd일 HH시 mm분")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime scheduleDateTime;
-
-    private boolean isChecked;
+    private AttendanceStatus attendanceStatus;
 
     @Builder
-    public GetScheduleResponse(Long scheduleId, String scheduleName, String scheduleContent,
-        LocalDateTime scheduleDateTime, boolean isChecked) {
+    public GetScheduleListResponse(
+        Long scheduleId, String scheduleName,
+        LocalDateTime scheduleDateTime, AttendanceStatus attendanceStatus) {
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
-        this.scheduleContent = scheduleContent;
         this.scheduleDateTime = scheduleDateTime;
-        this.isChecked = isChecked;
+        this.attendanceStatus = getAttendanceStatus();
     }
 }
