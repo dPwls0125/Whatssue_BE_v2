@@ -8,6 +8,7 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType;
 import GDG.whatssue.domain.officialabsence.repository.OfficialAbsenceRequestRepository;
+import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
@@ -30,10 +31,7 @@ public class AttendanceService {
 
     public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) throws Exception {
 
-        if(!scheduleRepository.findById(scheduleId).get().isChecked()){
-//            if(scheduleAttendanceResultRepository.findById(scheduleId).isPresent()) {
-//                throw new Exception("이미 출석이 진행중입니다. 출석을 종료한 후에 다시 시도해 주세요.");
-//            }
+        if(scheduleRepository.findById(scheduleId).get().getAttendanceStatus().equals(AttendanceStatus.BEFORE)){
             List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(() -> new Exception("해당 동아리에 가입된 멤버가 없습니다."));
             // 해당 출석을 여는
             for(ClubMember clubMember : clubMembers){
@@ -109,6 +107,7 @@ public class AttendanceService {
                         .build();
             } else return null;
         });
+
         return attendedMembers;
     }
     public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) throws Exception{
@@ -143,4 +142,5 @@ public class AttendanceService {
         attendanceResult.setAttendanceType(type);
         scheduleAttendanceResultRepository.save(attendanceResult);
     }
+
 }
