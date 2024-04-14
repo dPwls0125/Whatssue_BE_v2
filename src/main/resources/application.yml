@@ -53,11 +53,15 @@ logging:
 #          http11: debug
 
 server:
+  url: ${SERVER_URL}
   servlet:
     encoding:
       charset: UTF-8
       force: true
   port: 8080
+
+front:
+    url: ${FRONT_URL}
 
 coolsms:
   api:

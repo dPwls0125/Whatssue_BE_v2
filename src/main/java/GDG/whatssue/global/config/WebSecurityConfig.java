@@ -4,6 +4,7 @@ import GDG.whatssue.domain.user.service.CustomOauth2Service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,7 +21,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true) //secured 활성화, preAuthorize, postAuthorize 활성화
 public class WebSecurityConfig {
-    private final CustomOauth2Service CustomOauth2Service;
+    private final CustomOauth2Service customOauth2Service;
+
+    @Value("${server.url}")
+    private String serverUrl;
+
 
     private static final String[] AUTH_WHITELIST = {
             // swagger
@@ -40,13 +45,12 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-//                        .requestMatchers(HttpMethod.POST,"/board/get/list").hasRole("USER") // prefixed with ROLE_
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2->oauth2
-                        .defaultSuccessUrl("http://3.34.58.135:3000", true)
-//                        .failureUrl("/loginForm")
+                        .defaultSuccessUrl( serverUrl +"/api/user/login/redirect" )
+//                        .successHandler()
                         .userInfoEndpoint(userInfo->userInfo
-                                .userService(CustomOauth2Service))
+                                .userService(customOauth2Service))
                 )
 //                .formLogin((form) -> form
 ////                        .loginPage("/loginForm")
@@ -56,8 +60,10 @@ public class WebSecurityConfig {
 //                        .defaultSuccessUrl("/")
 //                )
                 .logout((logout) -> logout.permitAll());
+
         return http.build();
     }
+
 
     @Bean // 해당 메서드의 리턴되는 오브젝트를 IoC로 등록해준다.
     public PasswordEncoder passwordEncoder(){
