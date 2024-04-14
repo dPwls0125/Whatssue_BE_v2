@@ -2,13 +2,7 @@ package GDG.whatssue.domain.officialabsence.entity;
 
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Builder;
@@ -37,8 +31,9 @@ public class OfficialAbsenceRequest {
     @JoinColumn(name = "official_absence_content", nullable = false)
     private String officialAbsenceContent;
 
-    @Column(name = "is_checked")
-    private boolean isChecked;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OfficialAbsenceRequestType officialAbsenceRequestType;
 
     public OfficialAbsenceRequest() {
         // 기본 생성자

@@ -1,5 +1,7 @@
 package GDG.whatssue.domain.club.service.impl;
 
+import static GDG.whatssue.global.common.FileConst.*;
+
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
@@ -12,7 +14,6 @@ import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
-import GDG.whatssue.domain.file.service.impl.S3UploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.repository.UserRepository;
@@ -30,11 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class ClubServiceImpl implements ClubService {
-
-    private static String PROFILE_IMAGE_DIRNAME = "clubProfileImage";
-
-    //주소 앞에 s3 의존관계 없애야함 TODO
-    private static String DEFAULT_PROFILE_IMAGE =  "https://whatssue.s3.ap-northeast-2.amazonaws.com/" + PROFILE_IMAGE_DIRNAME + "/default.png";
     private final ClubRepository clubRepository;
     private final FileRepository fileRepository;
     private final ClubMemberRepository clubMemberRepository;
@@ -65,7 +61,7 @@ public class ClubServiceImpl implements ClubService {
         }
 
         //클럽을 생성한 멤버(관리자)로 추가
-        //따로 메서드로 뺄것. + 추가하면서 관련 테이블 생성도 해야함. TODO
+        //따로 메서드로 뺄것 TODO
         clubMemberRepository.save(
             ClubMember.builder()
             .club(savedClub)
@@ -88,7 +84,7 @@ public class ClubServiceImpl implements ClubService {
             deleteProfileImage(club);
         }
 
-        if (profileImage != null) { //헤더가 있는 경우 업로드 -> 사진 ㄴ유지 또는 변경
+        if (profileImage != null) { //헤더가 있는 경우 업로드 -> 사진 유지 또는 변경
             saveProfileImage(profileImage, club);
         }
     }
@@ -105,18 +101,8 @@ public class ClubServiceImpl implements ClubService {
     public GetClubInfoResponse getClubInfo(Long clubId) {
         Club club = getClub(clubId);
 
-        String storeFileName = "";
-        UploadFile profileImage = club.getProfileImage();
-
-        if (profileImage != null) {
-            storeFileName = profileImage.getStoreFileName();
-        }
-
-        if (profileImage == null) {
-            storeFileName = DEFAULT_PROFILE_IMAGE;
-        }
-
-        String fullPath = fileUploadService.getFullPath(storeFileName);
+        String profileImageFullPath = fileUploadService.getFullPath(
+            getStoreFileName(club.getProfileImage(), CLUB_PROFILE_IMAGE_DIRNAME));
 
         return GetClubInfoResponse.builder()
             .clubName(club.getClubName())
@@ -124,34 +110,24 @@ public class ClubServiceImpl implements ClubService {
             .contactMeans(club.getContactMeans())
             .namePolicy(club.getNamePolicy())
             .privateCode(club.getPrivateCode())
-            .profileImage(fullPath)
+            .profileImage(profileImageFullPath)
             .isPrivate(club.isPrivate()).build();
     }
 
     public GetJoinClubListResponse entityToJoinClubListResponse(ClubMember clubMember) {
         Club club = clubMember.getClub();
 
-        String storeFileName = "";
-        UploadFile profileImage = club.getProfileImage();
-
-        if (profileImage != null) {
-            storeFileName = profileImage.getStoreFileName();
-        }
-
-        if (profileImage == null) {
-            storeFileName = DEFAULT_PROFILE_IMAGE;
-        }
-
-        String fullPath = fileUploadService.getFullPath(storeFileName);
+        String profileImageFullPath = fileUploadService.getFullPath(
+            getStoreFileName(club.getProfileImage(), CLUB_PROFILE_IMAGE_DIRNAME));
 
         return GetJoinClubListResponse.builder()
             .clubId(club.getId())
             .clubName(club.getClubName())
-            .profileImage(storeFileName)
+            .profileImage(profileImageFullPath)
             .createdAt(clubMember.getCreateAt())
             .role(clubMember.getRole()).build();
-
     }
+
 
 
     @Override
@@ -162,22 +138,30 @@ public class ClubServiceImpl implements ClubService {
         club.createNewPrivateCode();
     }
 
+    private static String getStoreFileName(UploadFile uploadFile, String dirName) {
+        String storeFileName;
+
+        if (uploadFile != null) {
+            storeFileName = uploadFile.getStoreFileName();
+        } else {
+            storeFileName = dirName + DEFAULT_IMAGE_NAME;
+        }
+
+        return storeFileName;
+    }
     @Override
     public boolean isClubExist(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElse(null);
+        clubRepository.findById(clubId)
+            .orElseThrow(()-> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
 
-        if (club == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return true;
     }
 
     @Transactional
     public void saveProfileImage(MultipartFile profileImage, Club savedClub) throws IOException {
         String originalFileName = profileImage.getOriginalFilename();
         //profileImage fileRepository 및 s3에 저장 처리
-        String storeFileName = fileUploadService.saveFile(profileImage, PROFILE_IMAGE_DIRNAME);
+        String storeFileName = fileUploadService.saveFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
 
         fileRepository.save(UploadFile.builder()
             .club(savedClub)

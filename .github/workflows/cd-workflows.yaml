@@ -5,7 +5,6 @@ on:
     branches:
       - 'develop'
       - 'main'
-
 jobs:
   CD:
     runs-on: ubuntu-latest
@@ -40,6 +39,8 @@ jobs:
           cloud.aws.region.static: ap-northeast-2
           spring.redis.data.host: ${{ secrets.REDIS_HOST }}
           spring.redis.data.password: ${{ secrets.REDIS_PASSWORD }}
+          server.url: ${{ secrets.SERVER_URL }}
+          front.url: ${{ secrets.FRONT_URL }}
 
       - name: Grant execute permission for gradlew
 

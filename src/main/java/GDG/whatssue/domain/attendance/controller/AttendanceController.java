@@ -1,14 +1,14 @@
 package GDG.whatssue.domain.attendance.controller;
 
+import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
-import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
+import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.service.AttendanceService;
-import GDG.whatssue.domain.schedule.entity.Schedule;
+import GDG.whatssue.global.common.annotation.ClubManager;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +21,12 @@ import java.util.*;
 @RestController
 @Slf4j
 public class AttendanceController {
+
     private final AttendanceService attendanceService;
 
-    @Operation(summary = "출석 열기_manager")
+    @ClubManager
+    @Operation(summary = "출석 열기_manager ",description = "출석을 열면 출석을 진행하지 않았던 경우는 모두 결석 처리 리스트를 생성합니다.")
     @GetMapping("/schedules/{scheduleId}/attendance-start")
-    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity openAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         AttendanceNumResponseDto dto;
         try {
@@ -36,9 +37,10 @@ public class AttendanceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
+
+    @ClubManager
     @Operation(summary = "출석 종료")
     @PostMapping("/schedules/{scheduleId}/attendance-end")
-    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
             attendanceService.deleteAttendance(clubId, scheduleId);
@@ -48,20 +50,19 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
 
+    @ClubManager
     @Operation(summary = "일정별 출석한 멤버 리스트 조회")
     @GetMapping("/schedules/{scheduleId}/attendance-list")
-    @PreAuthorize("hasRole('ROLE_'+#clubId+'MANAGER')")
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) throws Exception {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
     @Operation(summary = "출석하기 _ user")
-    @PostMapping("/schedules/{scheduleId}/attendance")
-    @PreAuthorize("hasAnyRole('ROLE_'+#clubId+'MEMBER','ROLE_'+#clubId+'MANAGER')")
-    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @RequestBody ScheduleAttendanceRequestDto requestDto) {
+    @PostMapping("/schedules/{scheduleId}/attendance/{memberId}")
+    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @PathVariable Long memberId, AttendanceNumRequestDto requestDto) {
         try {
-            attendanceService.doAttendance(clubId, scheduleId, requestDto);
+            attendanceService.doAttendance(clubId, scheduleId, memberId, requestDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
         }
@@ -74,6 +75,19 @@ public class AttendanceController {
         List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
+
+    @ClubManager
+    @Operation(summary = "출석 정정")
+    @PutMapping("/schedules/{scheduleId}/attendance/{memberId}/{attendanceType}")
+    public ResponseEntity modifyMemberAttendance(@PathVariable Long scheduleId, @PathVariable Long memberId, @PathVariable String attendanceType){
+        try {
+             attendanceService.modifyMemberAttendance(scheduleId, memberId, attendanceType);
+         }catch (Exception e){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
+         }
+         return ResponseEntity.status(HttpStatus.OK).body("출석이 정정되었습니다.");
+    }
+
 }
 
 

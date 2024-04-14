@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ScheduleAttendanceRequestDto {
-    private Long clubMemberId;
+public class AttendanceNumRequestDto {
+
     private int attendanceNum;
 
 }

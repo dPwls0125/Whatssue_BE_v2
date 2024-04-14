@@ -21,21 +21,11 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-//    @Column( unique = true, nullable = false)
-//    private String userNick;
-
-//    @Column
-//    private String userPw;
-
     @Column
     private String userEmail;
 
     @Column
     private String userName;
-
-//    @Column
-//    private String userPhone;
-
 
     @Column( nullable = false, unique = true)
     private String oauth2Id;

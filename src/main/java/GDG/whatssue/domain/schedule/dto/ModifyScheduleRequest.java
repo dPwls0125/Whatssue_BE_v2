@@ -15,6 +15,9 @@ public class ModifyScheduleRequest {
     @NotBlank
     private String scheduleContent;
 
+    @NotBlank
+    private String schedulePlace;
+
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime scheduleDateTime;

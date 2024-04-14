@@ -1,11 +1,13 @@
 package GDG.whatssue.domain.schedule.controller;
 
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
-import GDG.whatssue.domain.schedule.dto.GetScheduleResponse;
+import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
+import GDG.whatssue.domain.schedule.dto.GetScheduleListResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
-import GDG.whatssue.domain.schedule.service.ScheduleService;
-import GDG.whatssue.global.annotation.ClubManager;
+import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
+import GDG.whatssue.global.common.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.LoginMember;
 import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,23 +30,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Interceptor
+ *  - ClubCheckInterceptor : 클럽 유효성 체크, 멤버 여부 체크, 관리자 여부 체크
+ *  - ScheduleCheckInterceptor : 스케줄 유효성 체크, 스케줄-클럽 권한 체크
+ */
 @Tag(name = "ScheduleController", description = "모임의 일정에 관련된 api")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}/schedules")
 public class ScheduleController {
 
-    private final ScheduleService scheduleService;
-
-    /**
-     * Filter 또는 Interceptor를 통해 schedule이 club의 것인지 체크 필요 TODO
-     */
+    private final ScheduleServiceImpl scheduleService;
 
     @ClubManager
     @Operation(summary = "일정 추가", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PostMapping
-    public ResponseEntity addSchedule(@PathVariable(name = "clubId") Long clubId, @Valid @RequestBody AddScheduleRequest requestDto) {
-        scheduleService.saveSchedule(clubId, requestDto);
+    public ResponseEntity addSchedule (
+        @PathVariable(name = "clubId") Long clubId,
+        @LoginMember Long memberId,
+        @Valid @RequestBody AddScheduleRequest requestDto) {
+        scheduleService.saveSchedule(clubId, memberId, requestDto);
 
         return ResponseEntity.status(200).body("ok");
     }
@@ -72,7 +78,7 @@ public class ScheduleController {
     @Operation(summary = "일정 상세조회")
     @GetMapping("/{scheduleId}")
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleResponse scheduleDto = scheduleService.findSchedule(scheduleId);
+        GetScheduleDetailResponse scheduleDto = scheduleService.findSchedule(scheduleId);
 
         return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
     }
@@ -81,14 +87,13 @@ public class ScheduleController {
     @GetMapping
     @Parameter(name = "date", description = "날짜 미입력 시 전체 일정 조회 (날짜 패턴 : yyyy-MM-dd or yyyy-MM)", required = false, in = ParameterIn.QUERY)
     public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date) {
-        List<GetScheduleResponse> responseDtoList;
-        responseDtoList = getScheduleResponses(clubId, date);
+        List<GetScheduleListResponse> responseDtoList = getScheduleResponses(clubId, date);
 
         return new ResponseEntity(responseDtoList, HttpStatus.OK);
     }
 
-    private List<GetScheduleResponse> getScheduleResponses(Long clubId, String date) {
-        List<GetScheduleResponse> responseDtoList;
+    private List<GetScheduleListResponse> getScheduleResponses(Long clubId, String date) {
+        List<GetScheduleListResponse> responseDtoList;
         if (date == null) { //전체 조회
             responseDtoList = scheduleService.findScheduleAll(clubId);
         } else {
@@ -101,8 +106,8 @@ public class ScheduleController {
         return responseDtoList;
     }
 
-    private List<GetScheduleResponse> getScheduleResponsesByFilter(Long clubId, String date, boolean day_check, boolean month_check) {
-        List<GetScheduleResponse> responseDtoList;
+    private List<GetScheduleListResponse> getScheduleResponsesByFilter(Long clubId, String date, boolean day_check, boolean month_check) {
+        List<GetScheduleListResponse> responseDtoList;
         if (day_check) { //일자별 조회
             responseDtoList = scheduleService.findScheduleByDay(clubId, date);
         } else if (month_check) { //월별 조회
