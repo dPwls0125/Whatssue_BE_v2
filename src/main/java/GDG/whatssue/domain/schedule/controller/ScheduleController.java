@@ -83,9 +83,10 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
     }
 
-    @Operation(summary = "일정 조회(전체/일별/월별)")
+    @Operation(summary = "일정 조회(기간)")
     @GetMapping
-    @Parameter(name = "date", description = "날짜 미입력 시 전체 일정 조회 (날짜 패턴 : yyyy-MM-dd or yyyy-MM)", required = false, in = ParameterIn.QUERY)
+    @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년)", required = false, in = ParameterIn.QUERY)
+    @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", required = false, in = ParameterIn.QUERY)
     public ResponseEntity getScheduleAll(
         @PathVariable(name = "clubId") Long clubId,
         @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,
