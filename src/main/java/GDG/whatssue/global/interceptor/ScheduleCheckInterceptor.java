@@ -2,7 +2,7 @@ package GDG.whatssue.global.interceptor;
 
 import static GDG.whatssue.global.error.CommonErrorCode.*;
 
-import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
+import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ import org.springframework.web.servlet.HandlerMapping;
 public class ScheduleCheckInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private ScheduleServiceImpl scheduleService;
+    private ScheduleService scheduleService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
