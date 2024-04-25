@@ -2,6 +2,7 @@ package GDG.whatssue.global.interceptor;
 
 import static GDG.whatssue.global.error.CommonErrorCode.*;
 
+import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,9 +30,9 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
         Long clubId = getClubId(request);
         Long scheduleId = getScheduleId(request);
 
-        //클럽의 스케줄 체크
+        //스케줄 존재 및 클럽 소유여부 체크
         if (!scheduleService.isClubSchedule(clubId, scheduleId)) {
-            throw new CommonException(FORBIDDEN_ACCESS_ERROR);
+            throw new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR);
         }
 
         //인터셉터 통과

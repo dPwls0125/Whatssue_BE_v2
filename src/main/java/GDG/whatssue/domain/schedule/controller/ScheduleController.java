@@ -78,17 +78,19 @@ public class ScheduleController {
     @Operation(summary = "일정 상세조회")
     @GetMapping("/{scheduleId}")
     public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleDetailResponse scheduleDto = scheduleService.findSchedule(scheduleId);
+        GetScheduleDetailResponse scheduleDto = scheduleService.findScheduleById(scheduleId);
 
         return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
     }
 
-    @Operation(summary = "일정 조회(기간)")
+    @Operation(summary = "일정 조회(검색 : 검색어, 기간)")
     @GetMapping
-    @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년)", required = false, in = ParameterIn.QUERY)
+    @Parameter(name = "query", description = "검색어. 일정명으로 검색", required = false, in = ParameterIn.QUERY)
+    @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", required = false, in = ParameterIn.QUERY)
     @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", required = false, in = ParameterIn.QUERY)
-    public ResponseEntity getScheduleAll(
+    public ResponseEntity findSchedules(
         @PathVariable(name = "clubId") Long clubId,
+        @RequestParam(name = "query", required = false, defaultValue = "") String query,
         @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,
         @RequestParam(name = "eDate", required = false, defaultValue = "2199-12-31") String eDate) {
         
@@ -99,7 +101,7 @@ public class ScheduleController {
             throw new CommonException(ScheduleErrorCode.INVALID_SCHEDULE_DATE_PATTERN_ERROR);
         }
 
-        List<GetScheduleListResponse> responseDtoList = scheduleService.findScheduleList(clubId, sDate, eDate);
+        List<GetScheduleListResponse> responseDtoList = scheduleService.findSchedules(clubId, query, sDate, eDate);
         return new ResponseEntity(responseDtoList, HttpStatus.OK);
     }
 }
