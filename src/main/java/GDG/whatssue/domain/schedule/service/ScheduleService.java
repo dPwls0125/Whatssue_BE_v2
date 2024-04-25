@@ -52,30 +52,26 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-    public GetScheduleDetailResponse findSchedule(Long scheduleId) {
+    public GetScheduleDetailResponse findScheduleById(Long scheduleId) {
         Schedule schedule = getSchedule(scheduleId);
 
         return scheduleToGetScheduleDetailResponse(schedule);
     }
 
-    public List<GetScheduleListResponse> findScheduleList(Long clubId, String sDate, String eDate) {
-        List<Schedule> scheduleList = scheduleQueryRepository.findSchedules(clubId, sDate, eDate);
+    public List<GetScheduleListResponse> findSchedules(Long clubId, String query, String sDate, String eDate) {
+        List<Schedule> scheduleList = scheduleQueryRepository.findSchedules(clubId, query, sDate, eDate);
         return scheduleListToResponseDtoList(scheduleList);
     }
 
     public boolean isClubSchedule(Long clubId, Long scheduleId) {
-        Schedule schedule = getSchedule(scheduleId);
-        if (schedule.getClub().getId() == clubId) {
-            return true;
-        } else {
-            return false;
-        }
+        return scheduleRepository.existsByIdAndClub_Id(scheduleId, clubId);
     }
 
     public List<GetScheduleListResponse> scheduleListToResponseDtoList(List<Schedule> scheduleList) {
         return scheduleList.stream()
             .map(s -> scheduleToGetScheduleListResponse(s))
             .collect(Collectors.toList());
+
     }
 
     public GetScheduleListResponse scheduleToGetScheduleListResponse(Schedule schedule) {

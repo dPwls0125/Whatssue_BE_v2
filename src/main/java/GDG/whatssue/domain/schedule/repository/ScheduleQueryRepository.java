@@ -13,6 +13,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Repository
 @Transactional
@@ -21,15 +22,24 @@ public class ScheduleQueryRepository {
 
     private final JPAQueryFactory query;
 
-    public List<Schedule> findSchedules(Long clubId, String startDate, String endDate) {
-        return query.select(schedule)
+    public List<Schedule> findSchedules(Long clubId, String searchQuery, String startDate, String endDate) {
+        return query
+            .select(schedule)
             .from(schedule)
-            .where(filterClub(clubId), filterDate(startDate, endDate))
+            .where(filterClub(clubId), filterQuery(searchQuery), filterDate(startDate, endDate))
             .fetch();
     }
 
     public BooleanExpression filterClub(Long clubId) {
         return schedule.club.id.eq(clubId);
+    }
+
+    public BooleanExpression filterQuery(String searchQuery) {
+        if (StringUtils.hasText(searchQuery)) {
+            return schedule.scheduleName.like("%" + searchQuery + "%");
+        }
+
+        return null;
     }
 
     public BooleanExpression filterDate(String startDate, String endDate) {
@@ -39,7 +49,4 @@ public class ScheduleQueryRepository {
 
         return schedule.scheduleDateTime.between(startDateTime, endDateTime);
     }
-
-
-
 }
