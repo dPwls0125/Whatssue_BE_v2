@@ -4,6 +4,7 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Transactional
 public class Comment extends BaseEntity {
 
     @Id
@@ -41,6 +43,7 @@ public class Comment extends BaseEntity {
 
     @Column(name = "comment_content",nullable = false)
     private String content;
+
 
 
 }
