@@ -3,7 +3,6 @@ package GDG.whatssue.global.interceptor;
 import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.*;
 import static GDG.whatssue.global.error.CommonErrorCode.*;
 
-import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.user.entity.KakaoDetails;

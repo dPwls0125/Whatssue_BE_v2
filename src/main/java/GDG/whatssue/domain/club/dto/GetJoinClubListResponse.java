@@ -12,17 +12,18 @@ public class GetJoinClubListResponse {
 
     public Long clubId;
     public String clubName;
-    public String profileImage;
+    public String clubProfileImage;
     public LocalDateTime createdAt;
     public Role role;
+
     //현재 인원 TODO
 
     @Builder
-    public GetJoinClubListResponse(Long clubId, String clubName, String profileImage,
+    public GetJoinClubListResponse(Long clubId, String clubName, String clubProfileImage,
         LocalDateTime createdAt, Role role) {
         this.clubId = clubId;
         this.clubName = clubName;
-        this.profileImage = profileImage;
+        this.clubProfileImage = clubProfileImage;
         this.createdAt = createdAt;
         this.role = role;
     }
