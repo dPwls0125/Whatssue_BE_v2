@@ -51,12 +51,12 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @Operation(summary = "모임 생성")
+    @Operation(summary = "모임 생성", description = "기본 사진일 시 profileImage 헤더 x")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createClub(
         @LoginUser Long userId,
         @RequestPart("request") ClubCreateRequest request,
-        @RequestPart("profileImage") MultipartFile profileImage) throws IOException {
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
         //Validation 및 예외처리 TODO
 
@@ -66,7 +66,7 @@ public class ClubController {
     }
 
     @ClubManager
-    @Operation(summary = "모임 정보 수정", description = "최종 프로필 사진이 기본 사진일 시 profileImage 헤더 x")
+    @Operation(summary = "모임 정보 수정", description = "기본 사진일 시 profileImage 헤더 x")
     @PatchMapping(value = "/{clubId}/info",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity updateClubInfo(@PathVariable("clubId") Long clubId,

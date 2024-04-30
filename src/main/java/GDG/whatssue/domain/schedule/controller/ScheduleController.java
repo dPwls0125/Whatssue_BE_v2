@@ -58,9 +58,10 @@ public class ScheduleController {
     @ClubManager
     @Operation(summary = "일정 수정", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PatchMapping("/{scheduleId}")
-    public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,
+    public ResponseEntity modifySchedule(
+        @PathVariable(name = "clubId") Long clubId,
+        @PathVariable(name = "scheduleId") Long scheduleId,
         @Valid @RequestBody ModifyScheduleRequest requestDto) {
-
         scheduleService.updateSchedule(scheduleId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body("ok");
@@ -85,12 +86,12 @@ public class ScheduleController {
 
     @Operation(summary = "일정 조회(검색 : 검색어, 기간)")
     @GetMapping
-    @Parameter(name = "query", description = "검색어. 일정명으로 검색", required = false, in = ParameterIn.QUERY)
+    @Parameter(name = "q", description = "검색어. 일정명으로 검색", required = false, in = ParameterIn.QUERY)
     @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", required = false, in = ParameterIn.QUERY)
     @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", required = false, in = ParameterIn.QUERY)
     public ResponseEntity findSchedules(
         @PathVariable(name = "clubId") Long clubId,
-        @RequestParam(name = "query", required = false, defaultValue = "") String query,
+        @RequestParam(name = "q", required = false, defaultValue = "") String query,
         @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,
         @RequestParam(name = "eDate", required = false, defaultValue = "2199-12-31") String eDate) {
         
