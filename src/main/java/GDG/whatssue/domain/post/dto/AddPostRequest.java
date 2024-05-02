@@ -13,8 +13,10 @@ public class AddPostRequest {
     private String postContent;
     private PostCategory postCategory;
 
-    public Post toEntity() {
+    public Post toEntity(Club club, ClubMember writer) {
         return Post.builder()
+            .club(club)
+            .writer(writer)
             .postTitle(this.postTitle)
             .postCategory(this.postCategory)
             .postContent(this.postContent)

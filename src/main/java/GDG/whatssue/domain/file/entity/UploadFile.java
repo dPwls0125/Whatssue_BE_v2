@@ -44,8 +44,10 @@ public class UploadFile {
     private String storeFileName;
 
     @Builder
-    public UploadFile(Club club, String uploadFileName, String storeFileName) {
+    public UploadFile(Club club, ClubMember clubMember, Post post, String uploadFileName, String storeFileName) {
         this.club = club;
+        this.clubMember = clubMember;
+        this.post = post;
         this.uploadFileName = uploadFileName;
         this.storeFileName = storeFileName;
     }

@@ -5,6 +5,7 @@ import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.common.annotation.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -30,7 +31,8 @@ public class PostController {
         @PathVariable(name = "clubId") Long clubId,
         @LoginMember Long memberId,
         @RequestPart("request") AddPostRequest request,
-        @RequestPart("postImages") List<MultipartFile> postImages) {
+        @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages)
+        throws IOException {
         
         //addPost 처리 TODO
         postService.addPost(clubId, memberId, request, postImages);
