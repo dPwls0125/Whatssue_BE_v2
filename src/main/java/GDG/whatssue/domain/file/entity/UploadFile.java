@@ -34,7 +34,7 @@ public class UploadFile {
     private ClubMember clubMember;
 
     @ManyToOne
-    @JoinColumn(name = "club_member_id")
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @Column(nullable = false)
