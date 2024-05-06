@@ -45,8 +45,14 @@ public class OfficialAbsenceService {
 
         ClubMember clubMember = clubMemberRepository.findById(officialAbsenceAddRequestDto.getClubMemberId())
             .orElseThrow(() -> new NoSuchElementException("No club member found for memberId: " + officialAbsenceAddRequestDto.getClubMemberId()));
-        String officialAbsenceContent = officialAbsenceAddRequestDto.getOfficialAbsenceContent();
 
+        boolean isAlreadyRequested = officialAbsenceRequestRepository.existsByScheduleAndClubMember(schedule, clubMember);
+
+        if (isAlreadyRequested) {
+            throw new IllegalStateException("Official absence request for schedule " + scheduleId + " by member " + officialAbsenceAddRequestDto.getClubMemberId() + " already exists.");
+        }
+
+        String officialAbsenceContent = officialAbsenceAddRequestDto.getOfficialAbsenceContent();
         ClubMember clubMemberEntity = clubMemberRepository.findById(clubMember.getId()).get();
 
         OfficialAbsenceRequest officialAbsenceRequest = OfficialAbsenceRequest.builder()
