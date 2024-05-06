@@ -1,8 +1,8 @@
 package GDG.whatssue.domain.officialabsence.entity;
 
 public enum OfficialAbsenceRequestType {
-    NOT_CHECKED,
+    WAITING,
     ACCEPTED,
-    DENIED
+    REJECTED
 
 }
