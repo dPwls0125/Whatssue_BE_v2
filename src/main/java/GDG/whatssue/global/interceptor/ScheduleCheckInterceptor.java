@@ -2,7 +2,8 @@ package GDG.whatssue.global.interceptor;
 
 import static GDG.whatssue.global.error.CommonErrorCode.*;
 
-import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
+import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
+import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +18,7 @@ import org.springframework.web.servlet.HandlerMapping;
 public class ScheduleCheckInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private ScheduleServiceImpl scheduleService;
+    private ScheduleService scheduleService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -29,9 +30,9 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
         Long clubId = getClubId(request);
         Long scheduleId = getScheduleId(request);
 
-        //클럽의 스케줄 체크
+        //스케줄 존재 및 클럽 소유여부 체크
         if (!scheduleService.isClubSchedule(clubId, scheduleId)) {
-            throw new CommonException(FORBIDDEN_ACCESS_ERROR);
+            throw new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR);
         }
 
         //인터셉터 통과
@@ -41,11 +42,7 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
     private Long getClubId(HttpServletRequest request) {
         String clubId = extractPathVariableFromRequest(request, "clubId");
 
-        try {
-            return Long.parseLong(clubId);
-        } catch (Exception e) {
-            throw new CommonException(BAD_REQUEST);
-        }
+        return Long.parseLong(clubId);
     }
 
     private Long getScheduleId(HttpServletRequest request) {

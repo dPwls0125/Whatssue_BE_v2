@@ -42,4 +42,9 @@ public class ClubMemberServiceImpl implements ClubMemberService {
 
         return clubMember.isFirstVisit();
     }
+
+    @Override
+    public Long getClubMemberId(Long clubId, Long userId) {
+        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId).get().getId();
+    }
 }

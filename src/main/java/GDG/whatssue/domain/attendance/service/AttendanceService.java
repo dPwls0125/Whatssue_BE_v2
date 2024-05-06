@@ -1,9 +1,14 @@
 package GDG.whatssue.domain.attendance.service;
 
+import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
-import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceRequestDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
+import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
+import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType;
+import GDG.whatssue.domain.officialabsence.repository.OfficialAbsenceRequestRepository;
+import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
@@ -22,7 +27,23 @@ public class AttendanceService {
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleRepository scheduleRepository;
+    private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
+
     public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) throws Exception {
+
+        if(scheduleRepository.findById(scheduleId).get().getAttendanceStatus().equals(AttendanceStatus.BEFORE)){
+            List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(() -> new Exception("해당 동아리에 가입된 멤버가 없습니다."));
+            // 해당 출석을 여는
+            for(ClubMember clubMember : clubMembers){
+                ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
+                        .clubMember(clubMember)
+                        .schedule(scheduleRepository.findById(scheduleId).orElseThrow(() -> new Exception("해당 일정이 존재하지 않습니다.")))
+                        .attendanceType(AttendanceType.ABSENCE)
+                        .build();
+                scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
+            }
+        }
+
         Random random = new Random();
         int randomInt = random.nextInt(1, 1001);
         if (attendanceNumMap.containsKey(clubId)) {
@@ -41,7 +62,7 @@ public class AttendanceService {
                 .build();
         return attendanceNumResponseDto;
     }
-/*현재 진행중인 일정 리스트*/
+    //현재 진행중인 일정 리스트
     public List<ScheduleDto> currentAttendanceList(Long clubId) {
         List<ScheduleDto> scheduleIdList = new ArrayList<>();
         if (attendanceNumMap.containsKey(clubId)) {
@@ -53,7 +74,7 @@ public class AttendanceService {
                         .scheduleName(schedule.getScheduleName())
                         .scheduleContent(schedule.getScheduleContent())
                         .scheduleDateTime(schedule.getScheduleDateTime())
-                        .isChecked(schedule.isChecked())
+                        .attendanceStatus(schedule.getAttendanceStatus())
                         .build();
                 scheduleIdList.add(dto);
             }
@@ -86,19 +107,40 @@ public class AttendanceService {
                         .build();
             } else return null;
         });
+
         return attendedMembers;
     }
-    public void doAttendance(Long clubId, Long schduleId, ScheduleAttendanceRequestDto requestDto) throws Exception{
+    public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) throws Exception{
 
         int attendanceNum = attendanceNumMap.get(clubId).get(schduleId);
         int inputValue = requestDto.getAttendanceNum();
+
         if (attendanceNum == inputValue) {
-            ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
-                    .clubMember(clubMemberRepository.findById(requestDto.getClubMemberId()).get())
-                    .schedule(scheduleRepository.findById(schduleId).get())
-                    .attendanceType(AttendanceType.ATTENDANCE)
-                    .build();
+            ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(schduleId, memberId)
+                    .orElseThrow(() -> new Exception("해당 일정에 대한 출석 결과가 존재하지 않습니다."));
+            scheduleAttendanceResult.setAttendanceType(AttendanceType.ATTENDANCE);
             scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
-        }else throw new Exception("출석번호가 일치하지 않습니다.다시 시도해 주세요");
+        }else throw new Exception(" 출석번호가 일치하지 않습니다. 다시 시도해 주세요");
+
     }
+
+    public void modifyMemberAttendance(Long scheduleId, Long memberId, String attendanceType){
+
+        ScheduleAttendanceResult attendanceResult = scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId, memberId)
+                .orElseThrow(() -> new RuntimeException("해당 일정에 대한 출석 결과가 존재하지 않습니다."));
+        AttendanceType type = AttendanceType.valueOf(attendanceType.toUpperCase());
+
+        if(type.equals(AttendanceType.OFFICIAL_ABSENCE)) {
+            OfficialAbsenceRequest officialAbsenceRequest = OfficialAbsenceRequest.builder()
+                    .clubMember(attendanceResult.getClubMember())
+                    .schedule(attendanceResult.getSchedule())
+                    .officialAbsenceContent("관리자의 출석 정정에 의해 인정된 공결입니다.")
+                    .officialAbsenceRequestType(OfficialAbsenceRequestType.ACCEPTED)
+                    .build();
+            officialAbsenceRequestRepository.save(officialAbsenceRequest);
+        }
+        attendanceResult.setAttendanceType(type);
+        scheduleAttendanceResultRepository.save(attendanceResult);
+    }
+
 }

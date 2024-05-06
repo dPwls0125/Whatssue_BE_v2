@@ -60,7 +60,7 @@ public class ClubMember extends BaseEntity {
     @OneToMany(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList;
 
-    @OneToMany(mappedBy = "clubMember")
+    @OneToMany(mappedBy = "writer")
     private List<Post> postList;
 
     @Builder
