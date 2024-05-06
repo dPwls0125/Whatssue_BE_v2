@@ -1,15 +1,20 @@
 package GDG.whatssue.domain.post.controller;
 
 import GDG.whatssue.domain.post.dto.AddPostRequest;
+import GDG.whatssue.domain.post.dto.GetPostResponse;
 import GDG.whatssue.domain.post.service.PostService;
+import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,8 +39,16 @@ public class PostController {
         @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages)
         throws IOException {
         
-        //addPost 처리 TODO
+        //게시글, 공지 구분 및 권한에 따른 예외처리 TODO
         postService.addPost(clubId, memberId, request, postImages);
         return null;
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity getPost(
+        @PathVariable(name = "clubId") Long clubId, @PathVariable(name = "postId") Long postId) {
+        GetPostResponse responseDto = postService.getPost(postId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }
