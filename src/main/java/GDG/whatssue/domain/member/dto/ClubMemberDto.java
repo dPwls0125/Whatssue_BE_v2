@@ -10,4 +10,5 @@ public class ClubMemberDto {
     private String memberName;
     private boolean isEmailPublic;
     private boolean isPhonePublic;
+
 }
