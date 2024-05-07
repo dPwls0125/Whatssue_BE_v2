@@ -10,5 +10,4 @@ import lombok.*;
 public class CommentBaseDto {
     private Long commentId;
     private String content;
-
 }

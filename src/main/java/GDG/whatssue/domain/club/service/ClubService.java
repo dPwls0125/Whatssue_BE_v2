@@ -162,7 +162,6 @@ public class ClubService {
 
         return club;
     }
-
     public Club getClub(Long clubId) {
         return clubRepository.findById(clubId).orElseThrow(()
             -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));

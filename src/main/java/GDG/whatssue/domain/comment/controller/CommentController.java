@@ -7,6 +7,7 @@ import GDG.whatssue.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.Member;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,17 +32,20 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 삭제")
-    public void deleteComment() {
+    public void deleteComment(Long memberId, Long commentId) {
+        commentService.deleteComment(memberId, commentId);
         // 댓글 삭제
     }
 
     @Operation(summary = "댓글 조회")
-    public void getComment() {
-        // 댓글 조회
+    @GetMapping("/get")
+    public ResponseEntity getComment(Long commentId) {
+        return ResponseEntity.status(200).body(commentService.getComment(commentId));
     }
 
     @Operation(summary = "댓글 목록 조회")
-    public void getCommentList() {
-        // 댓글 목록 조회
+    @GetMapping("/list")
+    public ResponseEntity getCommentList(Long postId) {
+        return ResponseEntity.status(200).body(commentService.getCommentList(postId));
     }
 }

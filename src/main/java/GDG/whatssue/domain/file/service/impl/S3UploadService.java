@@ -25,7 +25,6 @@ public class S3UploadService implements FileUploadService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-
     @Override
     public String saveFile(MultipartFile multipartFile, String dirName) throws IOException {
         //저장 사진이 없으면 기본 경로 반환

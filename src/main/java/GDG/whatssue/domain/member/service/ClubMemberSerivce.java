@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.member.service;
 
+import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
@@ -21,6 +22,7 @@ public class ClubMemberSerivce {
     private final ClubMemberRepository clubMemberRepository;
     private final AmazonS3 s3Client;
     private final UserRepository userRepository;
+    private final FileUploadService fileUploadService;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -28,6 +30,12 @@ public class ClubMemberSerivce {
         ClubMember clubMember = clubMemberRepository.findById(memberId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
         try{
+            clubMember = ClubMember.builder()
+                    .memberName(requestDto.getMemberName())
+                    .memberIntro(requestDto.getMemberIntro())
+                    .isEmailPublic(requestDto.isEmailPublic())
+                    .isPhonePublic(requestDto.isPhonePublic())
+                    .build();
             clubMember.setMemberName(requestDto.getMemberName());
             clubMember.setMemberIntro(requestDto.getMemberIntro());
             clubMember.setEmailPublic(requestDto.isEmailPublic());
@@ -44,6 +52,9 @@ public class ClubMemberSerivce {
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->new RuntimeException("User Not Found"));
+
+        String storeFileName = member.getProfileImage().getStoreFileName();
+        String memberProfileImage = fileUploadService.getFullPath(storeFileName);
 
         URL url = s3Client.getUrl(bucketName,memberId.toString());
 

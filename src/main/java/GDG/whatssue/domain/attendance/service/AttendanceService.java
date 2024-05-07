@@ -28,7 +28,6 @@ public class AttendanceService {
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleRepository scheduleRepository;
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
-
     public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) throws Exception {
 
         if(scheduleRepository.findById(scheduleId).get().getAttendanceStatus().equals(AttendanceStatus.BEFORE)){

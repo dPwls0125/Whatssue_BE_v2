@@ -1,7 +1,5 @@
 package GDG.whatssue.domain.comment.dto;
-
 import lombok.*;
-
 @Getter
 @Setter
 @AllArgsConstructor

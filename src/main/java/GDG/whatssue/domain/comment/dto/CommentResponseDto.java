@@ -1,9 +1,6 @@
 package GDG.whatssue.domain.comment.dto;
 
 import lombok.*;
-
-
-
 @Getter
 @Setter
 public class CommentResponseDto extends CommentBaseDto {
