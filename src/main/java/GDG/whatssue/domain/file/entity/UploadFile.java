@@ -2,12 +2,14 @@ package GDG.whatssue.domain.file.entity;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.post.entity.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +33,10 @@ public class UploadFile {
     @JoinColumn(name = "club_member_id")
     private ClubMember clubMember;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
     @Column(nullable = false)
     private String uploadFileName;
 
@@ -38,8 +44,10 @@ public class UploadFile {
     private String storeFileName;
 
     @Builder
-    public UploadFile(Club club, String uploadFileName, String storeFileName) {
+    public UploadFile(Club club, ClubMember clubMember, Post post, String uploadFileName, String storeFileName) {
         this.club = club;
+        this.clubMember = clubMember;
+        this.post = post;
         this.uploadFileName = uploadFileName;
         this.storeFileName = storeFileName;
     }

@@ -17,8 +17,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@Getter
 public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +32,7 @@ public class Post extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "club_member_id", nullable = false)
-    private ClubMember clubMember;
+    private ClubMember writer;
 
     @ManyToOne
     @JoinColumn(name = "club_id", nullable = false)
@@ -45,4 +50,15 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList;
+
+    @Builder
+    public Post(Long id, ClubMember writer, Club club, String postTitle, String postContent,
+        PostCategory postCategory) {
+        this.id = id;
+        this.writer = writer;
+        this.club = club;
+        this.postTitle = postTitle;
+        this.postContent = postContent;
+        this.postCategory = postCategory;
+    }
 }
