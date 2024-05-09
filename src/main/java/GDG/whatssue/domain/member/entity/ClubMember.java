@@ -24,11 +24,11 @@ public class ClubMember extends BaseEntity {
     @Column(name = "club_member_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -51,10 +51,10 @@ public class ClubMember extends BaseEntity {
     @Column(nullable = false)
     private boolean isFirstVisit;
 
-    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private UploadFile profileImage;
 
-    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private MemberAttendanceResult memberAttendanceResult;
 
     @OneToMany(mappedBy = "clubMember",cascade = CascadeType.REMOVE)

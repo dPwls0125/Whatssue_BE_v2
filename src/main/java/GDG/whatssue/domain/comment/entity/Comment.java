@@ -24,18 +24,18 @@ public class Comment extends BaseEntity {
     @Column(name="comment_id",unique = true)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parentComment; // 부모 댓글
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
     private List<Comment> childComments; // 자식 댓글 리스트
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "club_member_id", nullable = false)
     private ClubMember clubMember;
 
