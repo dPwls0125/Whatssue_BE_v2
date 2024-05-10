@@ -18,7 +18,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +38,14 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "club_member_id", nullable = false)
-    private ClubMember clubMember;
+    private ClubMember register;
 
     @Column(nullable = false)
     private String scheduleName;
 
-    @Column
+    @Column(nullable = false)
     private String scheduleContent;
 
     @Column(nullable = false)
@@ -65,6 +64,15 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
+    public void setClub(Club club) {
+        this.club = club;
+        club.getScheduleList().add(this); //연관관계 편의 메서드
+    }
+
+    public void setClubMember(ClubMember register) {
+        this.register = register;
+    }
+
     public void update(ModifyScheduleRequest request) {
         this.scheduleName = request.getScheduleName();
         this.scheduleContent = request.getScheduleContent();
@@ -73,10 +81,10 @@ public class Schedule extends BaseEntity {
     }
 
     @Builder
-    public Schedule(Club club, ClubMember clubMember, String scheduleName, String scheduleContent,
+    public Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
         LocalDateTime scheduleDateTime, String schedulePlace, AttendanceStatus attendanceStatus) {
         this.club = club;
-        this.clubMember = clubMember;
+        this.register = register;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
         this.scheduleDateTime = scheduleDateTime;

@@ -3,6 +3,7 @@ package GDG.whatssue.domain.schedule.service;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -35,15 +35,16 @@ public class ScheduleService {
 
     @Transactional
     public void saveSchedule(Long clubId, Long memberId, AddScheduleRequest requestDto) {
-        Club club = getClub(clubId);
+        Schedule schedule = requestDto.toEntity();
+        scheduleRepository.save(schedule);
 
-        Schedule saveSchedule = requestDto.toEntity(club, clubMemberRepository.findById(memberId).get());
-        scheduleRepository.save(saveSchedule);
+        schedule.setClub(findClub(clubId));
+        schedule.setClubMember(findMember(memberId));
     }
 
     @Transactional
     public void updateSchedule(Long scheduleId, ModifyScheduleRequest requestDto) {
-        Schedule schedule = getSchedule(scheduleId);
+        Schedule schedule = findSchedule(scheduleId);
         schedule.update(requestDto);
     }
 
@@ -53,13 +54,11 @@ public class ScheduleService {
     }
 
     public GetScheduleDetailResponse findScheduleById(Long scheduleId) {
-        Schedule schedule = getSchedule(scheduleId);
-
-        return scheduleToGetScheduleDetailResponse(schedule);
+        return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId));
     }
 
-    public List<GetScheduleListResponse> findSchedules(Long clubId, String query, String sDate, String eDate) {
-        List<Schedule> scheduleList = scheduleQueryRepository.findSchedules(clubId, query, sDate, eDate);
+    public List<GetScheduleListResponse> findScheduleByFilter(Long clubId, String query, String sDate, String eDate) {
+        List<Schedule> scheduleList = scheduleQueryRepository.findScheduleByFilter(clubId, query, sDate, eDate);
         return scheduleListToResponseDtoList(scheduleList);
     }
 
@@ -83,7 +82,7 @@ public class ScheduleService {
     }
 
     private GetScheduleDetailResponse scheduleToGetScheduleDetailResponse(Schedule schedule) {
-        ClubMember register = schedule.getClubMember();
+        ClubMember register = schedule.getRegister();
 
         String storeFileName = register.getProfileImage().getStoreFileName();
         String registerProfileImage = fileUploadService.getFullPath(storeFileName);
@@ -100,12 +99,17 @@ public class ScheduleService {
             .attendanceStatus(schedule.getAttendanceStatus()).build();
     }
 
-    private Club getClub(Long clubId) {
+    private Club findClub(Long clubId) {
         return clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
     }
 
-    private Schedule getSchedule(Long scheduleId) {
+    private ClubMember findMember(Long memberId) {
+        return clubMemberRepository.findById(memberId)
+            .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
+    }
+
+    private Schedule findSchedule(Long scheduleId) {
         return scheduleRepository.findById(scheduleId)
             .orElseThrow(() -> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
     }

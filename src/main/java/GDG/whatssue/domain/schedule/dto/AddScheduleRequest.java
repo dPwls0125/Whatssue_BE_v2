@@ -13,11 +13,12 @@ import lombok.Getter;
 @Getter
 public class AddScheduleRequest {
 
+    private Club club;
+    private ClubMember register;
     @NotBlank
     private String scheduleName;
     @NotNull
     private String scheduleContent;
-
     @NotNull
     private String schedulePlace;
 
@@ -25,14 +26,12 @@ public class AddScheduleRequest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime scheduleDateTime;
 
-    public Schedule toEntity(Club club, ClubMember registerMember) {
+    public Schedule toEntity() {
         return Schedule.builder()
-            .club(club)
             .scheduleName(scheduleName)
             .scheduleContent(scheduleContent)
             .scheduleDateTime(scheduleDateTime)
             .schedulePlace(schedulePlace)
-            .clubMember(registerMember)
             .attendanceStatus(AttendanceStatus.BEFORE).build();
     }
 }
