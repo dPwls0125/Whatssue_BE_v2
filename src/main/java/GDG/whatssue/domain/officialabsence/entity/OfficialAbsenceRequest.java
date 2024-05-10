@@ -20,11 +20,11 @@ public class OfficialAbsenceRequest {
     @Column(name = "official_absence_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "club_member_id", nullable = false)
     private ClubMember clubMember;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
 

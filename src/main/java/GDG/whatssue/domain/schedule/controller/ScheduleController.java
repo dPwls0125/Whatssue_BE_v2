@@ -1,5 +1,7 @@
 package GDG.whatssue.domain.schedule.controller;
 
+import static org.springframework.http.HttpStatus.*;
+
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.GetScheduleListResponse;
@@ -18,8 +20,8 @@ import java.util.List;
 
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}/schedules")
+@CrossOrigin
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -46,42 +49,50 @@ public class ScheduleController {
     @ClubManager
     @Operation(summary = "일정 추가", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PostMapping
-    public ResponseEntity addSchedule (
+    public ResponseEntity<String> addSchedule (
         @PathVariable(name = "clubId") Long clubId,
         @LoginMember Long memberId,
         @Valid @RequestBody AddScheduleRequest requestDto) {
         scheduleService.saveSchedule(clubId, memberId, requestDto);
 
-        return ResponseEntity.status(200).body("ok");
+        return ResponseEntity
+            .status(OK)
+            .body("ok");
     }
 
     @ClubManager
     @Operation(summary = "일정 수정", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PatchMapping("/{scheduleId}")
-    public ResponseEntity modifySchedule(
+    public ResponseEntity<String> modifySchedule(
         @PathVariable(name = "clubId") Long clubId,
         @PathVariable(name = "scheduleId") Long scheduleId,
         @Valid @RequestBody ModifyScheduleRequest requestDto) {
         scheduleService.updateSchedule(scheduleId, requestDto);
 
-        return ResponseEntity.status(HttpStatus.OK).body("ok");
+        return ResponseEntity
+            .status(OK)
+            .body("ok");
     }
 
     @ClubManager
     @Operation(summary = "일정 삭제")
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
+    public ResponseEntity<String> deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         scheduleService.deleteSchedule(scheduleId);
 
-        return ResponseEntity.status(HttpStatus.OK).body("ok");
+        return ResponseEntity
+            .status(OK)
+            .body("ok");
     }
     
     @Operation(summary = "일정 상세조회")
     @GetMapping("/{scheduleId}")
-    public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
+    public ResponseEntity<GetScheduleDetailResponse> getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
         GetScheduleDetailResponse scheduleDto = scheduleService.findScheduleById(scheduleId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
+        return ResponseEntity
+            .status(OK)
+            .body(scheduleDto);
     }
 
     @Operation(summary = "일정 조회(검색 : 검색어, 기간)")
@@ -89,7 +100,7 @@ public class ScheduleController {
     @Parameter(name = "q", description = "검색어. 일정명으로 검색", required = false, in = ParameterIn.QUERY)
     @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", required = false, in = ParameterIn.QUERY)
     @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", required = false, in = ParameterIn.QUERY)
-    public ResponseEntity findSchedules(
+    public ResponseEntity<List<GetScheduleListResponse>> findSchedules(
         @PathVariable(name = "clubId") Long clubId,
         @RequestParam(name = "q", required = false, defaultValue = "") String query,
         @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,
@@ -103,6 +114,9 @@ public class ScheduleController {
         }
 
         List<GetScheduleListResponse> responseDtoList = scheduleService.findSchedules(clubId, query, sDate, eDate);
-        return new ResponseEntity(responseDtoList, HttpStatus.OK);
+
+        return ResponseEntity
+            .status(OK)
+            .body(responseDtoList);
     }
 }
