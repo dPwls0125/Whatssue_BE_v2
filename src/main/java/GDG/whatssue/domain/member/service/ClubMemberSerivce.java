@@ -36,6 +36,7 @@ public class ClubMemberSerivce {
                     .isEmailPublic(requestDto.isEmailPublic())
                     .isPhonePublic(requestDto.isPhonePublic())
                     .build();
+
             clubMember.setMemberName(requestDto.getMemberName());
             clubMember.setMemberIntro(requestDto.getMemberIntro());
             clubMember.setEmailPublic(requestDto.isEmailPublic());

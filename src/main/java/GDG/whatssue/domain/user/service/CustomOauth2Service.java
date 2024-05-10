@@ -64,6 +64,7 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         User user = findOrSaveUser(oAuth2User, userRequest.getClientRegistration().getRegistrationId(), profile.get("nickname").toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         List<ClubMember> clubMemberList = user.getClubMemberList();
+
         for (ClubMember clubMember : clubMemberList) {
             authorities.add((GrantedAuthority) () -> {
                 Long clubId = clubMember.getClub().getId();
@@ -72,6 +73,7 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                 return "ROLE_" + clubId + role;
             });
         }
+
         KakaoDetails kakaoDetails = KakaoDetails.builder()
                 .registrationId(userRequest.getClientRegistration().getRegistrationId())
                 .user(user)
@@ -138,13 +140,12 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
         RedirectView redirectView = new RedirectView();
         if(user.getUserPhone()==null || user.getUserEmail()==null){
-            System.out.println("회원가입 안되어있음");
-            redirectView.setUrl( frontUrl + "/user/login"); // 회원가입 페이지
+            System.out.println("회원가입 안되어있음 -> 회원가입 페이지로 redirect");
+            redirectView.setUrl( frontUrl + "/user/signup"); // 회원가입 페이지
         } else {
-            System.out.println("회원가입 되어있음");
+            System.out.println("회원가입 되어있음 -> 메인페이지로 redirect");
             redirectView.setUrl(frontUrl);// 메인 페이지
         }
         return redirectView;
     }
-
 }

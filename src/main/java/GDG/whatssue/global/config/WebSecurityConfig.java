@@ -25,8 +25,6 @@ public class WebSecurityConfig {
 
     @Value("${server.url}")
     private String serverUrl;
-
-
     private static final String[] AUTH_WHITELIST = {
             // swagger
             "/v3/api-docs/**",
@@ -38,7 +36,6 @@ public class WebSecurityConfig {
             "/signUp"
         //,"/api/**"
     };
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -60,7 +57,6 @@ public class WebSecurityConfig {
 //                        .defaultSuccessUrl("/")
 //                )
                 .logout((logout) -> logout.permitAll());
-
         return http.build();
     }
 
