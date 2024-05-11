@@ -82,16 +82,17 @@ public class AttendanceService {
         return scheduleIdList;
     }
     /*Delete 시에 결석자 명단을 업로드해야할까?*/
-    public void deleteAttendance(Long clubId, Long scheduleId) throws Exception {
-        if (attendanceNumMap.containsKey(clubId)) {
-            if (attendanceNumMap.get(clubId).containsKey(scheduleId))
-                attendanceNumMap.get(clubId).remove(scheduleId);
-            else
-                throw new Exception("출석이 진행중이지 않습니다.");
-        } else {
-            throw new Exception("출석이 진행중이지 않습니다.");
-        }
+    public void offOngoingAttendance(Long clubId, Long scheduleId) throws Exception {
+
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+
+        if(schedule.getAttendanceStatus().equals(AttendanceStatus.ONGOING)){
+            attendanceNumMap.get(clubId).remove(scheduleId);
+            schedule.setAttendanceStatus(AttendanceStatus.COMPLETE);
+
+        }else throw new Exception("출석이 진행중이지 않습니다.");
     }
+
     public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId) throws Exception {
         List<ScheduleAttendanceResult> attendanceList;
         attendanceList = scheduleAttendanceResultRepository.findByScheduleId(scheduleId);
