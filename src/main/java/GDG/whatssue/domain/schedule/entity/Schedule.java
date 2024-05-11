@@ -6,7 +6,6 @@ import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
-import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,13 +21,9 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 
 @Getter
-@NoArgsConstructor
 @Entity
 public class Schedule extends BaseEntity {
     @Id
@@ -66,10 +61,11 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
-
     //==생성 메서드==//
-    @Builder
-    public Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
+    private Schedule() {
+    }
+
+    private Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
         LocalDateTime scheduleDateTime, String schedulePlace) {
         this.club = club;
         club.getScheduleList().add(this); //연관관계 편의 메서드
@@ -80,6 +76,15 @@ public class Schedule extends BaseEntity {
         this.scheduleDateTime = scheduleDateTime;
         this.schedulePlace = schedulePlace;
         this.attendanceStatus = AttendanceStatus.BEFORE;
+    }
+
+    /**
+     * 정적 팩토리 메서드 패턴
+     */
+    public static Schedule of(Club club, ClubMember register, String scheduleName,
+        String scheduleContent, LocalDateTime scheduleDateTime, String schedulePlace) {
+
+        return new Schedule(club, register, scheduleName, scheduleContent, scheduleDateTime, schedulePlace);
     }
 
     //==비즈니스 로직==//

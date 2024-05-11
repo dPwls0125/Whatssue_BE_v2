@@ -54,7 +54,7 @@ public class ScheduleService {
         return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId));
     }
 
-    public List<GetScheduleListResponse> findScheduleByFilter(Long clubId, String query, String sDate, String eDate) {
+    public List<GetScheduleListResponse> findSchedulesByFilter(Long clubId, String query, String sDate, String eDate) {
         List<Schedule> scheduleList = scheduleQueryRepository.findScheduleByFilter(clubId, query, sDate, eDate);
         return scheduleListToResponseDtoList(scheduleList);
     }

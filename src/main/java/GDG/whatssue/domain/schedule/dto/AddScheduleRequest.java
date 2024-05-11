@@ -26,13 +26,8 @@ public class AddScheduleRequest {
     private LocalDateTime scheduleDateTime;
 
     public Schedule toEntity(Club club, ClubMember register) {
-        return Schedule.builder()
-            .club(club)
-            .register(register)
-            .scheduleName(scheduleName)
-            .scheduleContent(scheduleContent)
-            .scheduleDateTime(scheduleDateTime)
-            .schedulePlace(schedulePlace)
-            .build();
+        return Schedule.of(
+            club, register, scheduleName,
+            scheduleContent, scheduleDateTime, schedulePlace);
     }
 }
