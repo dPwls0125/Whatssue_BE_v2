@@ -30,6 +30,7 @@ jobs:
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
           spring.security.oauth2.client.registration.Kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
           spring.security.oauth2.client.registration.Kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          spring.jpa.hibernate.ddl-auto: update
           coolsms.api.number: ${{ secrets.FROMNUMBER }}
           coolsms.api.secret: ${{ secrets.COOLSMS_API_SECRET }}
           coolsms.api.key: ${{ secrets.COOLSMS_API_KEY }}
