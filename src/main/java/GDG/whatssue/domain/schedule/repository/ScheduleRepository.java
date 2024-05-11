@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     Optional<Schedule> findById(Long id);
 
+    boolean existsByIdAndClub_Id(Long scheduleId, Long clubId);
 }

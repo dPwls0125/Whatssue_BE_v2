@@ -42,7 +42,7 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private NamePolicy namePolicy;
 
-    @OneToOne(mappedBy = "club")
+    @OneToOne(mappedBy = "club", fetch = FetchType.EAGER)
     private UploadFile profileImage;
 
     @OneToMany(mappedBy = "club")
