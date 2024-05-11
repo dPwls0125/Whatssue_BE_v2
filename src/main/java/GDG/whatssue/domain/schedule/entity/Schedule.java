@@ -18,16 +18,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @Entity
 public class Schedule extends BaseEntity {
     @Id
@@ -35,18 +31,18 @@ public class Schedule extends BaseEntity {
     @Column(name = "schedule_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//지연 로딩 설정
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //지연 로딩 설정
     @JoinColumn(name = "club_member_id", nullable = false)
-    private ClubMember clubMember;
+    private ClubMember register;
 
     @Column(nullable = false)
     private String scheduleName;
 
-    @Column
+    @Column(nullable = false)
     private String scheduleContent;
 
     @Column(nullable = false)
@@ -65,22 +61,65 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
+    //==생성 메서드==//
+    private Schedule() {
+    }
+
+    private Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
+        LocalDateTime scheduleDateTime, String schedulePlace) {
+        this.club = club;
+        club.getScheduleList().add(this); //연관관계 편의 메서드
+
+        this.register = register;
+        this.scheduleName = scheduleName;
+        this.scheduleContent = scheduleContent;
+        this.scheduleDateTime = scheduleDateTime;
+        this.schedulePlace = schedulePlace;
+        this.attendanceStatus = AttendanceStatus.BEFORE;
+    }
+
+    /**
+     * 정적 팩토리 메서드 패턴
+     */
+    public static Schedule of(Club club, ClubMember register, String scheduleName,
+        String scheduleContent, LocalDateTime scheduleDateTime, String schedulePlace) {
+
+        return new Schedule(club, register, scheduleName, scheduleContent, scheduleDateTime, schedulePlace);
+    }
+
+    //==비즈니스 로직==//
+    /**
+     * 일정 출석 시작
+     */
+    public void startAttendance() {
+        if (attendanceStatus == AttendanceStatus.ONGOING) {
+            //이미 출석 진행중 예외
+        }
+
+        if (attendanceStatus == AttendanceStatus.COMPLETE) {
+            //이미 출석 완료 예외
+        }
+
+        attendanceStatus = AttendanceStatus.ONGOING;
+    }
+
+    /**
+     * 일정 출석 종료
+     */
+    public void finishAttendance() {
+        if (attendanceStatus != AttendanceStatus.ONGOING) {
+            //출석 진행중이 아님 예외
+        }
+        attendanceStatus = AttendanceStatus.COMPLETE;
+    }
+
+    /**
+     * 일정 내용 수정
+     */
     public void update(ModifyScheduleRequest request) {
         this.scheduleName = request.getScheduleName();
         this.scheduleContent = request.getScheduleContent();
         this.scheduleDateTime = request.getScheduleDateTime();
         this.schedulePlace = request.getSchedulePlace();
-    }
-
-    @Builder
-    public Schedule(Club club, ClubMember clubMember, String scheduleName, String scheduleContent,
-        LocalDateTime scheduleDateTime, String schedulePlace, AttendanceStatus attendanceStatus) {
-        this.club = club;
-        this.clubMember = clubMember;
-        this.scheduleName = scheduleName;
-        this.scheduleContent = scheduleContent;
-        this.scheduleDateTime = scheduleDateTime;
-        this.schedulePlace = schedulePlace;
-        this.attendanceStatus = attendanceStatus;
     }
 }

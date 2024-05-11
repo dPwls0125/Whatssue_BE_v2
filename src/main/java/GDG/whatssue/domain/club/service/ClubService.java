@@ -15,6 +15,7 @@ import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
+import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.error.CommonException;
@@ -52,22 +53,20 @@ public class ClubService {
 
     @Transactional
     public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
-        //초대코드 추가하여 클럽 생성
-        Club savedClub = clubRepository.save(createDtoToClubEntity(requestDto));
-        
+        User user = userRepository.findById(userId).get();
+
+        //클럽 생성
+        Club club = requestDto.toEntity();
+        clubRepository.save(club);
+
         //프로필 사진 저장
-        saveClubProfileImage(profileImage, savedClub);
+        saveClubProfileImage(profileImage, club); //관련 연관관계 편의메서드 TODO
 
         //클럽을 생성한 멤버(관리자)로 추가
-        clubMemberRepository.save(
-            ClubMember.builder()
-            .club(savedClub)
-            .user(userRepository.findById(userId).get())
-            .role(Role.MANAGER)
-            .isFirstVisit(true).build());
+        ClubMember clubMember = ClubMember.of(club, user, Role.MANAGER);
+        clubMemberRepository.save(clubMember);
 
-        return ClubCreateResponse.builder()
-            .clubId(savedClub.getId()).build();
+        return ClubCreateResponse.builder().clubId(club.getId()).build();
     }
 
     @Transactional
@@ -76,18 +75,19 @@ public class ClubService {
 
         //정보 update
         club.updateClubInfo(requestDto);
+
         //버킷 및 DB 파일 삭제
         deleteProfileImage(club);
+
         //버킷 및 DB 파일 저장
         saveClubProfileImage(profileImage, club);
     }
 
     @Transactional
     public void updateClubPrivateStatus(Long clubId) {
-        Club club = getClub(clubId);
-
-        club.updateIsPrivate();
+        getClub(clubId).updateIsPrivate();
     }
+
 
     public GetClubInfoResponse getClubInfo(Long clubId) {
         Club club = getClub(clubId);
@@ -127,14 +127,15 @@ public class ClubService {
     }
 
     public boolean isClubExist(Long clubId) {
-        clubRepository.findById(clubId)
-            .orElseThrow(()-> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
-
+        getClub(clubId);
         return true;
     }
 
+    /**
+     * TODO
+     */
     @Transactional
-    public void saveClubProfileImage(MultipartFile profileImage, Club savedClub) throws IOException {
+    public void saveClubProfileImage(MultipartFile profileImage, Club club) throws IOException {
         //s3에 저장 처리
         String storeFileName = fileUploadService.saveFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
 
@@ -145,7 +146,7 @@ public class ClubService {
         }
 
         fileRepository.save(UploadFile.builder()
-            .club(savedClub)
+            .club(club)
             .uploadFileName(originalFileName)
             .storeFileName(storeFileName).build());
     }
@@ -156,12 +157,6 @@ public class ClubService {
         fileRepository.deleteById(club.getProfileImage().getId()); //레포에서 삭제
     }
 
-    public Club createDtoToClubEntity(ClubCreateRequest requestDto) {
-        Club club = requestDto.toEntity();
-        club.createNewPrivateCode();
-
-        return club;
-    }
     public Club getClub(Long clubId) {
         return clubRepository.findById(clubId).orElseThrow(()
             -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
