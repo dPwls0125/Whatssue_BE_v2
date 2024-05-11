@@ -6,6 +6,7 @@ import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,6 +25,7 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 
 @Getter
 @NoArgsConstructor
@@ -34,11 +36,11 @@ public class Schedule extends BaseEntity {
     @Column(name = "schedule_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//지연 로딩 설정
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //지연 로딩 설정
     @JoinColumn(name = "club_member_id", nullable = false)
     private ClubMember register;
 
@@ -64,31 +66,55 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
-    public void setClub(Club club) {
-        this.club = club;
-        club.getScheduleList().add(this); //연관관계 편의 메서드
-    }
 
-    public void setClubMember(ClubMember register) {
-        this.register = register;
-    }
-
-    public void update(ModifyScheduleRequest request) {
-        this.scheduleName = request.getScheduleName();
-        this.scheduleContent = request.getScheduleContent();
-        this.scheduleDateTime = request.getScheduleDateTime();
-        this.schedulePlace = request.getSchedulePlace();
-    }
-
+    //==생성 메서드==//
     @Builder
     public Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
-        LocalDateTime scheduleDateTime, String schedulePlace, AttendanceStatus attendanceStatus) {
+        LocalDateTime scheduleDateTime, String schedulePlace) {
         this.club = club;
+        club.getScheduleList().add(this); //연관관계 편의 메서드
+
         this.register = register;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
         this.scheduleDateTime = scheduleDateTime;
         this.schedulePlace = schedulePlace;
-        this.attendanceStatus = attendanceStatus;
+        this.attendanceStatus = AttendanceStatus.BEFORE;
+    }
+
+    //==비즈니스 로직==//
+    /**
+     * 일정 출석 시작
+     */
+    public void startAttendance() {
+        if (attendanceStatus == AttendanceStatus.ONGOING) {
+            //이미 출석 진행중 예외
+        }
+
+        if (attendanceStatus == AttendanceStatus.COMPLETE) {
+            //이미 출석 완료 예외
+        }
+
+        attendanceStatus = AttendanceStatus.ONGOING;
+    }
+
+    /**
+     * 일정 출석 종료
+     */
+    public void finishAttendance() {
+        if (attendanceStatus != AttendanceStatus.ONGOING) {
+            //출석 진행중이 아님 예외
+        }
+        attendanceStatus = AttendanceStatus.COMPLETE;
+    }
+
+    /**
+     * 일정 내용 수정
+     */
+    public void update(ModifyScheduleRequest request) {
+        this.scheduleName = request.getScheduleName();
+        this.scheduleContent = request.getScheduleContent();
+        this.scheduleDateTime = request.getScheduleDateTime();
+        this.schedulePlace = request.getSchedulePlace();
     }
 }

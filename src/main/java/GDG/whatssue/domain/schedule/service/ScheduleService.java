@@ -35,11 +35,8 @@ public class ScheduleService {
 
     @Transactional
     public void saveSchedule(Long clubId, Long memberId, AddScheduleRequest requestDto) {
-        Schedule schedule = requestDto.toEntity();
+        Schedule schedule = requestDto.toEntity(findClub(clubId), findMember(memberId));
         scheduleRepository.save(schedule);
-
-        schedule.setClub(findClub(clubId));
-        schedule.setClubMember(findMember(memberId));
     }
 
     @Transactional
@@ -70,7 +67,6 @@ public class ScheduleService {
         return scheduleList.stream()
             .map(s -> scheduleToGetScheduleListResponse(s))
             .collect(Collectors.toList());
-
     }
 
     private GetScheduleListResponse scheduleToGetScheduleListResponse(Schedule schedule) {
