@@ -22,7 +22,7 @@ public class ScheduleQueryRepository {
 
     private final JPAQueryFactory query;
 
-    public List<Schedule> findSchedules(Long clubId, String searchQuery, String startDate, String endDate) {
+    public List<Schedule> findScheduleByFilter(Long clubId, String searchQuery, String startDate, String endDate) {
         return query
             .select(schedule)
             .from(schedule)

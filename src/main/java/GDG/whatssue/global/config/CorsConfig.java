@@ -21,8 +21,13 @@ public class CorsConfig implements Filter {
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, origin, content-type, accept");
         chain.doFilter(req, res);
     }
-    public void init(FilterConfig filterConfig){}
-    public void destroy() {}
+
+    public void init(FilterConfig filterConfig) {
+    }
+
+    public void destroy() {
+    }
+
     @Override
     public boolean isLoggable(LogRecord record) {
         return false;

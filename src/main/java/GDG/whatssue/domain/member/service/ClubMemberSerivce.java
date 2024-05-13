@@ -30,6 +30,7 @@ public class ClubMemberSerivce {
         ClubMember clubMember = clubMemberRepository.findById(memberId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
         try{
+<<<<<<< Updated upstream
             clubMember = ClubMember.builder()
                     .memberName(requestDto.getMemberName())
                     .memberIntro(requestDto.getMemberIntro())
@@ -37,6 +38,8 @@ public class ClubMemberSerivce {
                     .isPhonePublic(requestDto.isPhonePublic())
                     .build();
 
+=======
+>>>>>>> Stashed changes
             clubMember.setMemberName(requestDto.getMemberName());
             clubMember.setMemberIntro(requestDto.getMemberIntro());
             clubMember.setEmailPublic(requestDto.isEmailPublic());

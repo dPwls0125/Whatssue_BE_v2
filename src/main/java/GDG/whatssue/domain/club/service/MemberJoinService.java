@@ -27,12 +27,7 @@ public class MemberJoinService {
                 .orElseThrow(() -> new IllegalArgumentException("클럽 가입 요청을 찾을 수 없습니다: " + clubJoinRequestId));
 
         // 클럽 멤버 엔티티 생성
-        ClubMember clubMember = ClubMember.builder()
-                .club(clubJoinRequest.getClub())
-                .user(clubJoinRequest.getUser())
-                .role(Role.MEMBER) // 초기는 MEMBER 롤 설정
-                .isFirstVisit(true)
-                .build();
+        ClubMember clubMember = ClubMember.of(clubJoinRequest.getClub(), clubJoinRequest.getUser(), Role.MEMBER);
 
         clubMemberRepository.save(clubMember);
         clubJoinRequestRepository.delete(clubJoinRequest);

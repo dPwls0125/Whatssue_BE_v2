@@ -113,7 +113,7 @@ public class ScheduleController {
             throw new CommonException(ScheduleErrorCode.INVALID_SCHEDULE_DATE_PATTERN_ERROR);
         }
 
-        List<GetScheduleListResponse> responseDtoList = scheduleService.findSchedules(clubId, query, sDate, eDate);
+        List<GetScheduleListResponse> responseDtoList = scheduleService.findSchedulesByFilter(clubId, query, sDate, eDate);
 
         return ResponseEntity
             .status(OK)

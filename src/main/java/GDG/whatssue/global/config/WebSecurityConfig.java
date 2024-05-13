@@ -61,7 +61,7 @@ public class WebSecurityConfig {
     }
 
 
-    @Bean // 해당 메서드의 리턴되는 오브젝트를 IoC로 등록해준다.
+    @Bean // 해당 메서드의 리턴되는 오브젝트를 IoC로 등록해준다.xg
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
