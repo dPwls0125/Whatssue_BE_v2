@@ -9,7 +9,7 @@ import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 //import GDG.whatssue.domain.member.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-        import GDG.whatssue.global.error.CommonException;
+import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +44,5 @@ public class ClubMemberManagingService {
             throw new CommonException(ClubMemberErrorCode.CLUB_MEMBER_COULD_NOT_MODIFY_ERROR);
         }
     }
-
 
 }

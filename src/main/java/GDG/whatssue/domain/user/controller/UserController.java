@@ -45,7 +45,7 @@ public class  UserController {
     }
 
     @GetMapping("/login/redirect")
-    @Operation(summary = "로그인 이후 적절한 화면으로 리다이렉트", description = "회원가입을 안한 유저인 경우 -> signup page\n 회원가입을 한 유저인 경우 -> main page")
+    @Operation(summary = "로그인 이후 적절한 화면으로 리다이렉트", description = "회원가입을 안한 유저인 경우 -> signUp page\n 회원가입을 한 유저인 경우 -> main page")
     public RedirectView loginRedirect(@LoginUser Long userId){
         RedirectView redirect = customOauth2Service.loginRedirect(userId);
         return redirect;

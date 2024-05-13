@@ -30,10 +30,12 @@ public class ClubMemberSerivce {
         ClubMember clubMember = clubMemberRepository.findById(memberId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
         try{
-            clubMember.setMemberName(requestDto.getMemberName());
-            clubMember.setMemberIntro(requestDto.getMemberIntro());
-            clubMember.setEmailPublic(requestDto.isEmailPublic());
-            clubMember.setPhonePublic(requestDto.isPhonePublic());
+            clubMember = ClubMember.builder()
+                    .memberName(requestDto.getMemberName())
+                    .memberIntro(requestDto.getMemberIntro())
+                    .isEmailPublic(requestDto.isEmailPublic())
+                    .isPhonePublic(requestDto.isPhonePublic())
+                    .build();
             clubMemberRepository.save(clubMember);
         }catch(Exception e){
             throw new CommonException(ClubMemberErrorCode.CLUB_MEMBER_COULD_NOT_MODIFY_ERROR);
