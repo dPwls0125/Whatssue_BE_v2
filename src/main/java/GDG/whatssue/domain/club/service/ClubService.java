@@ -55,12 +55,9 @@ public class ClubService {
     public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
         User user = userRepository.findById(userId).get();
 
-        //클럽 생성
-        Club club = requestDto.toEntity();
+        //프로필 사진 저장 및 클럽 생성
+        Club club = requestDto.toEntity(uploadClubProfileImage(profileImage));
         clubRepository.save(club);
-
-        //프로필 사진 저장
-        saveClubProfileImage(profileImage, club); //관련 연관관계 편의메서드 TODO
 
         //클럽을 생성한 멤버(관리자)로 추가
         ClubMember clubMember = ClubMember.of(club, user, Role.MANAGER);
@@ -80,7 +77,7 @@ public class ClubService {
         deleteProfileImage(club);
 
         //버킷 및 DB 파일 저장
-        saveClubProfileImage(profileImage, club);
+        uploadClubProfileImage(profileImage, club);
     }
 
     @Transactional
@@ -131,24 +128,16 @@ public class ClubService {
         return true;
     }
 
-    /**
-     * TODO
-     */
-    @Transactional
-    public void saveClubProfileImage(MultipartFile profileImage, Club club) throws IOException {
+    public UploadFile uploadClubProfileImage(MultipartFile profileImage) throws IOException {
         //s3에 저장 처리
-        String storeFileName = fileUploadService.saveFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
-
-        //fileDB에 저장
+        String storeFileName = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
         String originalFileName = storeFileName;
+
         if (profileImage != null)  {
             originalFileName = profileImage.getOriginalFilename();
         }
 
-        fileRepository.save(UploadFile.builder()
-            .club(club)
-            .uploadFileName(originalFileName)
-            .storeFileName(storeFileName).build());
+        return UploadFile.of(originalFileName, storeFileName);
     }
 
     @Transactional

@@ -92,25 +92,25 @@ public class Schedule extends BaseEntity {
      * 일정 출석 시작
      */
     public void startAttendance() {
-        if (attendanceStatus == AttendanceStatus.ONGOING) {
+        if (this.attendanceStatus == AttendanceStatus.ONGOING) {
             //이미 출석 진행중 예외
         }
 
-        if (attendanceStatus == AttendanceStatus.COMPLETE) {
+        if (this.attendanceStatus == AttendanceStatus.COMPLETE) {
             //이미 출석 완료 예외
         }
 
-        attendanceStatus = AttendanceStatus.ONGOING;
+        this.attendanceStatus = AttendanceStatus.ONGOING;
     }
 
     /**
      * 일정 출석 종료
      */
     public void finishAttendance() {
-        if (attendanceStatus != AttendanceStatus.ONGOING) {
+        if (this.attendanceStatus != AttendanceStatus.ONGOING) {
             //출석 진행중이 아님 예외
         }
-        attendanceStatus = AttendanceStatus.COMPLETE;
+        this.attendanceStatus = AttendanceStatus.COMPLETE;
     }
 
     /**

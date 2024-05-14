@@ -73,7 +73,10 @@ public class ClubMember extends BaseEntity {
         user.getClubMemberList().add(this); //연관관계 편의 메서드
 
         this.role = role;
-        isFirstVisit = true;
+        this.memberName = user.getUserName();
+        this.isPhonePublic = false;
+        this.isEmailPublic = false;
+        this.isFirstVisit = true;
     }
 
     public static ClubMember of(Club club, User user, Role role) {
