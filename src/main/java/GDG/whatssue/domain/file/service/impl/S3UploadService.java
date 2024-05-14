@@ -26,7 +26,7 @@ public class S3UploadService implements FileUploadService {
     public String bucket;
 
     @Override
-    public String saveFile(MultipartFile multipartFile, String dirName) throws IOException {
+    public String uploadFile(MultipartFile multipartFile, String dirName) throws IOException {
         //저장 사진이 없으면 기본 경로 반환
         if (multipartFile == null) {
             return dirName + FileConst.DEFAULT_IMAGE_NAME;
