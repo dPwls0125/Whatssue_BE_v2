@@ -44,6 +44,8 @@ public class UploadFile {
     @Column(nullable = false)
     private String storeFileName;
 
+
+    //==생성 메서드==//
     private UploadFile(){}
 
     private UploadFile(String uploadFileName, String storeFileName) {
@@ -51,7 +53,6 @@ public class UploadFile {
         this.storeFileName = storeFileName;
     }
 
-    //==생성 메서드==//
     /**
      * 정적 팩토리 메서드
      */

@@ -56,8 +56,8 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
-
-    //==비즈니스 로직==//
+    
+    //연관관계 메서드
     public void addPostImageFile(UploadFile uploadFile) {
         this.postImageFiles.add(uploadFile);
         uploadFile.setPost(this); //연관관계 편의 메서드

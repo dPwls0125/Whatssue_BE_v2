@@ -51,36 +51,44 @@ public class ClubMember extends BaseEntity {
     @Column(nullable = false)
     private boolean isFirstVisit;
 
-    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
+    @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
     private UploadFile profileImage;
 
-    @OneToOne(mappedBy = "clubMember",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
+    @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
     private MemberAttendanceResult memberAttendanceResult;
 
-    @OneToMany(mappedBy = "clubMember",cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "clubMember", cascade = CascadeType.REMOVE)
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
     @OneToMany(mappedBy = "writer")
     private List<Post> postList = new ArrayList<>();
 
+    //==연관관계 메서드==//
+    private void setClub(Club club) {
+        this.club = club;
+        club.getClubMemberList().add(this);
+    }
+
+    private void setUser(User user) {
+        this.user = user;
+        user.getClubMemberList().add(this);
+    }
+
     //==생성메서드==//
     private ClubMember(){}
-    private ClubMember(Club club, User user, Role role) {
-        this.club = club;
-        club.getClubMemberList().add(this); //연관관계 편의 메서드
+    private ClubMember(Club club, User user) {
+        setClub(club);
+        setUser(user);
 
-        this.user = user;
-        user.getClubMemberList().add(this); //연관관계 편의 메서드
-
-        this.role = role;
+        this.role = Role.MEMBER;
         this.memberName = user.getUserName();
         this.isPhonePublic = false;
         this.isEmailPublic = false;
         this.isFirstVisit = true;
     }
 
-    public static ClubMember of(Club club, User user, Role role) {
-        return new ClubMember(club, user, role);
+    public static ClubMember newMember(Club club, User user) {
+        return new ClubMember(club, user);
     }
 
     //==비즈니스 로직==//
@@ -88,7 +96,7 @@ public class ClubMember extends BaseEntity {
     /**
      * 멤버 프로필 설정
      */
-    public void setProfile(String memberIntro, String memberName, boolean isEmailPublic, boolean isPhonePublic) {
+    public void updateProfile(String memberIntro, String memberName, boolean isEmailPublic, boolean isPhonePublic) {
         this.memberIntro = memberIntro;
         this.memberName = memberName;
         this.isEmailPublic = isEmailPublic;
