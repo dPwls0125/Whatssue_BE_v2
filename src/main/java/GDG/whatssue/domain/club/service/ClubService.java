@@ -17,7 +17,6 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,12 +54,18 @@ public class ClubService {
     public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
         User user = userRepository.findById(userId).get();
 
-        //프로필 사진 저장 및 클럽 생성
-        Club club = requestDto.toEntity(uploadClubProfileImage(profileImage));
+        //클럽 생성
+        Club club = requestDto.toEntity();
         clubRepository.save(club);
 
-        //클럽을 생성한 멤버(관리자)로 추가
-        ClubMember clubMember = ClubMember.of(club, user, Role.MANAGER);
+        //프로필 사진 저장
+        UploadFile clubProfileImage = uploadClubProfileImage(profileImage);
+        club.setProfileImage(clubProfileImage);
+        fileRepository.save(clubProfileImage);
+
+        //로그인 유저 관리자로 추가
+        ClubMember clubMember = ClubMember.newMember(club, user);
+        clubMember.switchToManager();
         clubMemberRepository.save(clubMember);
 
         return ClubCreateResponse.builder().clubId(club.getId()).build();
@@ -76,8 +81,10 @@ public class ClubService {
         //버킷 및 DB 파일 삭제
         deleteProfileImage(club);
 
-        //버킷 및 DB 파일 저장
-        uploadClubProfileImage(profileImage, club);
+        //프로필 사진 저장
+        UploadFile clubProfileImage = uploadClubProfileImage(profileImage);
+        club.setProfileImage(clubProfileImage);
+        fileRepository.save(clubProfileImage);
     }
 
     @Transactional
@@ -143,7 +150,7 @@ public class ClubService {
     @Transactional
     public void deleteProfileImage(Club club) {
         fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
-        fileRepository.deleteById(club.getProfileImage().getId()); //레포에서 삭제
+        fileRepository.delete(club.getProfileImage());//레포에서 삭제
     }
 
     public Club getClub(Long clubId) {

@@ -42,32 +42,36 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private NamePolicy namePolicy;
 
-    @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.ALL) //지연 로딩
+    @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) //지연 로딩
     private UploadFile profileImage;
 
-    @OneToMany(mappedBy = "club")
+    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
     private List<ClubMember> clubMemberList = new ArrayList<>();
 
     @OneToMany(mappedBy = "club")
     private List<ClubJoinRequest> clubJoinRequestList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "club")
+    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
     private List<Schedule> scheduleList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "club")
+    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
     private List<Post> postList = new ArrayList<>();
+
+    //==연관관계 메서드==//
+    public void setProfileImage(UploadFile profileImage) {
+        this.profileImage = profileImage;
+        profileImage.setClub(this); //연관관계 편의 메서드
+    }
 
     //==생성메서드==//
     private Club() {}
 
-    private Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy, UploadFile profileImage) {
+    private Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
         this.clubName = clubName;
         this.clubIntro = clubInfo;
         this.isPrivate = isPrivate;
         this.contactMeans = contactMeans;
         this.namePolicy = namePolicy;
-        this.profileImage = profileImage;
-        profileImage.setClub(this); //연관관계 편의 메서드
 
         this.createNewPrivateCode();
     }
@@ -75,12 +79,11 @@ public class Club extends BaseEntity {
     /**
      * 팩토리 메서드 패턴
      */
-    public static Club of(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy, UploadFile profileImage) {
-        return new Club(clubName, clubInfo, isPrivate, contactMeans, namePolicy, profileImage);
+    public static Club createClub(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
+        return new Club(clubName, clubInfo, isPrivate, contactMeans, namePolicy);
     }
 
     //==비즈니스 로직==//
-    
     /**
      * 모임 정보 수정
      */

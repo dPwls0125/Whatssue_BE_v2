@@ -35,14 +35,16 @@ public class ScheduleService {
 
     @Transactional
     public void saveSchedule(Long clubId, Long memberId, AddScheduleRequest requestDto) {
-        Schedule schedule = requestDto.toEntity(findClub(clubId), findMember(memberId));
-        scheduleRepository.save(schedule);
+        scheduleRepository.save(requestDto.toEntity(findClub(clubId), findMember(memberId)));
     }
 
     @Transactional
     public void updateSchedule(Long scheduleId, ModifyScheduleRequest requestDto) {
-        Schedule schedule = findSchedule(scheduleId);
-        schedule.update(requestDto);
+        findSchedule(scheduleId).update(
+            requestDto.getScheduleName(),
+            requestDto.getScheduleContent(),
+            requestDto.getScheduleDateTime(),
+            requestDto.getSchedulePlace());
     }
 
     @Transactional

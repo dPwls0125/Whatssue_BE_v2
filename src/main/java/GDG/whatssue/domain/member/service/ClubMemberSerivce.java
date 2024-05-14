@@ -30,7 +30,7 @@ public class ClubMemberSerivce {
         ClubMember clubMember = clubMemberRepository.findById(memberId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
         try{
-            clubMember.setProfile(requestDto.getMemberName(),
+            clubMember.updateProfile(requestDto.getMemberName(),
                     requestDto.getMemberIntro(),
                     requestDto.isEmailPublic(),
                     requestDto.isPhonePublic());
