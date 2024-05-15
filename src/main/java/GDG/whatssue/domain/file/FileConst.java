@@ -1,4 +1,4 @@
-package GDG.whatssue.global.common;
+package GDG.whatssue.domain.file;
 
 public abstract class FileConst {
     public static final String CLUB_PROFILE_IMAGE_DIRNAME = "clubProfileImage";

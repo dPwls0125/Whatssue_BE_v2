@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.post.service;
 
-import static GDG.whatssue.global.common.FileConst.POST_IMAGE_DIRNAME;
+import static GDG.whatssue.domain.file.FileConst.POST_IMAGE_DIRNAME;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.repository.ClubRepository;
@@ -65,17 +65,12 @@ public class PostService {
 
     @Transactional
     public void uploadPostImages(List<MultipartFile> postImages, Post post) throws IOException {
-        if (postImages == null) {
-            return;
-        }
-
-        for (MultipartFile postImage : postImages) {
-            //s3에 업로드
-            String storeFileName = fileUploadService.uploadFile(postImage, POST_IMAGE_DIRNAME);
-            String originalFileName = postImage.getOriginalFilename();
-            
-            //사진 추가 및 file db 저장
-            post.addPostImageFile(UploadFile.of(originalFileName, storeFileName));
+        if (postImages != null) {
+            for (MultipartFile postImage : postImages) {
+                UploadFile imageFile = fileUploadService.uploadFile(postImage, POST_IMAGE_DIRNAME);
+                post.addPostImageFile(imageFile);
+                fileRepository.save(imageFile);
+            }
         }
     }
 

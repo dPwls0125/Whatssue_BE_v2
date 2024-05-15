@@ -16,7 +16,6 @@ import lombok.*;
 
 @Getter
 @Entity
-@Setter //setter 닫기 TODO
 public class ClubMember extends BaseEntity {
 
     @Id
@@ -74,6 +73,11 @@ public class ClubMember extends BaseEntity {
         user.getClubMemberList().add(this);
     }
 
+    public void setProfileImage(UploadFile profileImage) {
+        this.profileImage = profileImage;
+        profileImage.setClubMember(this);
+    }
+
     //==생성메서드==//
     private ClubMember(){}
     private ClubMember(Club club, User user) {
@@ -115,5 +119,9 @@ public class ClubMember extends BaseEntity {
      */
     public void switchToMember() {
         this.role = Role.MEMBER;
+    }
+
+    public boolean checkManagerRole() {
+        return role == Role.MANAGER;
     }
 }

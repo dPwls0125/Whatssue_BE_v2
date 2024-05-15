@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.club.service;
 
-import static GDG.whatssue.global.common.FileConst.*;
+import static GDG.whatssue.domain.file.FileConst.*;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
@@ -59,7 +59,7 @@ public class ClubService {
         clubRepository.save(club);
 
         //프로필 사진 저장
-        UploadFile clubProfileImage = uploadClubProfileImage(profileImage);
+        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
         club.setProfileImage(clubProfileImage);
         fileRepository.save(clubProfileImage);
 
@@ -82,7 +82,7 @@ public class ClubService {
         deleteProfileImage(club);
 
         //프로필 사진 저장
-        UploadFile clubProfileImage = uploadClubProfileImage(profileImage);
+        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
         club.setProfileImage(clubProfileImage);
         fileRepository.save(clubProfileImage);
     }
@@ -133,18 +133,6 @@ public class ClubService {
     public boolean isClubExist(Long clubId) {
         getClub(clubId);
         return true;
-    }
-
-    public UploadFile uploadClubProfileImage(MultipartFile profileImage) throws IOException {
-        //s3에 저장 처리
-        String storeFileName = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
-        String originalFileName = storeFileName;
-
-        if (profileImage != null)  {
-            originalFileName = profileImage.getOriginalFilename();
-        }
-
-        return UploadFile.of(originalFileName, storeFileName);
     }
 
     @Transactional
