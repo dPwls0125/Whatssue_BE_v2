@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.member.service;
 
+import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
@@ -18,7 +19,7 @@ import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
-public class ClubMemberSerivce {
+public class ClubMemberService {
     private final ClubMemberRepository clubMemberRepository;
     private final AmazonS3 s3Client;
     private final UserRepository userRepository;
@@ -40,6 +41,7 @@ public class ClubMemberSerivce {
             throw new CommonException(ClubMemberErrorCode.CLUB_MEMBER_COULD_NOT_MODIFY_ERROR);
         }
     }
+
     // TDDO
     public MemberProfileDto getMemberProfile(Long memberId, Long userId) {
 
@@ -68,4 +70,23 @@ public class ClubMemberSerivce {
         return profile;
     }
 
+    public boolean isClubMember(Long clubId, Long userId) {
+        return getClubMember(clubId, userId) != null;
+    }
+
+    public boolean isClubManager(Long clubId, Long userId) {
+        return getClubMember(clubId, userId).checkManagerRole();
+    }
+
+    public boolean isFirstVisit(Long clubId, Long userId) {
+        return getClubMember(clubId, userId).isFirstVisit();
+    }
+
+    public Long getClubMemberId(Long clubId, Long userId) {
+        return getClubMember(clubId, userId).getId();
+    }
+
+    public ClubMember getClubMember(Long clubId, Long userId) {
+        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId).orElse(null);
+    }
 }

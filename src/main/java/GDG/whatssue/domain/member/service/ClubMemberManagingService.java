@@ -34,9 +34,9 @@ public class ClubMemberManagingService {
             .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
         try{
             if (role.toUpperCase().equals(Role.MANAGER.toString()))
-                clubMember.setRole(Role.MANAGER);
+                clubMember.switchToManager();
             else if (role.toUpperCase().equals(Role.MEMBER.toString()))
-                clubMember.setRole(Role.MEMBER);
+                clubMember.switchToMember();
             else
                 throw new CommonException(ClubMemberErrorCode.CLUB_MEMBER_COULD_NOT_MODIFY_ERROR);
             clubMemberRepository.save(clubMember);

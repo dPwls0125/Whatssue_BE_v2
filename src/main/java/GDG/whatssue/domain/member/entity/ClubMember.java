@@ -16,7 +16,6 @@ import lombok.*;
 
 @Getter
 @Entity
-@Setter //setter 닫기 TODO
 public class ClubMember extends BaseEntity {
 
     @Id
@@ -120,5 +119,9 @@ public class ClubMember extends BaseEntity {
      */
     public void switchToMember() {
         this.role = Role.MEMBER;
+    }
+
+    public boolean checkManagerRole() {
+        return role == Role.MANAGER;
     }
 }
