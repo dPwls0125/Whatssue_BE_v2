@@ -74,6 +74,11 @@ public class ClubMember extends BaseEntity {
         user.getClubMemberList().add(this);
     }
 
+    public void setProfileImage(UploadFile profileImage) {
+        this.profileImage = profileImage;
+        profileImage.setClubMember(this);
+    }
+
     //==생성메서드==//
     private ClubMember(){}
     private ClubMember(Club club, User user) {
