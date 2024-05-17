@@ -2,15 +2,17 @@ package GDG.whatssue.domain.schedule.repository;
 
 import static GDG.whatssue.domain.schedule.entity.QSchedule.*;
 
-import GDG.whatssue.domain.schedule.entity.Schedule;
+import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -18,23 +20,54 @@ import org.springframework.util.StringUtils;
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class ScheduleQueryRepository {
+public class ScheduleQueryRepository implements ScheduleRepositoryCustom{
 
-    private final JPAQueryFactory query;
+    private final JPAQueryFactory queryFactory;
 
-    public List<Schedule> findScheduleByFilter(Long clubId, String searchQuery, String startDate, String endDate) {
-        return query
-            .select(schedule)
+    @Override
+    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, String sDate, String eDate, Pageable pageable) {
+
+        JPAQuery<SchedulesResponse> query = queryFactory
+            .select(Projections.constructor(
+                SchedulesResponse.class,
+                schedule.id,
+                schedule.scheduleName,
+                schedule.scheduleDate,
+                schedule.scheduleTime))
             .from(schedule)
-            .where(filterClub(clubId), filterQuery(searchQuery), filterDate(startDate, endDate))
-            .fetch();
+            .where(
+                filterClub(clubId),
+                filterQuery(searchQuery),
+                filterDate(sDate, eDate))
+            .orderBy(schedule.scheduleDate.asc(), schedule.scheduleTime.asc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize());
+
+//        for (Sort.Order o : pageable.getSort()) {
+//            PathBuilder pathBuilder = new PathBuilder(schedule.getType(), schedule.getMetadata());
+//            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
+//                pathBuilder.get(o.getProperty())));
+//        }
+
+        List<SchedulesResponse> results = query.fetch();
+
+        long total = query.select(schedule)
+            .from(schedule)
+            .where(
+                filterClub(clubId),
+                filterQuery(searchQuery),
+                filterDate(sDate, eDate))
+            .stream()
+            .count();
+
+        return new PageImpl<>(results, pageable, total);
     }
 
-    public BooleanExpression filterClub(Long clubId) {
+    private BooleanExpression filterClub(Long clubId) {
         return schedule.club.id.eq(clubId);
     }
 
-    public BooleanExpression filterQuery(String searchQuery) {
+    private BooleanExpression filterQuery(String searchQuery) {
         if (StringUtils.hasText(searchQuery)) {
             return schedule.scheduleName.like("%" + searchQuery + "%");
         }
@@ -42,11 +75,11 @@ public class ScheduleQueryRepository {
         return null;
     }
 
-    public BooleanExpression filterDate(String startDate, String endDate) {
+    private BooleanExpression filterDate(String sDate, String eDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime startDateTime = LocalDate.parse(startDate, formatter).atStartOfDay();
-        LocalDateTime endDateTime = LocalDate.parse(endDate, formatter).atTime(LocalTime.MAX);
+        LocalDate startDate = LocalDate.parse(sDate, formatter);
+        LocalDate endDate = LocalDate.parse(eDate, formatter);
 
-        return schedule.scheduleDateTime.between(startDateTime, endDateTime);
+        return schedule.scheduleDate.between(startDate, endDate);
     }
 }

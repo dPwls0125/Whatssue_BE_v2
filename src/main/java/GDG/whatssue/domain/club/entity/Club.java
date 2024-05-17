@@ -16,6 +16,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Club extends BaseEntity {
 
     @Id
@@ -64,8 +65,6 @@ public class Club extends BaseEntity {
     }
 
     //==생성메서드==//
-    private Club() {}
-
     private Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
         this.clubName = clubName;
         this.clubIntro = clubInfo;
