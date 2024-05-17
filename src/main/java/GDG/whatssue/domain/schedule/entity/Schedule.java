@@ -18,16 +18,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
+<<<<<<< Updated upstream
+=======
 import lombok.NoArgsConstructor;
+>>>>>>> Stashed changes
 
 @Getter
-@NoArgsConstructor
 @Entity
 public class Schedule extends BaseEntity {
     @Id
