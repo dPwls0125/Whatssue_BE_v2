@@ -3,24 +3,16 @@ package GDG.whatssue.domain.schedule.repository;
 import static GDG.whatssue.domain.schedule.entity.QSchedule.*;
 
 import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
-import GDG.whatssue.domain.schedule.dto.SearchCond;
-import GDG.whatssue.domain.schedule.entity.Schedule;
-import com.querydsl.core.QueryResults;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -33,8 +25,8 @@ public class ScheduleQueryRepository implements ScheduleRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, SearchCond searchCond, Pageable pageable) {
-        System.out.println(searchCond.getQ());
+    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, String sDate, String eDate, Pageable pageable) {
+
         JPAQuery<SchedulesResponse> query = queryFactory
             .select(Projections.constructor(
                 SchedulesResponse.class,
@@ -45,8 +37,8 @@ public class ScheduleQueryRepository implements ScheduleRepositoryCustom{
             .from(schedule)
             .where(
                 filterClub(clubId),
-                filterQuery(searchCond.getQ()),
-                filterDate(searchCond.getSDate(), searchCond.getEDate()))
+                filterQuery(searchQuery),
+                filterDate(sDate, eDate))
             .orderBy(schedule.scheduleDate.asc(), schedule.scheduleTime.asc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
@@ -63,8 +55,8 @@ public class ScheduleQueryRepository implements ScheduleRepositoryCustom{
             .from(schedule)
             .where(
                 filterClub(clubId),
-                filterQuery(searchCond.getQ()),
-                filterDate(searchCond.getSDate(), searchCond.getEDate()))
+                filterQuery(searchQuery),
+                filterDate(sDate, eDate))
             .stream()
             .count();
 

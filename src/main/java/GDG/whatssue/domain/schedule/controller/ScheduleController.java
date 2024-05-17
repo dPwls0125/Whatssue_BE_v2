@@ -6,16 +6,19 @@ import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
-import GDG.whatssue.domain.schedule.dto.SearchCond;
+import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginMember;
+import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -102,13 +105,20 @@ public class ScheduleController {
     @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
     public ResponseEntity<PageImpl<SchedulesResponse>> findSchedules(
         @PathVariable(name = "clubId") Long clubId,
-        @ModelAttribute SearchCond searchCond,
+        @RequestParam(name = "q", required = false, defaultValue = "") String query,
+        @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,
+        @RequestParam(name = "eDate", required = false, defaultValue = "2199-12-31") String eDate,
         Pageable pageable) {
 
-        searchCond.validateDateFormat();
+        //유효성 체크
+        if (!(
+            Pattern.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}", sDate)
+            && Pattern.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}", eDate))) {
+            throw new CommonException(ScheduleErrorCode.INVALID_SCHEDULE_DATE_PATTERN_ERROR);
+        }
 
         return ResponseEntity
             .status(OK)
-            .body(scheduleService.findAllSchedule(clubId, searchCond, pageable));
+            .body(scheduleService.findAllSchedule(clubId, query, sDate, eDate, pageable));
     }
 }

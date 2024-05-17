@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class UploadFile {
 
     @Id
@@ -46,8 +47,6 @@ public class UploadFile {
 
 
     //==생성 메서드==//
-    private UploadFile(){}
-
     private UploadFile(String uploadFileName, String storeFileName) {
         this.uploadFileName = uploadFileName;
         this.storeFileName = storeFileName;

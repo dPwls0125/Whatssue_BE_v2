@@ -1,6 +1,7 @@
 package GDG.whatssue.domain.club.dto;
 
 import GDG.whatssue.domain.member.entity.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,7 @@ public class GetJoinClubListResponse {
     public Long clubId;
     public String clubName;
     public String clubProfileImage;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime createdAt;
     public Role role;
 

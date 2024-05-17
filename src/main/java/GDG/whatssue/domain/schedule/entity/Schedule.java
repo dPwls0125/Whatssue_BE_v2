@@ -18,14 +18,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor
 public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,9 +73,6 @@ public class Schedule extends BaseEntity {
     }
 
     //==생성 메서드==//
-    private Schedule() {
-    }
-
     private Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
         LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
 

@@ -10,7 +10,6 @@ import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
-import GDG.whatssue.domain.schedule.dto.SearchCond;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
@@ -58,8 +57,8 @@ public class ScheduleService {
         return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId));
     }
 
-    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, SearchCond searchCond, Pageable pageable) {
-        return scheduleQueryRepository.findAllSchedule(clubId, searchCond, pageable);
+    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, String query, String sDate, String eDate, Pageable pageable) {
+        return scheduleQueryRepository.findAllSchedule(clubId, query, sDate, eDate, pageable);
     }
 
     public boolean isClubSchedule(Long clubId, Long scheduleId) {

@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor
 public class ClubJoinRequest extends BaseEntity {
 
     @Id
@@ -33,7 +34,6 @@ public class ClubJoinRequest extends BaseEntity {
     private User user;
 
     //==생성메서드==//
-    private ClubJoinRequest(){}
     private ClubJoinRequest(Club club, User user) {
         this.club = club;
         club.getClubJoinRequestList().add(this); //연관관계 편의 메서드
