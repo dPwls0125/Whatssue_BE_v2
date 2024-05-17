@@ -15,6 +15,7 @@ import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +73,7 @@ public class AttendanceService {
                         .clubId(schedule.getClub().getId())
                         .scheduleName(schedule.getScheduleName())
                         .scheduleContent(schedule.getScheduleContent())
-                        .scheduleDateTime(schedule.getScheduleDateTime())
+                        .scheduleDateTime(LocalDateTime.of(schedule.getScheduleDate(), schedule.getScheduleTime()))
                         .attendanceStatus(schedule.getAttendanceStatus())
                         .build();
                 scheduleIdList.add(dto);

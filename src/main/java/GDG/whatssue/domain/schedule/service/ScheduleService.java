@@ -7,18 +7,18 @@ import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
-import GDG.whatssue.domain.schedule.dto.GetScheduleListResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.club.entity.Club;
+import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.repository.ScheduleQueryRepository;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import GDG.whatssue.global.error.CommonException;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +43,8 @@ public class ScheduleService {
         findSchedule(scheduleId).update(
             requestDto.getScheduleName(),
             requestDto.getScheduleContent(),
-            requestDto.getScheduleDateTime(),
+            requestDto.getScheduleDate(),
+            requestDto.getScheduleTime(),
             requestDto.getSchedulePlace());
     }
 
@@ -56,27 +57,12 @@ public class ScheduleService {
         return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId));
     }
 
-    public List<GetScheduleListResponse> findSchedulesByFilter(Long clubId, String query, String sDate, String eDate) {
-        List<Schedule> scheduleList = scheduleQueryRepository.findScheduleByFilter(clubId, query, sDate, eDate);
-        return scheduleListToResponseDtoList(scheduleList);
+    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, String query, String sDate, String eDate, Pageable pageable) {
+        return scheduleQueryRepository.findAllSchedule(clubId, query, sDate, eDate, pageable);
     }
 
     public boolean isClubSchedule(Long clubId, Long scheduleId) {
         return scheduleRepository.existsByIdAndClub_Id(scheduleId, clubId);
-    }
-
-    private List<GetScheduleListResponse> scheduleListToResponseDtoList(List<Schedule> scheduleList) {
-        return scheduleList.stream()
-            .map(s -> scheduleToGetScheduleListResponse(s))
-            .collect(Collectors.toList());
-    }
-
-    private GetScheduleListResponse scheduleToGetScheduleListResponse(Schedule schedule) {
-        return GetScheduleListResponse.builder()
-            .scheduleId(schedule.getId())
-            .scheduleName(schedule.getScheduleName())
-            .scheduleDateTime(schedule.getScheduleDateTime())
-            .attendanceStatus(schedule.getAttendanceStatus()).build();
     }
 
     private GetScheduleDetailResponse scheduleToGetScheduleDetailResponse(Schedule schedule) {
@@ -89,7 +75,8 @@ public class ScheduleService {
             .scheduleId(schedule.getId())
             .scheduleName(schedule.getScheduleName())
             .scheduleContent(schedule.getScheduleContent())
-            .scheduleDateTime(schedule.getScheduleDateTime())
+            .scheduleDate(schedule.getScheduleDate())
+            .scheduleTime(schedule.getScheduleTime())
             .schedulePlace(schedule.getSchedulePlace())
             .registerName(register.getMemberName())
             .registerProfileImage(registerProfileImage)
