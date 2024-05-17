@@ -32,7 +32,7 @@ spring:
     oauth2:
       client:
         registration:
-          kakao:
+          Kakao:
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET}
             authorization-grant-type: authorization_code
@@ -40,7 +40,7 @@ spring:
             client-authentication-method: client_secret_post
             client-name: Kakao
         provider:
-          kakao:
+          Kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize #인가코드 받기 항목
             token-uri: https://kauth.kakao.com/oauth/token #토큰 받기 항목
             user-info-uri: https://kapi.kakao.com/v2/user/me #유저 정보 받기 항목
