@@ -17,7 +17,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -45,8 +47,11 @@ public class Schedule extends BaseEntity {
     private String scheduleContent;
 
     @Column(nullable = false)
-    private LocalDateTime scheduleDateTime;
-    
+    private LocalDate scheduleDate;
+
+    @Column(nullable = false)
+    private LocalTime scheduleTime;
+
     @Column(nullable = false)
     private String schedulePlace;
 
@@ -71,13 +76,14 @@ public class Schedule extends BaseEntity {
     }
 
     private Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
-        LocalDateTime scheduleDateTime, String schedulePlace) {
+        LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
 
         setClub(club);
         this.register = register;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
-        this.scheduleDateTime = scheduleDateTime;
+        this.scheduleDate = scheduleDate;
+        this.scheduleTime = scheduleTime;
         this.schedulePlace = schedulePlace;
         this.attendanceStatus = AttendanceStatus.BEFORE;
     }
@@ -86,9 +92,9 @@ public class Schedule extends BaseEntity {
      * 정적 팩토리 메서드 패턴
      */
     public static Schedule createSchedule(Club club, ClubMember register, String scheduleName,
-        String scheduleContent, LocalDateTime scheduleDateTime, String schedulePlace) {
+        String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
 
-        return new Schedule(club, register, scheduleName, scheduleContent, scheduleDateTime, schedulePlace);
+        return new Schedule(club, register, scheduleName, scheduleContent, scheduleDate, scheduleTime, schedulePlace);
     }
 
     //==비즈니스 로직==//
@@ -120,11 +126,11 @@ public class Schedule extends BaseEntity {
     /**
      * 일정 내용 수정
      */
-    public void update(String scheduleName, String scheduleContent, LocalDateTime scheduleDateTime, String schedulePlace) {
+    public void update(String scheduleName, String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
-        this.scheduleDateTime = scheduleDateTime;
+        this.scheduleDate = scheduleDate;
+        this.scheduleTime = scheduleTime;
         this.schedulePlace = schedulePlace;
     }
-
 }

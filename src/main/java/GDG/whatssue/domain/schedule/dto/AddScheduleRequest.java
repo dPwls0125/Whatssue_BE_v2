@@ -6,14 +6,14 @@ import GDG.whatssue.domain.schedule.entity.Schedule;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
 public class AddScheduleRequest {
 
-    private Club club;
-    private ClubMember register;
     @NotBlank
     private String scheduleName;
     @NotNull
@@ -22,12 +22,17 @@ public class AddScheduleRequest {
     private String schedulePlace;
 
     @NotBlank
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime scheduleDateTime;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate scheduleDate;
+
+    @NotBlank
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime scheduleTime;
+
 
     public Schedule toEntity(Club club, ClubMember register) {
         return Schedule.createSchedule(
             club, register, scheduleName,
-            scheduleContent, scheduleDateTime, schedulePlace);
+            scheduleContent, scheduleDate, scheduleTime, schedulePlace);
     }
 }
