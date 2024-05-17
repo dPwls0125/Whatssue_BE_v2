@@ -65,14 +65,14 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         List<ClubMember> clubMemberList = user.getClubMemberList();
 
-        for (ClubMember clubMember : clubMemberList) {
-            authorities.add((GrantedAuthority) () -> {
-                Long clubId = clubMember.getClub().getId();
-                Role role = clubMember.getRole();
-                System.out.println("ROLE_" + clubId + role);
-                return "ROLE_" + clubId + role;
-            });
-        }
+//        for (ClubMember clubMember : clubMemberList) {
+//            authorities.add((GrantedAuthority) () -> {
+//                Long clubId = clubMember.getClub().getId();
+//                Role role = clubMember.getRole();
+//                System.out.println("ROLE_" + clubId + role);
+//                return "ROLE_" + clubId + role;
+//            });
+//        }
 
         KakaoDetails kakaoDetails = KakaoDetails.builder()
                 .registrationId(userRequest.getClientRegistration().getRegistrationId())
