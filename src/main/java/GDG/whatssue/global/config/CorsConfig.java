@@ -1,6 +1,6 @@
 package GDG.whatssue.global.config;
 
-<<<<<<< Updated upstream
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
@@ -33,24 +33,4 @@ public class CorsConfig implements Filter {
     public boolean isLoggable(LogRecord record) {
         return false;
     }
-=======
-
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-@Configuration
-public class CorsConfig implements WebMvcConfigurer {
-        private final long MAX_AGE_SECS = 3600;
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(MAX_AGE_SECS);
-        }
-
->>>>>>> Stashed changes
 }

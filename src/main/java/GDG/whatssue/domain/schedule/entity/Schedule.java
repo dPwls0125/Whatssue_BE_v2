@@ -21,10 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
-<<<<<<< Updated upstream
-=======
 import lombok.NoArgsConstructor;
->>>>>>> Stashed changes
 
 @Getter
 @Entity
