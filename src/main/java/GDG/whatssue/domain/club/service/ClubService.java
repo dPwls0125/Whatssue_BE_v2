@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.club.service;
 
-import static GDG.whatssue.global.common.FileConst.*;
+import static GDG.whatssue.domain.file.FileConst.*;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
@@ -17,7 +17,6 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,10 +59,13 @@ public class ClubService {
         clubRepository.save(club);
 
         //프로필 사진 저장
-        saveClubProfileImage(profileImage, club); //관련 연관관계 편의메서드 TODO
+        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
+        club.setProfileImage(clubProfileImage);
+        fileRepository.save(clubProfileImage);
 
-        //클럽을 생성한 멤버(관리자)로 추가
-        ClubMember clubMember = ClubMember.of(club, user, Role.MANAGER);
+        //로그인 유저 관리자로 추가
+        ClubMember clubMember = ClubMember.newMember(club, user);
+        clubMember.switchToManager();
         clubMemberRepository.save(clubMember);
 
         return ClubCreateResponse.builder().clubId(club.getId()).build();
@@ -79,8 +81,10 @@ public class ClubService {
         //버킷 및 DB 파일 삭제
         deleteProfileImage(club);
 
-        //버킷 및 DB 파일 저장
-        saveClubProfileImage(profileImage, club);
+        //프로필 사진 저장
+        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
+        club.setProfileImage(clubProfileImage);
+        fileRepository.save(clubProfileImage);
     }
 
     @Transactional
@@ -131,30 +135,10 @@ public class ClubService {
         return true;
     }
 
-    /**
-     * TODO
-     */
-    @Transactional
-    public void saveClubProfileImage(MultipartFile profileImage, Club club) throws IOException {
-        //s3에 저장 처리
-        String storeFileName = fileUploadService.saveFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
-
-        //fileDB에 저장
-        String originalFileName = storeFileName;
-        if (profileImage != null)  {
-            originalFileName = profileImage.getOriginalFilename();
-        }
-
-        fileRepository.save(UploadFile.builder()
-            .club(club)
-            .uploadFileName(originalFileName)
-            .storeFileName(storeFileName).build());
-    }
-
     @Transactional
     public void deleteProfileImage(Club club) {
         fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
-        fileRepository.deleteById(club.getProfileImage().getId()); //레포에서 삭제
+        fileRepository.delete(club.getProfileImage());//레포에서 삭제
     }
 
     public Club getClub(Long clubId) {

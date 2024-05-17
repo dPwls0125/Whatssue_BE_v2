@@ -2,6 +2,7 @@ package GDG.whatssue.domain.post.entity;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.comment.entity.Comment;
+import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.CascadeType;
@@ -17,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,12 +47,21 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private String postContent;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<UploadFile> postImageFiles = new ArrayList<>();
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PostCategory postCategory;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<Comment> commentList;
+    private List<Comment> commentList = new ArrayList<>();
+    
+    //연관관계 메서드
+    public void addPostImageFile(UploadFile uploadFile) {
+        this.postImageFiles.add(uploadFile);
+        uploadFile.setPost(this); //연관관계 편의 메서드
+    }
 
     @Builder
     public Post(Long id, ClubMember writer, Club club, String postTitle, String postContent,
@@ -62,4 +73,6 @@ public class Post extends BaseEntity {
         this.postContent = postContent;
         this.postCategory = postCategory;
     }
+
+
 }

@@ -2,7 +2,6 @@ package GDG.whatssue.domain.club.dto;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.entity.NamePolicy;
-import GDG.whatssue.domain.member.entity.ClubMember;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -17,6 +16,6 @@ public class ClubCreateRequest {
     private NamePolicy namePolicy;
 
     public Club toEntity() {
-        return Club.of(clubName, clubIntro, isPrivate, contactMeans, namePolicy);
+        return Club.createClub(clubName, clubIntro, isPrivate, contactMeans, namePolicy);
     }
 }

@@ -2,7 +2,6 @@ package GDG.whatssue.domain.schedule.entity;
 
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
-import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
@@ -65,15 +64,20 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule")
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
+    //==연관관계 메서드==//
+    private void setClub(Club club) {
+        this.club = club;
+        club.getScheduleList().add(this);
+    }
+
     //==생성 메서드==//
     private Schedule() {
     }
 
     private Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
         LocalDateTime scheduleDateTime, String schedulePlace) {
-        this.club = club;
-        club.getScheduleList().add(this); //연관관계 편의 메서드
 
+        setClub(club);
         this.register = register;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
@@ -85,7 +89,7 @@ public class Schedule extends BaseEntity {
     /**
      * 정적 팩토리 메서드 패턴
      */
-    public static Schedule of(Club club, ClubMember register, String scheduleName,
+    public static Schedule createSchedule(Club club, ClubMember register, String scheduleName,
         String scheduleContent, LocalDateTime scheduleDateTime, String schedulePlace) {
 
         return new Schedule(club, register, scheduleName, scheduleContent, scheduleDateTime, schedulePlace);
@@ -96,34 +100,35 @@ public class Schedule extends BaseEntity {
      * 일정 출석 시작
      */
     public void startAttendance() {
-        if (attendanceStatus == AttendanceStatus.ONGOING) {
+        if (this.attendanceStatus == AttendanceStatus.ONGOING) {
             //이미 출석 진행중 예외
         }
 
-        if (attendanceStatus == AttendanceStatus.COMPLETE) {
+        if (this.attendanceStatus == AttendanceStatus.COMPLETE) {
             //이미 출석 완료 예외
         }
 
-        attendanceStatus = AttendanceStatus.ONGOING;
+        this.attendanceStatus = AttendanceStatus.ONGOING;
     }
 
     /**
      * 일정 출석 종료
      */
     public void finishAttendance() {
-        if (attendanceStatus != AttendanceStatus.ONGOING) {
+        if (this.attendanceStatus != AttendanceStatus.ONGOING) {
             //출석 진행중이 아님 예외
         }
-        attendanceStatus = AttendanceStatus.COMPLETE;
+        this.attendanceStatus = AttendanceStatus.COMPLETE;
     }
 
     /**
      * 일정 내용 수정
      */
-    public void update(ModifyScheduleRequest request) {
-        this.scheduleName = request.getScheduleName();
-        this.scheduleContent = request.getScheduleContent();
-        this.scheduleDateTime = request.getScheduleDateTime();
-        this.schedulePlace = request.getSchedulePlace();
+    public void update(String scheduleName, String scheduleContent, LocalDateTime scheduleDateTime, String schedulePlace) {
+        this.scheduleName = scheduleName;
+        this.scheduleContent = scheduleContent;
+        this.scheduleDateTime = scheduleDateTime;
+        this.schedulePlace = schedulePlace;
     }
+
 }
