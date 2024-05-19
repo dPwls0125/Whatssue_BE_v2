@@ -64,9 +64,9 @@ public class ClubService {
         fileRepository.save(clubProfileImage);
 
         //로그인 유저 관리자로 추가
-        ClubMember clubMember = ClubMember.newMember(club, user);
-        clubMember.switchToManager();
-        clubMemberRepository.save(clubMember);
+        ClubMember newMember = ClubMember.newMember(user);
+        newMember.switchToManager();
+        club.addMember(newMember);
 
         return ClubCreateResponse.builder().clubId(club.getId()).build();
     }
@@ -106,6 +106,7 @@ public class ClubService {
             .namePolicy(club.getNamePolicy())
             .privateCode(club.getPrivateCode())
             .clubProfileImage(clubProfileImage)
+            .memberCount(club.getMemberCount())
             .isPrivate(club.isPrivate()).build();
     }
 

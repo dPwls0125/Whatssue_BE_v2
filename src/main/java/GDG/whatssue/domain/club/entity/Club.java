@@ -46,7 +46,7 @@ public class Club extends BaseEntity {
     @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) //지연 로딩
     private UploadFile profileImage;
 
-    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
     private List<ClubMember> clubMemberList = new ArrayList<>();
 
     @OneToMany(mappedBy = "club")
@@ -59,6 +59,11 @@ public class Club extends BaseEntity {
     private List<Post> postList = new ArrayList<>();
 
     //==연관관계 메서드==//
+    public void addMember(ClubMember member) {
+        clubMemberList.add(member);
+        member.setClub(this);
+    }
+
     public void setProfileImage(UploadFile profileImage) {
         this.profileImage = profileImage;
         profileImage.setClub(this); //연관관계 편의 메서드
@@ -104,5 +109,12 @@ public class Club extends BaseEntity {
      */
     public void createNewPrivateCode() {
         this.privateCode = UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    /**
+     * 가입 멤버 수 반환
+     */
+    public int getMemberCount() {
+        return clubMemberList.size();
     }
 }
