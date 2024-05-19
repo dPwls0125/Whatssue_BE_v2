@@ -80,7 +80,7 @@ public class ClubController {
 
     @ClubManager
     @Operation(summary = "초대코드 갱신")
-    @PatchMapping("/{clubId}/private-code")
+    @PostMapping("/{clubId}/private-code")
     public ResponseEntity updateClubPrivateCode(@PathVariable("clubId") Long clubId) {
         clubService.updateClubCode(clubId);
 
@@ -89,7 +89,7 @@ public class ClubController {
 
     @ClubManager
     @Operation(summary = "모임 가입 신청 여닫기")
-    @PatchMapping(value = "/{clubId}/private")
+    @PostMapping(value = "/{clubId}/private")
     public ResponseEntity updateClubPrivateStatus(@PathVariable("clubId") Long clubId){
         clubService.updateClubPrivateStatus(clubId);
 
