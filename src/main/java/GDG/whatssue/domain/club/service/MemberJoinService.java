@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.club.service;
 
+import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.club.repository.ClubJoinRequestRepository;
@@ -25,10 +26,9 @@ public class MemberJoinService {
         ClubJoinRequest clubJoinRequest = clubJoinRequestRepository.findById(clubJoinRequestId)
                 .orElseThrow(() -> new IllegalArgumentException("클럽 가입 요청을 찾을 수 없습니다: " + clubJoinRequestId));
 
-        // 클럽 멤버 엔티티 생성
-        ClubMember clubMember = ClubMember.newMember(clubJoinRequest.getClub(), clubJoinRequest.getUser());
+        Club club = clubJoinRequest.getClub();
+        club.addMember(ClubMember.newMember(clubJoinRequest.getUser()));
 
-        clubMemberRepository.save(clubMember);
         clubJoinRequestRepository.delete(clubJoinRequest);
     }
 
