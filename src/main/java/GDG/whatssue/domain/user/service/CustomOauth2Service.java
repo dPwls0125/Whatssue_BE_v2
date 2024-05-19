@@ -33,8 +33,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
-    @Value("${front.url}")
-    private String frontUrl;
     /*
     Third party 접근을 위한 accessToken 발급 이후 실행됨
      */
@@ -136,16 +134,4 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         return dto;
     }
 
-    public RedirectView loginRedirect(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-        RedirectView redirectView = new RedirectView();
-        if(user.getUserPhone()==null || user.getUserEmail()==null){
-            System.out.println("회원가입 안되어있음 -> 회원가입 페이지로 redirect");
-            redirectView.setUrl( frontUrl + "/user/signup"); // 회원가입 페이지
-        } else {
-            System.out.println("회원가입 되어있음 -> 메인페이지로 redirect");
-            redirectView.setUrl(frontUrl);// 메인 페이지
-        }
-        return redirectView;
-    }
 }

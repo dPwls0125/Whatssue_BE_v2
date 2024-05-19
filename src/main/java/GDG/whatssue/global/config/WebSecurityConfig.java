@@ -1,6 +1,7 @@
 package GDG.whatssue.global.config;
 
 import GDG.whatssue.domain.user.service.CustomOauth2Service;
+import GDG.whatssue.domain.user.service.OauthSuccessHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true) //secured 활성화, preAuthorize, postAuthorize 활성화
 public class WebSecurityConfig {
     private final CustomOauth2Service customOauth2Service;
+    private final OauthSuccessHandler oauthSuccessHandler;
 
     @Value("${server.url}")
     private String serverUrl;
@@ -46,8 +48,7 @@ public class WebSecurityConfig {
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2->oauth2
-                        .defaultSuccessUrl( serverUrl +"/api/user/login/redirect" )
-//                        .successHandler()
+                        .successHandler(oauthSuccessHandler)
                         .userInfoEndpoint(userInfo->userInfo
                                 .userService(customOauth2Service))
                                 .permitAll()
