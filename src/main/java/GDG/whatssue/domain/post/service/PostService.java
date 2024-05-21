@@ -11,6 +11,7 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.post.dto.AddPostRequest;
 import GDG.whatssue.domain.post.dto.GetPostResponse;
+import GDG.whatssue.domain.post.dto.UpdatePostRequest;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.domain.post.exception.PostErrorCode;
 import GDG.whatssue.domain.post.repository.PostRepository;
@@ -74,4 +75,17 @@ public class PostService {
         }
     }
 
+    @Transactional
+    public void deletePost(Long postId) throws IOException {
+        Post post = postRepository.findById(postId).get();
+        if(post ==null){
+            //postId에 해당하는 게시글이 null일 경우 에러반환 TODO
+        }
+
+        postRepository.delete(post);
+    }
+
+    public void updatePost(Long clubId, Long memberId, Long postId, UpdatePostRequest request, List<MultipartFile> postImages) {
+    //기존 post에 수정 사항을 적용하는 메소드 작성 TODO
+    }
 }
