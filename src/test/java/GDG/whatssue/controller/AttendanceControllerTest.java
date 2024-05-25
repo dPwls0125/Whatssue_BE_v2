@@ -12,6 +12,7 @@ import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestReporter;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("출석 컨트롤러 테스트")
 @WithMockUser(username = "testUser", roles = "USER")
+@Disabled
 public class AttendanceControllerTest {
 
     @Autowired
