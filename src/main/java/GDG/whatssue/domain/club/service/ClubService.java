@@ -5,7 +5,6 @@ import static GDG.whatssue.domain.file.FileConst.*;
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
-import GDG.whatssue.domain.club.dto.GetJoinClubListResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
@@ -17,11 +16,9 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
+import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,19 +33,6 @@ public class ClubService {
     private final ClubMemberRepository clubMemberRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
-
-    public List<GetJoinClubListResponse> getJoinClubList(Long userId) {
-        List<ClubMember> clubMembers = clubMemberRepository.findByUser_UserId(userId);
-        if (clubMembers.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<GetJoinClubListResponse> responseList = clubMembers.stream()
-            .map(c -> entityToJoinClubListResponse(c))
-            .collect(Collectors.toList());
-
-        return responseList;
-    }
 
     @Transactional
     public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
@@ -97,7 +81,7 @@ public class ClubService {
         Club club = getClub(clubId);
 
         String storeFileName = club.getProfileImage().getStoreFileName();
-        String clubProfileImage = fileUploadService.getFullPath(storeFileName);
+        String clubProfileImage = S3Utils.getFullPath(storeFileName);
 
         return GetClubInfoResponse.builder()
             .clubName(club.getClubName())
@@ -108,20 +92,6 @@ public class ClubService {
             .clubProfileImage(clubProfileImage)
             .memberCount(club.getMemberCount())
             .isPrivate(club.isPrivate()).build();
-    }
-
-    public GetJoinClubListResponse entityToJoinClubListResponse(ClubMember clubMember) {
-        Club club = clubMember.getClub();
-
-        String storeFileName = club.getProfileImage().getStoreFileName();
-        String clubProfileImage = fileUploadService.getFullPath(storeFileName);
-
-        return GetJoinClubListResponse.builder()
-            .clubId(club.getId())
-            .clubName(club.getClubName())
-            .clubProfileImage(clubProfileImage)
-            .createdAt(clubMember.getCreateAt())
-            .role(clubMember.getRole()).build();
     }
 
     @Transactional

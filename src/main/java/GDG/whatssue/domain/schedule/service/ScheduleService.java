@@ -1,7 +1,6 @@
 package GDG.whatssue.domain.schedule.service;
 
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
-import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
@@ -13,11 +12,11 @@ import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
-import GDG.whatssue.domain.schedule.repository.ScheduleQueryRepository;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
+import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +29,6 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ClubRepository clubRepository;
     private final ClubMemberRepository clubMemberRepository;
-    private final ScheduleQueryRepository scheduleQueryRepository;
-    private final FileUploadService fileUploadService;
 
     @Transactional
     public void saveSchedule(Long clubId, Long memberId, AddScheduleRequest requestDto) {
@@ -57,8 +54,8 @@ public class ScheduleService {
         return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId));
     }
 
-    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, String query, String sDate, String eDate, Pageable pageable) {
-        return scheduleQueryRepository.findAllSchedule(clubId, query, sDate, eDate, pageable);
+    public Page<SchedulesResponse> findAllSchedule(Long clubId, String query, String sDate, String eDate, Pageable pageable) {
+        return scheduleRepository.findAllSchedule(clubId, query, sDate, eDate, pageable);
     }
 
     public boolean isClubSchedule(Long clubId, Long scheduleId) {
@@ -69,7 +66,7 @@ public class ScheduleService {
         ClubMember register = schedule.getRegister();
 
         String storeFileName = register.getProfileImage().getStoreFileName();
-        String registerProfileImage = fileUploadService.getFullPath(storeFileName);
+        String registerProfileImage = S3Utils.getFullPath(storeFileName);
 
         return GetScheduleDetailResponse.builder()
             .scheduleId(schedule.getId())

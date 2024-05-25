@@ -1,3 +1,26 @@
+package GDG.whatssue.domain.user.service;
+
+import GDG.whatssue.domain.member.repository.ClubMemberRepository;
+import GDG.whatssue.domain.user.dto.GetJoinClubResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class UserService {
+
+    private final ClubMemberRepository clubMemberRepository;
+
+    public Page<GetJoinClubResponse> getJoinClubList(Long userId, Pageable pageable) {
+        return clubMemberRepository.getJoinClubList(userId, pageable);
+    }
+
+}
+
 //package GDG.whatssue.domain.user.service;
 //import GDG.whatssue.domain.user.dto.UserDto;
 //import GDG.whatssue.domain.user.entity.PrincipalDetails;

@@ -1,13 +1,16 @@
 package GDG.whatssue.domain.attendance.dto;
 
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
+@Getter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@Data
 public class ScheduleAttendanceMemberDto {
 
     private Long clubId;

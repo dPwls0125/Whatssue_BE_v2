@@ -1,11 +1,18 @@
 package GDG.whatssue.domain.user.controller;
 
+import GDG.whatssue.domain.user.dto.GetJoinClubResponse;
 import GDG.whatssue.domain.user.dto.SignUpRequestDto;
 import GDG.whatssue.domain.user.dto.UserDto;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.domain.user.service.CustomOauth2Service;
+import GDG.whatssue.domain.user.service.UserService;
+import GDG.whatssue.global.common.annotation.LoginUser;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +26,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/user")
 public class  UserController {
 
+    private final UserService userService;
     private final CustomOauth2Service customOauth2Service;
+
+    @Operation(summary = "가입한 모임 조회")
+    @GetMapping("/clubs")
+    public ResponseEntity<Page<GetJoinClubResponse>> getJoinClubList(@LoginUser Long userId, Pageable pageable) {
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userService.getJoinClubList(userId, pageable));
+    }
 
     @GetMapping("/getInfo")
     public ResponseEntity getUserProfile(@AuthenticationPrincipal KakaoDetails kakaoDetails) {

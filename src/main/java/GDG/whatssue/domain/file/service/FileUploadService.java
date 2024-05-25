@@ -11,7 +11,4 @@ public interface FileUploadService {
     public UploadFile uploadFile(MultipartFile multipartFile, String dirName) throws IOException;
     public String downloadFile(String uploadFileName);
     public void deleteFile(String uploadFileName);
-    public String getFullPath(String fileName);
-
-
 }

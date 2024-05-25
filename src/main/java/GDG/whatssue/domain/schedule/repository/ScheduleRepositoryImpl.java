@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -20,12 +21,12 @@ import org.springframework.util.StringUtils;
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class ScheduleQueryRepository implements ScheduleRepositoryCustom{
+public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public PageImpl<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, String sDate, String eDate, Pageable pageable) {
+    public Page<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, String sDate, String eDate, Pageable pageable) {
 
         JPAQuery<SchedulesResponse> query = queryFactory
             .select(Projections.constructor(

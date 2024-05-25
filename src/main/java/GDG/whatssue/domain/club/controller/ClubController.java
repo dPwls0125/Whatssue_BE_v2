@@ -3,7 +3,6 @@ package GDG.whatssue.domain.club.controller;
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
-import GDG.whatssue.domain.club.dto.GetJoinClubListResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.service.ClubService;
 import GDG.whatssue.global.common.annotation.ClubManager;
@@ -11,7 +10,6 @@ import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,14 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ClubController {
 
     private final ClubService clubService;
-    
-    @Operation(summary = "가입한 모임 조회")
-    @GetMapping
-    public ResponseEntity getJoinClubList(@LoginUser Long userId) {
-        List<GetJoinClubListResponse> responseDto = clubService.getJoinClubList(userId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
 
     @Operation(summary = "모임 생성", description = "기본 사진일 시 profileImage 헤더 x")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})

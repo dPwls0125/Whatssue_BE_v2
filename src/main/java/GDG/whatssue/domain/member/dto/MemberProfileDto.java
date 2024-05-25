@@ -22,5 +22,5 @@ public class MemberProfileDto {
     private Role role;
     private Boolean isMemberEmailPublic;
     private Boolean isMemberPhonePublic;
-    private URL profileImage;
+    private String profileImage;
 }
