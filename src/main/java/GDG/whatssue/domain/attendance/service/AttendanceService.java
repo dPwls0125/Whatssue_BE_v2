@@ -52,6 +52,7 @@ public class AttendanceService {
         } else {
             attendanceNumMap.put(clubId, new HashMap<>());
         }
+
         Map<Long, Integer> innerMap = attendanceNumMap.get(clubId);
         innerMap.put(scheduleId, randomInt);
         randomInt = attendanceNumMap.get(clubId).get(scheduleId);
@@ -60,6 +61,7 @@ public class AttendanceService {
                 .clubId(clubId)
                 .scheduleId(scheduleId)
                 .build();
+
         return attendanceNumResponseDto;
     }
     //현재 진행중인 일정 리스트

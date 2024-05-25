@@ -11,6 +11,7 @@ import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,6 @@ public class ClubMemberService {
                     requestDto.getMemberIntro(),
                     requestDto.isEmailPublic(),
                     requestDto.isPhonePublic());
-
             clubMemberRepository.save(clubMember);
         }catch(Exception e){
             throw new CommonException(ClubMemberErrorCode.CLUB_MEMBER_COULD_NOT_MODIFY_ERROR);
@@ -34,6 +34,7 @@ public class ClubMemberService {
     }
 
     // TDDO
+    @Transactional
     public MemberProfileDto getMemberProfile(Long memberId, Long userId) {
 
         ClubMember member = clubMemberRepository.findById(memberId)

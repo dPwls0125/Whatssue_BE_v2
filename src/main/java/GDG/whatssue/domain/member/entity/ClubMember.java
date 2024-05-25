@@ -16,9 +16,7 @@ import lombok.*;
 
 @Getter
 @Entity
-@Setter
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor
 public class ClubMember extends BaseEntity {
 
     @Id
@@ -77,7 +75,6 @@ public class ClubMember extends BaseEntity {
     }
 
     //==생성메서드==//
-    private ClubMember(){}
     private ClubMember(User user) {
         setUser(user);
 

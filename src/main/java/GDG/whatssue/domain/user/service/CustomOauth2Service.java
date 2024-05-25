@@ -11,12 +11,16 @@ import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -32,7 +36,6 @@ import java.util.Map;
 public class CustomOauth2Service extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-
     /*
     Third party 접근을 위한 accessToken 발급 이후 실행됨
      */
@@ -132,6 +135,19 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                 .userPhone(user.getUserPhone())
                 .build();
         return dto;
+    }
+
+    @Bean
+    @Profile("test")
+    public UserDetailsService userDetailsService() {
+        UserDetailsService userDetailsService = username -> new InMemoryUserDetailsManager(
+                org.springframework.security.core.userdetails.User.withDefaultPasswordEncoder()
+                        .username("testuser")
+                        .password("password")
+                        .roles("USER")
+                        .build()
+        ).loadUserByUsername(username);
+        return userDetailsService;
     }
 
 }
