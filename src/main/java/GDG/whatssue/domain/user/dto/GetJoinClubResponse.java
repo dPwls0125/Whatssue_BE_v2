@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.club.dto;
+package GDG.whatssue.domain.user.dto;
 
 import GDG.whatssue.domain.member.entity.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class GetJoinClubListResponse {
+public class GetJoinClubResponse {
 
     public Long clubId;
     public String clubName;
@@ -20,8 +20,13 @@ public class GetJoinClubListResponse {
 
     //현재 인원 TODO
 
+
+    public void setClubProfileImage(String clubProfileImage) {
+        this.clubProfileImage = clubProfileImage;
+    }
+
     @Builder
-    public GetJoinClubListResponse(Long clubId, String clubName, String clubProfileImage,
+    public GetJoinClubResponse(Long clubId, String clubName, String clubProfileImage,
         LocalDateTime createdAt, Role role) {
         this.clubId = clubId;
         this.clubName = clubName;

@@ -16,17 +16,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -103,7 +101,7 @@ public class ScheduleController {
     @Parameter(name = "q", description = "검색어. 일정명으로 검색", in = ParameterIn.QUERY)
     @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", in = ParameterIn.QUERY)
     @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
-    public ResponseEntity<PageImpl<SchedulesResponse>> findSchedules(
+    public ResponseEntity<Page<SchedulesResponse>> findSchedules(
         @PathVariable(name = "clubId") Long clubId,
         @RequestParam(name = "q", required = false, defaultValue = "") String query,
         @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,

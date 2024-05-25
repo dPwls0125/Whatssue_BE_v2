@@ -64,10 +64,6 @@ public class S3UploadService implements FileUploadService {
         amazonS3.deleteObject(bucket, storeFileName);
     }
 
-    public String getFullPath(String fileName) {
-        return PATH + fileName;
-    }
-
     private String getFileName(String dirName, String originalFileName) {
         return dirName + "/" + UUID.randomUUID() + "." + extractExt(originalFileName);
     }

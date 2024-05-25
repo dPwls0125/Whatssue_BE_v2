@@ -22,7 +22,7 @@ public class MemberProfileDto {
     private Role role;
     private boolean isMemberEmailPublic;
     private boolean isMemberPhonePublic;
-    private URL profileImage;
+    private String profileImage;
 
 
 
