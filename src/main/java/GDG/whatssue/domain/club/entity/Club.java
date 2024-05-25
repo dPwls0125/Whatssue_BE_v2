@@ -17,6 +17,8 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class Club extends BaseEntity {
 
     @Id

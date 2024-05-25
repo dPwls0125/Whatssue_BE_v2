@@ -20,11 +20,7 @@ public class MemberProfileDto {
     private String memberName;
     private String memberIntro;
     private Role role;
-    private boolean isMemberEmailPublic;
-    private boolean isMemberPhonePublic;
+    private Boolean isMemberEmailPublic;
+    private Boolean isMemberPhonePublic;
     private URL profileImage;
-
-
-
-
 }
