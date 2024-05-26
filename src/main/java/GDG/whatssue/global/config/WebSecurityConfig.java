@@ -64,9 +64,9 @@ public class WebSecurityConfig {
                 .logout((logout) -> logout.permitAll())
                 .exceptionHandling(exception -> exception
                     .accessDeniedHandler((request, response, accessDeniedException) -> {
-                        response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
+                        response.setStatus(HttpStatus.FAILED_DEPENDENCY.value()); // 403
                     })
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)) // 403
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FAILED_DEPENDENCY) // 403
                 ); // 권한 없음
         return http.build();
     }

@@ -65,12 +65,12 @@ public class MyMessageService {
             return response;
         }
 
-        public String checkCertNum(String toNumber, int certNum,Long userId) {
+        public Boolean checkCertNum(String toNumber, int certNum,Long userId) {
             PhoneCertNum phoneCertNum = phoneCertNumRepository.findById(toNumber + ":" + userId).orElseThrow(() -> new RuntimeException("인증번호가 존재하지 않습니다."));
             if (phoneCertNum.getCertificationNum() != certNum) {
                 throw new RuntimeException("인증번호가 일치하지 않습니다.");
             }
-            return "인증번호가 일치합니다.";
+            return true;
         }
 
         private int randomNumber() {
