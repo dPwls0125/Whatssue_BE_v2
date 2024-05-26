@@ -3,6 +3,7 @@ package GDG.whatssue.domain.file.entity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.entity.Post;
+import GDG.whatssue.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,12 +45,30 @@ public class UploadFile {
     @Column(nullable = false)
     private String storeFileName;
 
-    @Builder
-    public UploadFile(Club club, ClubMember clubMember, Post post, String uploadFileName, String storeFileName) {
-        this.club = club;
-        this.clubMember = clubMember;
-        this.post = post;
+
+    //==생성 메서드==//
+    private UploadFile(String uploadFileName, String storeFileName) {
         this.uploadFileName = uploadFileName;
         this.storeFileName = storeFileName;
+    }
+
+    /**
+     * 정적 팩토리 메서드
+     */
+    public static UploadFile of(String uploadFileName, String storeFileName) {
+        return new UploadFile(uploadFileName, storeFileName);
+    }
+
+    //==비즈니스 로직==//
+    public void setClub(Club club) {
+        this.club = club;
+    }
+
+    public void setClubMember(ClubMember clubMember) {
+        this.clubMember = clubMember;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
     }
 }

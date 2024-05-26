@@ -49,7 +49,6 @@ public class GlobalExceptionHandler {
             .build();
 
         return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
-
     }
 
     @ExceptionHandler

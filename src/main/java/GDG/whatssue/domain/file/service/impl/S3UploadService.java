@@ -1,7 +1,8 @@
 package GDG.whatssue.domain.file.service.impl;
 
+import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.service.FileUploadService;
-import GDG.whatssue.global.common.FileConst;
+import GDG.whatssue.domain.file.FileConst;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -26,14 +27,16 @@ public class S3UploadService implements FileUploadService {
     public String bucket;
 
     @Override
-    public String saveFile(MultipartFile multipartFile, String dirName) throws IOException {
+    public UploadFile uploadFile(MultipartFile multipartFile, String dirName) throws IOException {
+        String storeFileName;
         //저장 사진이 없으면 기본 경로 반환
         if (multipartFile == null) {
-            return dirName + FileConst.DEFAULT_IMAGE_NAME;
+            storeFileName = dirName + FileConst.DEFAULT_IMAGE_NAME;
+            return UploadFile.of(storeFileName,storeFileName);
         }
 
         String originalFileName = multipartFile.getOriginalFilename();
-        String storeFileName = getFileName(dirName, originalFileName);
+        storeFileName = getFileName(dirName, originalFileName);
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
@@ -42,7 +45,7 @@ public class S3UploadService implements FileUploadService {
         amazonS3.putObject(new PutObjectRequest(bucket, storeFileName, multipartFile.getInputStream(), metadata)
             .withCannedAcl(CannedAccessControlList.PublicRead));
 
-        return storeFileName;
+        return UploadFile.of(originalFileName, storeFileName);
     }
 
     @Override
@@ -59,10 +62,6 @@ public class S3UploadService implements FileUploadService {
         }
 
         amazonS3.deleteObject(bucket, storeFileName);
-    }
-
-    public String getFullPath(String fileName) {
-        return PATH + fileName;
     }
 
     private String getFileName(String dirName, String originalFileName) {

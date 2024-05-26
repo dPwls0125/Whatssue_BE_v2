@@ -1,22 +1,24 @@
 package GDG.whatssue.domain.user.controller;
 
+import GDG.whatssue.domain.user.dto.GetJoinClubResponse;
 import GDG.whatssue.domain.user.dto.SignUpRequestDto;
 import GDG.whatssue.domain.user.dto.UserDto;
-//import GDG.whatssue.domain.user.entity.PrincipalDetails;
-//import GDG.whatssue.domain.user.service.UserService;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.domain.user.service.CustomOauth2Service;
+import GDG.whatssue.domain.user.service.UserService;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @Slf4j
@@ -24,7 +26,17 @@ import org.springframework.web.servlet.view.RedirectView;
 @RequestMapping("/api/user")
 public class  UserController {
 
+    private final UserService userService;
     private final CustomOauth2Service customOauth2Service;
+
+    @Operation(summary = "가입한 모임 조회")
+    @GetMapping("/clubs")
+    public ResponseEntity<Page<GetJoinClubResponse>> getJoinClubList(@LoginUser Long userId, Pageable pageable) {
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userService.getJoinClubList(userId, pageable));
+    }
 
     @GetMapping("/getInfo")
     public ResponseEntity getUserProfile(@AuthenticationPrincipal KakaoDetails kakaoDetails) {
@@ -44,10 +56,4 @@ public class  UserController {
         return ResponseEntity.status(200).body(userDto);
     }
 
-    @GetMapping("/login/redirect")
-    @Operation(summary = "로그인 이후 적절한 화면으로 리다이렉트", description = "회원가입을 안한 유저인 경우 -> signup page\n 회원가입을 한 유저인 경우 -> main page")
-    public RedirectView loginRedirect(@LoginUser Long userId){
-        RedirectView redirect = customOauth2Service.loginRedirect(userId);
-        return redirect;
-    }
 }

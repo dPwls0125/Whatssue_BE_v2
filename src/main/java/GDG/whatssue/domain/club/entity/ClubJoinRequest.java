@@ -33,9 +33,16 @@ public class ClubJoinRequest extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Builder
-    public ClubJoinRequest(Club club, User user) {
+    //==생성메서드==//
+    private ClubJoinRequest(Club club, User user) {
         this.club = club;
+        club.getClubJoinRequestList().add(this); //연관관계 편의 메서드
+
         this.user = user;
+        user.getClubJoinRequestList().add(this); //연관관계 편의 메서드
+    }
+
+    public static ClubJoinRequest of(Club club, User user) {
+        return new ClubJoinRequest(club, user);
     }
 }

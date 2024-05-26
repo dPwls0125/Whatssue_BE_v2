@@ -4,8 +4,8 @@ import static org.springframework.http.HttpStatus.*;
 
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
-import GDG.whatssue.domain.schedule.dto.GetScheduleListResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
+import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.common.annotation.ClubManager;
@@ -16,10 +16,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -97,15 +98,16 @@ public class ScheduleController {
 
     @Operation(summary = "일정 조회(검색 : 검색어, 기간)")
     @GetMapping
-    @Parameter(name = "q", description = "검색어. 일정명으로 검색", required = false, in = ParameterIn.QUERY)
-    @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", required = false, in = ParameterIn.QUERY)
-    @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", required = false, in = ParameterIn.QUERY)
-    public ResponseEntity<List<GetScheduleListResponse>> findSchedules(
+    @Parameter(name = "q", description = "검색어. 일정명으로 검색", in = ParameterIn.QUERY)
+    @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", in = ParameterIn.QUERY)
+    @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
+    public ResponseEntity<Page<SchedulesResponse>> findSchedules(
         @PathVariable(name = "clubId") Long clubId,
         @RequestParam(name = "q", required = false, defaultValue = "") String query,
         @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,
-        @RequestParam(name = "eDate", required = false, defaultValue = "2199-12-31") String eDate) {
-        
+        @RequestParam(name = "eDate", required = false, defaultValue = "2199-12-31") String eDate,
+        Pageable pageable) {
+
         //유효성 체크
         if (!(
             Pattern.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}", sDate)
@@ -113,10 +115,8 @@ public class ScheduleController {
             throw new CommonException(ScheduleErrorCode.INVALID_SCHEDULE_DATE_PATTERN_ERROR);
         }
 
-        List<GetScheduleListResponse> responseDtoList = scheduleService.findSchedules(clubId, query, sDate, eDate);
-
         return ResponseEntity
             .status(OK)
-            .body(responseDtoList);
+            .body(scheduleService.findAllSchedule(clubId, query, sDate, eDate, pageable));
     }
 }

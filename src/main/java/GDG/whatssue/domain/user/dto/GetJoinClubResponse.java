@@ -1,6 +1,7 @@
-package GDG.whatssue.domain.club.dto;
+package GDG.whatssue.domain.user.dto;
 
 import GDG.whatssue.domain.member.entity.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,18 +9,24 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class GetJoinClubListResponse {
+public class GetJoinClubResponse {
 
     public Long clubId;
     public String clubName;
     public String clubProfileImage;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime createdAt;
     public Role role;
 
     //현재 인원 TODO
 
+
+    public void setClubProfileImage(String clubProfileImage) {
+        this.clubProfileImage = clubProfileImage;
+    }
+
     @Builder
-    public GetJoinClubListResponse(Long clubId, String clubName, String clubProfileImage,
+    public GetJoinClubResponse(Long clubId, String clubName, String clubProfileImage,
         LocalDateTime createdAt, Role role) {
         this.clubId = clubId;
         this.clubName = clubName;

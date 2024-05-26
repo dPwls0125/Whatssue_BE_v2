@@ -27,7 +27,7 @@ public class AttendanceController {
     @ClubManager
     @Operation(summary = "출석 열기_manager ",description = "출석을 열면 출석을 진행하지 않았던 경우는 모두 결석 처리 리스트를 생성합니다.")
     @GetMapping("/schedules/{scheduleId}/attendance-start")
-    public ResponseEntity openAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
+    public ResponseEntity openAttendance(@PathVariable("clubId") Long clubId, @PathVariable("scheduleId") Long scheduleId) {
         AttendanceNumResponseDto dto;
         try {
             dto = attendanceService.openAttendance(clubId, scheduleId);

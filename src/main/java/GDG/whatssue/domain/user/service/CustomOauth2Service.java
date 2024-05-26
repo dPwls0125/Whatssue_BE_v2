@@ -11,12 +11,16 @@ import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -32,9 +36,6 @@ import java.util.Map;
 public class CustomOauth2Service extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-
-    @Value("${front.url}")
-    private String frontUrl;
     /*
     Third party 접근을 위한 accessToken 발급 이후 실행됨
      */
@@ -61,14 +62,16 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         User user = findOrSaveUser(oAuth2User, userRequest.getClientRegistration().getRegistrationId(), profile.get("nickname").toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         List<ClubMember> clubMemberList = user.getClubMemberList();
-        for (ClubMember clubMember : clubMemberList) {
-            authorities.add((GrantedAuthority) () -> {
-                Long clubId = clubMember.getClub().getId();
-                Role role = clubMember.getRole();
-                System.out.println("ROLE_" + clubId + role);
-                return "ROLE_" + clubId + role;
-            });
-        }
+
+//        for (ClubMember clubMember : clubMemberList) {
+//            authorities.add((GrantedAuthority) () -> {
+//                Long clubId = clubMember.getClub().getId();
+//                Role role = clubMember.getRole();
+//                System.out.println("ROLE_" + clubId + role);
+//                return "ROLE_" + clubId + role;
+//            });
+//        }
+
         KakaoDetails kakaoDetails = KakaoDetails.builder()
                 .registrationId(userRequest.getClientRegistration().getRegistrationId())
                 .user(user)
@@ -131,17 +134,17 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         return dto;
     }
 
-    public RedirectView loginRedirect(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-        RedirectView redirectView = new RedirectView();
-        if(user.getUserPhone()==null || user.getUserEmail()==null){
-            System.out.println("회원가입 안되어있음");
-            redirectView.setUrl( frontUrl + "/user/login"); // 회원가입 페이지
-        } else {
-            System.out.println("회원가입 되어있음");
-            redirectView.setUrl(frontUrl);// 메인 페이지
-        }
-        return redirectView;
+    @Bean
+    @Profile("test")
+    public UserDetailsService userDetailsService() {
+        UserDetailsService userDetailsService = username -> new InMemoryUserDetailsManager(
+                org.springframework.security.core.userdetails.User.withDefaultPasswordEncoder()
+                        .username("testuser")
+                        .password("password")
+                        .roles("USER")
+                        .build()
+        ).loadUserByUsername(username);
+        return userDetailsService;
     }
 
 }

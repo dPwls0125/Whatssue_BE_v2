@@ -21,7 +21,7 @@ public class MemberAttendanceResult {
 private Long id;
 
 @OneToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "club_id", nullable = false)
+@JoinColumn(name = "club_member_id", nullable = false)
 private ClubMember clubMember;
 
 @Column(nullable = false)

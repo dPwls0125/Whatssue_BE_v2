@@ -16,11 +16,6 @@ public class ClubCreateRequest {
     private NamePolicy namePolicy;
 
     public Club toEntity() {
-        return Club.builder()
-            .clubName(this.clubName)
-            .clubInfo(this.clubIntro)
-            .isPrivate(this.isPrivate)
-            .contactMeans(this.contactMeans)
-            .namePolicy(this.namePolicy).build();
+        return Club.createClub(clubName, clubIntro, isPrivate, contactMeans, namePolicy);
     }
 }

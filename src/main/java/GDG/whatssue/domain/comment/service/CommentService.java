@@ -8,6 +8,8 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.post.repository.PostRepository;
+import GDG.whatssue.global.error.CommonErrorCode;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).get();
         ClubMember writer = comment.getClubMember();
         ClubMember requester = clubMemberRepository.findById(memberId).get();
+
         // 작성자이거나 매니저일 경우에만 삭제 가능
         if((writer.getId() == memberId) ||  requester.getRole() == Role.MANAGER){
             comment.setHidden(true);
@@ -62,15 +65,22 @@ public class CommentService {
     public Comment getComment(Long commentId) {
         // 댓글 조회
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NullPointerException("댓글이 존재하지 않습니다."));
+        if(comment.isHidden()){
+            throw new CommonException(CommonErrorCode.BAD_REQUEST);
+        }
         return comment;
     }
 
     // 댓글 리스트 조회
-
     // hidden인 것들 제외하고 조회
     @Transactional
     public List getCommentList(Long postId) {
         List<Comment>comments = commentRepository.findByPostId(postId).orElseThrow(() -> new NullPointerException("댓글이 존재하지 않습니다."));
+        for(Comment comment : comments){ // 숨김 처리된 댓글 제외
+            if(comment.isHidden()){
+                comments.remove(comment);
+            }
+        }
         return comments;
     }
 

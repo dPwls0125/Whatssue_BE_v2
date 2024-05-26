@@ -1,11 +1,11 @@
 package GDG.whatssue.domain.club.service;
 
+import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.club.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.club.dto.ClubJoinRequestGetDto;
-import GDG.whatssue.domain.member.entity.Role;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,15 +26,9 @@ public class MemberJoinService {
         ClubJoinRequest clubJoinRequest = clubJoinRequestRepository.findById(clubJoinRequestId)
                 .orElseThrow(() -> new IllegalArgumentException("클럽 가입 요청을 찾을 수 없습니다: " + clubJoinRequestId));
 
-        // 클럽 멤버 엔티티 생성
-        ClubMember clubMember = ClubMember.builder()
-                .club(clubJoinRequest.getClub())
-                .user(clubJoinRequest.getUser())
-                .role(Role.MEMBER) // 초기는 MEMBER 롤 설정
-                .isFirstVisit(true)
-                .build();
+        Club club = clubJoinRequest.getClub();
+        club.addMember(ClubMember.newMember(clubJoinRequest.getUser()));
 
-        clubMemberRepository.save(clubMember);
         clubJoinRequestRepository.delete(clubJoinRequest);
     }
 

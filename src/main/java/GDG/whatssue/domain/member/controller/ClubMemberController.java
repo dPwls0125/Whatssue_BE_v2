@@ -3,7 +3,7 @@ package GDG.whatssue.domain.member.controller;
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
-import GDG.whatssue.domain.member.service.ClubMemberSerivce;
+import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}")
 public class ClubMemberController {
-    private final ClubMemberSerivce clubMemberSerivce;
+    private final ClubMemberService clubMemberSerivce;
     private final ClubMemberManagingService clubMemberManagingService;
 
     @ClubManager
