@@ -38,10 +38,4 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<ClubMember> clubMemberList = new ArrayList<>();
-    
-    //==연관관계 메서드==//
-    public void addClubMember(ClubMember clubMember) {
-        clubMember.setUser(this);
-        clubMemberList.add(clubMember);
-    }
 }
