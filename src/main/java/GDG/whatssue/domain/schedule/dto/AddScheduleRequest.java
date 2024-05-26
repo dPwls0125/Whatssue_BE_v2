@@ -30,9 +30,9 @@ public class AddScheduleRequest {
     private LocalTime scheduleTime;
 
 
-    public Schedule toEntity(Club club, ClubMember register) {
+    public Schedule toEntity(ClubMember register) {
         return Schedule.createSchedule(
-            club, register, scheduleName,
+            register, scheduleName,
             scheduleContent, scheduleDate, scheduleTime, schedulePlace);
     }
 }

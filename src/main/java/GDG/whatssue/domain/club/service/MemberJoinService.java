@@ -26,9 +26,9 @@ public class MemberJoinService {
         ClubJoinRequest clubJoinRequest = clubJoinRequestRepository.findById(clubJoinRequestId)
                 .orElseThrow(() -> new IllegalArgumentException("클럽 가입 요청을 찾을 수 없습니다: " + clubJoinRequestId));
 
-        Club club = clubJoinRequest.getClub();
-        club.addMember(ClubMember.newMember(clubJoinRequest.getUser()));
+        ClubMember member = ClubMember.newMember(clubJoinRequest.getClub(), clubJoinRequest.getUser());
 
+        clubMemberRepository.save(member);
         clubJoinRequestRepository.delete(clubJoinRequest);
     }
 

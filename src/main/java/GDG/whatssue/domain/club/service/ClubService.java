@@ -44,13 +44,12 @@ public class ClubService {
 
         //프로필 사진 저장
         UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
-        club.setProfileImage(clubProfileImage);
+        club.changeProfileImage(clubProfileImage);
         fileRepository.save(clubProfileImage);
 
         //로그인 유저 관리자로 추가
-        ClubMember newMember = ClubMember.newMember(user);
+        ClubMember newMember = ClubMember.newMember(club, user);
         newMember.switchToManager();
-        club.addMember(newMember);
 
         return ClubCreateResponse.builder().clubId(club.getId()).build();
     }
@@ -67,7 +66,7 @@ public class ClubService {
 
         //프로필 사진 저장
         UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
-        club.setProfileImage(clubProfileImage);
+        club.changeProfileImage(clubProfileImage);
         fileRepository.save(clubProfileImage);
     }
 
