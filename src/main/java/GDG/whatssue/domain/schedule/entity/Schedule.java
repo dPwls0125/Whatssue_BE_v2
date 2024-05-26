@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor
 public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,16 +69,11 @@ public class Schedule extends BaseEntity {
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
     //==연관관계 메서드==//
-    private void setClub(Club club) {
-        this.club = club;
-        club.getScheduleList().add(this);
-    }
 
     //==생성 메서드==//
-    private Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
+    private Schedule(ClubMember register, String scheduleName, String scheduleContent,
         LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
 
-        setClub(club);
         this.register = register;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
@@ -90,10 +86,10 @@ public class Schedule extends BaseEntity {
     /**
      * 정적 팩토리 메서드 패턴
      */
-    public static Schedule createSchedule(Club club, ClubMember register, String scheduleName,
+    public static Schedule createSchedule(ClubMember register, String scheduleName,
         String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
 
-        return new Schedule(club, register, scheduleName, scheduleContent, scheduleDate, scheduleTime, schedulePlace);
+        return new Schedule(register, scheduleName, scheduleContent, scheduleDate, scheduleTime, schedulePlace);
     }
 
     //==비즈니스 로직==//
@@ -131,5 +127,9 @@ public class Schedule extends BaseEntity {
         this.scheduleDate = scheduleDate;
         this.scheduleTime = scheduleTime;
         this.schedulePlace = schedulePlace;
+    }
+
+    public void setClub(Club club) {
+        this.club = club;
     }
 }

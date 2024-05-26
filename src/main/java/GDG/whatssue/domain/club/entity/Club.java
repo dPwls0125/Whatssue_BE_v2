@@ -59,14 +59,20 @@ public class Club extends BaseEntity {
     private List<Post> postList = new ArrayList<>();
 
     //==연관관계 메서드==//
-    public void addMember(ClubMember member) {
-        clubMemberList.add(member);
-        member.setClub(this);
+
+    public void changeProfileImage(UploadFile profileImage) {
+        profileImage.setClub(this); //연관관계 편의 메서드
+        this.profileImage = profileImage;
     }
 
-    public void setProfileImage(UploadFile profileImage) {
-        this.profileImage = profileImage;
-        profileImage.setClub(this); //연관관계 편의 메서드
+    public void addSchedule(Schedule schedule) {
+        schedule.setClub(this);
+        scheduleList.add(schedule);
+    }
+
+    public void removeSchedule(Schedule schedule) {
+        schedule.setClub(null);
+        scheduleList.remove(schedule);
     }
 
     //==생성메서드==//
