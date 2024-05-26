@@ -64,19 +64,24 @@ public class ClubMember extends BaseEntity {
     private List<Post> postList = new ArrayList<>();
 
     //==연관관계 메서드==//
-    private void setUser(User user) {
-        this.user = user;
+    public void addUser(User user) {
         user.getClubMemberList().add(this);
+        this.user = user;
     }
 
+    public void addClub(Club club) {
+        club.getClubMemberList().add(this);
+        this.club = club;
+    }
     public void setProfileImage(UploadFile profileImage) {
         this.profileImage = profileImage;
         profileImage.setClubMember(this);
     }
 
     //==생성메서드==//
-    private ClubMember(User user) {
-        setUser(user);
+    private ClubMember(Club club, User user) {
+        addClub(club);
+        addUser(user);
 
         this.role = Role.MEMBER;
         this.memberName = user.getUserName();
@@ -85,8 +90,8 @@ public class ClubMember extends BaseEntity {
         this.isFirstVisit = true;
     }
 
-    public static ClubMember newMember(User user) {
-        return new ClubMember(user);
+    public static ClubMember newMember(Club club, User user) {
+        return new ClubMember(club, user);
     }
 
     //==비즈니스 로직==//
@@ -122,4 +127,5 @@ public class ClubMember extends BaseEntity {
     public void setClub(Club club) {
         this.club = club;
     }
+
 }

@@ -32,7 +32,12 @@ public class ScheduleService {
 
     @Transactional
     public void saveSchedule(Long clubId, Long memberId, AddScheduleRequest requestDto) {
-        scheduleRepository.save(requestDto.toEntity(findClub(clubId), findMember(memberId)));
+        Club club = getClub(clubId);
+        Schedule schedule = requestDto.toEntity(findMember(memberId));
+
+        club.addSchedule(schedule);
+
+        scheduleRepository.save(schedule);
     }
 
     @Transactional
@@ -46,7 +51,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deleteSchedule(Long scheduleId) {
+    public void deleteSchedule(Long clubId, Long scheduleId) {
+        getClub(clubId).removeSchedule(findSchedule(scheduleId));
         scheduleRepository.deleteById(scheduleId);
     }
 
@@ -81,7 +87,7 @@ public class ScheduleService {
             .attendanceStatus(schedule.getAttendanceStatus()).build();
     }
 
-    private Club findClub(Long clubId) {
+    private Club getClub(Long clubId) {
         return clubRepository.findById(clubId)
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
     }
