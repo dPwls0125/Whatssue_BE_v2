@@ -42,9 +42,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
 
     private User findOrSaveUser(OAuth2User oAuth2User, String registrationId, String name) {
         String oauth2Id = registrationId + ":" + oAuth2User.getName(); // name = ID값
-        // 임시 유저로 역할 설정
-//        Role role = roleRepository.findByName(RoleName.TEMPORARY)
-//                .orElseThrow(() -> new OAuth2AuthenticationException("존재하지 않는 권한입니다."));
 
         return userRepository.findByOauth2Id(oauth2Id)
                 .orElseGet(() -> userRepository.save(User.builder()

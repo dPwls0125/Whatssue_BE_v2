@@ -1,19 +1,19 @@
 package GDG.whatssue.domain.comment.entity;
 
+import GDG.whatssue.domain.comment.dto.CommentCreateDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Transactional
 @Setter

@@ -1,10 +1,12 @@
 package GDG.whatssue.domain.schedule.entity;
 
+import GDG.whatssue.domain.attendance.Error.AttendanceErrorCode;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,7 +28,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@NoArgsConstructor
 public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -99,13 +100,13 @@ public class Schedule extends BaseEntity {
     /**
      * 일정 출석 시작
      */
-    public void startAttendance() {
+    public void checkIsAttendanced() {
         if (this.attendanceStatus == AttendanceStatus.ONGOING) {
-            //이미 출석 진행중 예외
+            throw new CommonException(AttendanceErrorCode.ATTENDANCE_ALREADY_ONGOING);
         }
 
         if (this.attendanceStatus == AttendanceStatus.COMPLETE) {
-            //이미 출석 완료 예외
+            throw new CommonException(AttendanceErrorCode.ATTENDANCE_ALREADY_COMPLETED);
         }
 
         this.attendanceStatus = AttendanceStatus.ONGOING;

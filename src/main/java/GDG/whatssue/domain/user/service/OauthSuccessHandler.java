@@ -37,11 +37,13 @@ public class OauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .orElseThrow(() -> new CommonException(UserErrorCode.USER_NOT_FOUND));
 
         if( user.getUserPhone()==null || user.getUserEmail()==null ){
+
             log.info("회원가입 안되어있음 -> 회원가입 페이지로 redirect");
             response.sendRedirect(frontUrl + "/user/signup");
         } else {
             log.info("회원가입 되어 있으므로 메인 페이지로 redirect");
             response.sendRedirect(frontUrl);
+
         }
     }
 
