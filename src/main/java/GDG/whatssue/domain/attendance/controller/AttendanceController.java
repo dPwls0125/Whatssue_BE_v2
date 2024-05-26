@@ -43,7 +43,7 @@ public class AttendanceController {
     @PostMapping("/schedules/{scheduleId}/attendance-end")
     public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
-            attendanceService.offOngoingAttendance(clubId, scheduleId);
+            attendanceService.deleteAttendance(clubId, scheduleId);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(e);
         }
