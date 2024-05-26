@@ -12,7 +12,8 @@ public enum ClubErrorCode implements ErrorCode {
     INVALID_PRIVATE_CODE_PATTERN_ERROR(HttpStatus.BAD_REQUEST, "Invalid Private Code Pattern [FFFFFF]"),
     INVALID_PRIVATE_CODE_ERROR(HttpStatus.BAD_REQUEST, "Invalid Private Code"),
     DUPLICATE_CLUB_JOIN_ERROR(HttpStatus.BAD_REQUEST, "Club That Has Already Joined"),
-    DUPLICATE_CLUB_JOIN_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "Club That Has Already Requested");
+    DUPLICATE_CLUB_JOIN_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "Club That Has Already Requested"),
+    NONE_CLUB_MEMBER_ERROR(HttpStatus.BAD_REQUEST, "There are no club members who joined");
 
     private final HttpStatus httpStatus;
     private final String message;

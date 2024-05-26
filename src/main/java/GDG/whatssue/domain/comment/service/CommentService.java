@@ -24,6 +24,7 @@ public class CommentService {
     private final PostRepository postRepository;
 
     public void createComment(Long memberId, CommentCreateDto dto){
+
         Comment comment = Comment.builder()
                 .parentComment(Optional.ofNullable(dto.getParentId()).flatMap(commentRepository::findById).orElse(null))
                 .post(postRepository.findById(dto.getPostId()).get())
@@ -31,7 +32,9 @@ public class CommentService {
                 .content(dto.getContent())
                 .hidden(false)
                 .build();
+
         commentRepository.save(comment);
+
     }
 
     public void updateComment(Long memberId, CommentModifyDto dto) {
