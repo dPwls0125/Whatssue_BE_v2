@@ -1,16 +1,13 @@
 package GDG.whatssue.domain.attendance.service;
 
-import GDG.whatssue.domain.attendance.Error.AttendanceErrorCode;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
-import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType;
 import GDG.whatssue.domain.officialabsence.repository.OfficialAbsenceRequestRepository;
-import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
@@ -19,7 +16,6 @@ import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultReposit
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import java.time.LocalDateTime;
 
-import GDG.whatssue.global.error.CommonException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -138,7 +134,7 @@ public class AttendanceService {
 
     private void initializeMemberAttendance(Long clubId) throws RuntimeException {
 
-        List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.NONE_CLUB_MEMBER_ERROR));
+        List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).get();
 
         for(ClubMember clubMember : clubMembers){
 

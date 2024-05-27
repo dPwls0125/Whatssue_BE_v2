@@ -34,7 +34,7 @@ public class ClubJoinService {
 
         //가입 코드로 클럽찾기
         Club club = clubRepository.findByPrivateCode(privateCode)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.INVALID_PRIVATE_CODE_ERROR));
+            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3101));
 
         //중복 신청 또는 이미 가입 체크
         checkJoinDuplicate(userId, club.getId());
@@ -65,7 +65,7 @@ public class ClubJoinService {
         boolean result = clubJoinRequestRepository.existsByClub_IdAndUser_UserId(clubId, userId);
 
         if (result) {
-            throw new CommonException(ClubErrorCode.DUPLICATE_CLUB_JOIN_REQUEST_ERROR);
+            throw new CommonException(ClubErrorCode.EX3201);
         }
     }
 
@@ -74,7 +74,7 @@ public class ClubJoinService {
         boolean result = clubMemberRepository.existsByClub_IdAndUser_UserId(clubId, userId);
 
         if (result) {
-            throw new CommonException(ClubErrorCode.DUPLICATE_CLUB_JOIN_ERROR);
+            throw new CommonException(ClubErrorCode.EX3200);
         }
     }
 }

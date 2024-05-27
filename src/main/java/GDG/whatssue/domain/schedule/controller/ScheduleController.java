@@ -113,7 +113,7 @@ public class ScheduleController {
         if (!(
             Pattern.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}", sDate)
             && Pattern.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}", eDate))) {
-            throw new CommonException(ScheduleErrorCode.INVALID_SCHEDULE_DATE_PATTERN_ERROR);
+            throw new CommonException(ScheduleErrorCode.EX4300);
         }
 
         return ResponseEntity

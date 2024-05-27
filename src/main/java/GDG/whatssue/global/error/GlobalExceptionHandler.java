@@ -18,10 +18,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CommonException.class)
         public ResponseEntity<ErrorResult> commonExHandle(CommonException e, HttpServletRequest request) {
-        log.warn("common exception= {}", e.getErrorCode().name());
+        log.warn("common exception= {}", e.getMessage());
         ErrorCode errorCode = e.getErrorCode();
         ErrorResult errorResult = ErrorResult.builder()
-            .code(errorCode.name())
+            .code(errorCode.getCode())
             .message(errorCode.getMessage())
             .path(request.getRequestURI())
             .build();
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResult> methodValidExHandle(MethodArgumentNotValidException e, HttpServletRequest request){
         log.warn("exception= {}", e.getMessage());
         BindingResult bindingResult = e.getBindingResult();
-        ErrorCode errorCode = CommonErrorCode.BAD_REQUEST;
+        ErrorCode errorCode = CommonErrorCode.EX0301;
 
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         List<ValidationError> validationErrorList = fieldErrors.stream()
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
             .collect(Collectors.toList());
 
         ErrorResult errorResult = ErrorResult.builder()
-            .code(errorCode.name())
+            .code(errorCode.getCode())
             .message(errorCode.getMessage())
             .path(request.getRequestURI())
             .errors(validationErrorList)
@@ -54,9 +54,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResult> allExHandle(Exception e, HttpServletRequest request) {
         log.warn("exception= {}", e.getMessage());
-        ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
+        ErrorCode errorCode = CommonErrorCode.EX0400;
         ErrorResult errorResult = ErrorResult.builder()
-            .code(errorCode.name())
+            .code(errorCode.getCode())
             .message(errorCode.getMessage())
             .path(request.getRequestURI())
             .build();

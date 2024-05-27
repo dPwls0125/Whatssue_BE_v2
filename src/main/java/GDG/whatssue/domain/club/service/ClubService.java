@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ClubService {
     private final ClubRepository clubRepository;
     private final FileRepository fileRepository;
-    private final ClubMemberRepository clubMemberRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
 
@@ -113,7 +112,7 @@ public class ClubService {
 
     public Club getClub(Long clubId) {
         return clubRepository.findById(clubId).orElseThrow(()
-            -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+            -> new CommonException(ClubErrorCode.EX3100));
     }
 }
 
