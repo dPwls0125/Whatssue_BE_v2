@@ -75,8 +75,6 @@ coolsms:
     secret: ${COOLSMS_API_SECRET}
     key: ${COOLSMS_API_KEY}
 
-
-
 cloud:
   aws:
     s3:

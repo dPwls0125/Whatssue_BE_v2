@@ -1,5 +1,8 @@
 package GDG.whatssue.domain.user.entity;
 
+import GDG.whatssue.domain.user.dto.SignUpRequestDto;
+import GDG.whatssue.domain.user.dto.UserDto;
+import GDG.whatssue.domain.user.dto.UserModifiyRequestDto;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
@@ -15,7 +18,6 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +40,29 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<ClubMember> clubMemberList = new ArrayList<>();
+
+
+    public UserDto entityToUserDto() {
+        return UserDto.builder()
+                .userId(this.userId)
+                .userName(this.userName)
+                .userPhone(this.userPhone)
+                .userEmail(this.userEmail)
+                .oauth2Id(this.oauth2Id)
+                .build();
+    }
+
+
+    public void setSignUpUserInfo(SignUpRequestDto request){
+        this.userName = request.getUserName();
+        this.userPhone = request.getUserPhone();
+        this.userEmail = request.getUserEmail();
+    }
+
+    public void setModifyUserInfo(UserModifiyRequestDto request){
+        this.userName = request.getUserName();
+        this.userPhone = request.getUserPhone();
+        this.userEmail = request.getUserEmail();
+    }
+
 }
