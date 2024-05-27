@@ -64,12 +64,12 @@ public class ClubMember extends BaseEntity {
     private List<Post> postList = new ArrayList<>();
 
     //==연관관계 메서드==//
-    public void addUser(User user) {
+    public void updateUser(User user) {
         user.getClubMemberList().add(this);
         this.user = user;
     }
 
-    public void addClub(Club club) {
+    public void updateClub(Club club) {
         club.getClubMemberList().add(this);
         this.club = club;
     }
@@ -80,8 +80,8 @@ public class ClubMember extends BaseEntity {
 
     //==생성메서드==//
     private ClubMember(Club club, User user) {
-        addClub(club);
-        addUser(user);
+        updateClub(club);
+        updateUser(user);
 
         this.role = Role.MEMBER;
         this.memberName = user.getUserName();

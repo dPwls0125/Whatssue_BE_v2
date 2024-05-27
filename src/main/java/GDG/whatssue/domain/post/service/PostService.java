@@ -35,13 +35,14 @@ public class PostService {
     private final FileRepository fileRepository;
 
     @Transactional
-    public void addPost(Long clubId, Long memberId, AddPostRequest request, List<MultipartFile> postImages)
+    public void addPost(Long clubId, Long userId, AddPostRequest request, List<MultipartFile> postImages)
         throws IOException {
         Club club = clubRepository.findById(clubId).get();
-        ClubMember writer = clubMemberRepository.findById(memberId).get();
+        ClubMember writer = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId).get();
 
         //게시글 db 저장
-        Post post = postRepository.save(request.toEntity(club, writer));
+        Post post = request.toEntity(club, writer);
+        postRepository.save(post);
 
         //이미지 s3 업로드, db 저장
         uploadPostImages(postImages, post);

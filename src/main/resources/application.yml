@@ -30,7 +30,7 @@ spring:
       dialect: org.hibernate.dialect.MySQL8Dialect
       show_sql: true
       generate-ddl: true
-      ddl-auto: create
+      ddl-auto: update
   #      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
 
 

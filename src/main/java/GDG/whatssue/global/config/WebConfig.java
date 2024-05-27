@@ -1,6 +1,5 @@
 package GDG.whatssue.global.config;
 
-import GDG.whatssue.global.argumentresolver.LoginMemberArgumentResolver;
 import GDG.whatssue.global.argumentresolver.LoginUserArgumentResolver;
 import GDG.whatssue.global.interceptor.ClubCheckInterceptor;
 import GDG.whatssue.global.interceptor.ScheduleCheckInterceptor;
