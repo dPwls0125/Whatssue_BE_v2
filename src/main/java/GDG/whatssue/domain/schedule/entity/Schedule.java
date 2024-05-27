@@ -96,7 +96,7 @@ public class Schedule extends BaseEntity {
     /**
      * 일정 출석 시작
      */
-    public void checkIsAttendanced() {
+    public void startAttendance() {
         if (this.attendanceStatus == AttendanceStatus.ONGOING) {
             throw new CommonException(AttendanceErrorCode.ATTENDANCE_ALREADY_ONGOING);
         }
@@ -115,6 +115,7 @@ public class Schedule extends BaseEntity {
         if (this.attendanceStatus != AttendanceStatus.ONGOING) {
             //출석 진행중이 아님 예외
         }
+
         this.attendanceStatus = AttendanceStatus.COMPLETE;
     }
 

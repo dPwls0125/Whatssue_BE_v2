@@ -10,6 +10,7 @@ import GDG.whatssue.domain.post.entity.PostCategory;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginMember;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
@@ -37,23 +38,12 @@ public class PostController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity writePost(
         @PathVariable(name = "clubId") Long clubId,
-        @LoginMember Long memberId,
+        @LoginUser Long userId,
         @RequestPart("request") AddPostRequest request,
         @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages)
         throws IOException {
-        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,memberId).get();
 
-        if(request.getPostCategory()==PostCategory.NOTICE){ //공지 조건
-            if(clubMember.getRole()== Role.MANAGER){//관리자 조건
-                postService.addPost(clubId, memberId, request, postImages);
-                return ResponseEntity.status(200).body("공지글 작성 완료");
-            }
-            else{
-                //MANAGER가 아닐 경우 공지 작성 불가 에러 반환 TODO
-                return null;
-            }
-        }
-        postService.addPost(clubId, memberId, request, postImages);
+        postService.addPost(clubId, userId, request, postImages);
         return ResponseEntity.status(200).body("게시글 작성 완료");
     }
 

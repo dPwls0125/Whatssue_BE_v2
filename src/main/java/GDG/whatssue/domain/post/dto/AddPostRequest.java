@@ -14,12 +14,6 @@ public class AddPostRequest {
     private PostCategory postCategory;
 
     public Post toEntity(Club club, ClubMember writer) {
-        return Post.builder()
-            .club(club)
-            .writer(writer)
-            .postTitle(this.postTitle)
-            .postCategory(this.postCategory)
-            .postContent(this.postContent)
-            .build();
+        return Post.createPost(club, writer, postTitle, postContent, postCategory);
     }
 }

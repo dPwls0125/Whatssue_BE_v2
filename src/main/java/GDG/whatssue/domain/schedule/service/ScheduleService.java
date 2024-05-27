@@ -31,12 +31,11 @@ public class ScheduleService {
     private final ClubMemberRepository clubMemberRepository;
 
     @Transactional
-    public void saveSchedule(Long clubId, Long memberId, AddScheduleRequest requestDto) {
+    public void saveSchedule(Long clubId, Long userId, AddScheduleRequest requestDto) {
         Club club = getClub(clubId);
-        Schedule schedule = requestDto.toEntity(findMember(memberId));
+        Schedule schedule = requestDto.toEntity(findMember(clubId, userId));
 
         club.addSchedule(schedule);
-
         scheduleRepository.save(schedule);
     }
 
@@ -92,8 +91,8 @@ public class ScheduleService {
             .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
     }
 
-    private ClubMember findMember(Long memberId) {
-        return clubMemberRepository.findById(memberId)
+    private ClubMember findMember(Long clubId, Long userId) {
+        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
             .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
     }
 

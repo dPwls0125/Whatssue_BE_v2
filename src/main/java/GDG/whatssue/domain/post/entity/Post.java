@@ -4,6 +4,7 @@ import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -47,7 +48,7 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private String postContent;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<UploadFile> postImageFiles = new ArrayList<>();
 
     @Column(nullable = false)
@@ -58,20 +59,40 @@ public class Post extends BaseEntity {
     private List<Comment> commentList = new ArrayList<>();
     
     //연관관계 메서드
-    public void addPostImageFile(UploadFile uploadFile) {
-        this.postImageFiles.add(uploadFile);
-        uploadFile.setPost(this); //연관관계 편의 메서드
+    private void updateWriter(ClubMember writer) {
+        writer.getPostList().add(this);
+        this.writer = writer;
     }
 
-    @Builder
-    public Post(Long id, ClubMember writer, Club club, String postTitle, String postContent,
-        PostCategory postCategory) {
-        this.id = id;
-        this.writer = writer;
+    private void updateClub(Club club) {
+        club.getPostList().add(this);
         this.club = club;
+    }
+
+    public void addPostImageFile(UploadFile uploadFile) {
+        uploadFile.setPost(this);
+        this.postImageFiles.add(uploadFile);
+    }
+    
+    //==생성 메서드==//
+    private Post(Club club, ClubMember writer, String postTitle, String postContent, PostCategory postCategory) {
+        updateWriter(writer);
+        updateClub(club);
+
         this.postTitle = postTitle;
         this.postContent = postContent;
         this.postCategory = postCategory;
+    }
+
+    public static Post createPost(Club club, ClubMember writer, String postTitle,
+        String postContent, PostCategory postCategory) {
+
+        if (postCategory == PostCategory.NOTICE && writer.getRole() == Role.MEMBER) {
+            //예외처리
+        }
+
+        return new Post(club, writer, postTitle, postContent, postCategory);
+
     }
 
 

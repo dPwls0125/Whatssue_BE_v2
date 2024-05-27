@@ -10,6 +10,7 @@ import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginMember;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,9 +53,9 @@ public class ScheduleController {
     @PostMapping
     public ResponseEntity<String> addSchedule (
         @PathVariable(name = "clubId") Long clubId,
-        @LoginMember Long memberId,
+        @LoginUser Long userId,
         @Valid @RequestBody AddScheduleRequest requestDto) {
-        scheduleService.saveSchedule(clubId, memberId, requestDto);
+        scheduleService.saveSchedule(clubId, userId, requestDto);
 
         return ResponseEntity
             .status(OK)

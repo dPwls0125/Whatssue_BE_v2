@@ -1,6 +1,5 @@
 package GDG.whatssue.domain.attendance.service;
 
-import GDG.whatssue.domain.attendance.Error.AttendanceErrorCode;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
@@ -44,7 +43,7 @@ public class AttendanceService {
         AttendanceStatus status = schedule.getAttendanceStatus();
 
         // 출석 가능 여부 확인 및 예외 처리
-        schedule.checkIsAttendanced();
+        schedule.startAttendance();
 
         // 출석을 진행하기 전, 모든 멤버의 해당 일정의 출석 상태를 absence 으로 변경
         initializeMemberAttendance(clubId);
