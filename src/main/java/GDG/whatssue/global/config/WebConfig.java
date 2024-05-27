@@ -21,7 +21,6 @@ public class WebConfig implements WebMvcConfigurer {
     private final ClubCheckInterceptor clubCheckInterceptor;
     private final ScheduleCheckInterceptor scheduleCheckInterceptor;
     private final LoginUserArgumentResolver loginUserArgumentResolver;
-    private final LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -37,7 +36,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(loginUserArgumentResolver);
-        resolvers.add(loginMemberArgumentResolver);
     }
 
     @Override
