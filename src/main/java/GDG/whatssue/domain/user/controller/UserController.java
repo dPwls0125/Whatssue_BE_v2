@@ -45,13 +45,13 @@ public class  UserController {
     }
 
     @PostMapping ("/signUp")
-    public ResponseEntity signUpWithPhoneNumAndName(@LoginUser Long userId, SignUpRequestDto request) {
+    public ResponseEntity signUpWithPhoneNumAndName(@LoginUser Long userId, @RequestBody SignUpRequestDto request) {
         UserDto userDto = userService.signUp(userId,request);
         return ResponseEntity.status(200).body(userDto);
     }
 
     @PostMapping("/modification/{modifierId}")
-    public ResponseEntity modifyUserInfo(@LoginUser Long userId, @PathVariable("modifierId") Long modifierId , UserModifiyRequestDto request) {
+    public ResponseEntity modifyUserInfo(@LoginUser Long userId, @PathVariable("modifierId") Long modifierId , @RequestBody UserModifiyRequestDto request) {
         UserDto userDto = userService.modifyUserInfo(userId,modifierId,request);
         return ResponseEntity.status(200).body(userDto);
     }

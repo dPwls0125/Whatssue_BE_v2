@@ -20,9 +20,12 @@ public class MyMessageService {
     private final DefaultMessageService defalutMessageService;
     @Autowired
     private final PhoneCertNumRepository phoneCertNumRepository;
+
     private String apiKey;
     private String apiSecret;
     private String fromNumber;
+
+    private PhoneCertNum phoneCertNum;
 
     public MyMessageService(PhoneCertNumRepository certificationNumRepository, @Value("${coolsms.api.key}") String apiKey, @Value("${coolsms.api.secret}") String apiSecret, @Value("${coolsms.api.number}") String fromNumber) {
         this.phoneCertNumRepository = certificationNumRepository;
@@ -38,7 +41,6 @@ public class MyMessageService {
     public SingleMessageSentResponse sendOne(String toNumber, Long userId) {
 
         Message message = new Message();
-        PhoneCertNum phoneCertNum = new PhoneCertNum();
 
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
 
