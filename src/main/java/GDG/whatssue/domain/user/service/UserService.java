@@ -1,24 +1,49 @@
 package GDG.whatssue.domain.user.service;
 
-import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-import GDG.whatssue.domain.user.dto.GetJoinClubResponse;
+import GDG.whatssue.domain.user.Error.UserErrorCode;
+import GDG.whatssue.domain.user.dto.SignUpRequestDto;
+import GDG.whatssue.domain.user.dto.UserDto;
+import GDG.whatssue.domain.user.dto.UserModifiyRequestDto;
+import GDG.whatssue.domain.user.entity.User;
+import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class UserService {
 
-    private final ClubMemberRepository clubMemberRepository;
+    private final UserServiceFacade userServiceFacade;
 
-    public Page<GetJoinClubResponse> getJoinClubList(Long userId, Pageable pageable) {
-        return clubMemberRepository.getJoinClubList(userId, pageable);
+    @Transactional
+    public UserDto getUserInfo(Long userId) {
+        User user = userServiceFacade.getUserById(userId);
+        // user정보를 Repository에서 가져와야 signup 이후의 정보(phone, name)를 가져올 수 있음.
+        return user.entityToUserDto();
     }
 
+    @Transactional
+    public UserDto signUp(Long userId, SignUpRequestDto requestDto) {
+        User user = userServiceFacade.getUserById(userId);
+        user.setSignUpUserInfo(requestDto);
+        return user.entityToUserDto();
+    }
+
+    @Transactional
+    public UserDto modifyUserInfo(Long userId, Long modifierId, UserModifiyRequestDto request) {
+        User user = userServiceFacade.getUserById(userId);
+
+        if(modifierId != userId){
+            throw new CommonException(UserErrorCode.CANNOT_MODIFY_OTHER_USER_INFO);
+        }
+
+        user.setModifyUserInfo(request);
+
+        UserDto dto = user.entityToUserDto();
+        return dto;
+    }
 }
 
 //package GDG.whatssue.domain.user.service;
@@ -84,17 +109,6 @@ public class UserService {
 ////                .build();
 ////    }
 //
-//    public UserDto getUserInfo(Long userId)  {
-//        User user = userRepository.findById(userId).orElseThrow(
-//                () -> new IllegalArgumentException("해당 유저가 없습니다.")
-//        );
-//        return UserDto.builder()
-//                .userId(String.valueOf(user.getUserId()))
-//                .userName(user.getUserName())
-//                .role(user.getRole())
-//                .oauth2Id(user.getOauth2Id())
-//                .build();
-//    }
 //
 //
 //}

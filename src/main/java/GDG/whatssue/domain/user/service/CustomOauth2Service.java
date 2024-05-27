@@ -39,7 +39,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
     /*
     Third party 접근을 위한 accessToken 발급 이후 실행됨
      */
-
     private User findOrSaveUser(OAuth2User oAuth2User, String registrationId, String name) {
         String oauth2Id = registrationId + ":" + oAuth2User.getName(); // name = ID값
 
@@ -83,56 +82,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         // Session(내부 Authentication(내부 oauthUserDetails))
     }
 
-    public UserDto getUserInfo(KakaoDetails kakaoDetails) {
-        User user = kakaoDetails.getUser();
-        Long userId = user.getUserId();
-        user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-         // user정보를 Repository에서 가져와야 signup 이후의 정보(phone, name)를 가져올 수 있음.
-        UserDto dto = UserDto.builder()
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .oauth2Id(user.getOauth2Id())
-                .userPhone(user.getUserPhone())
-                .userEmail(user.getUserEmail())
-                .build();
-        return dto;
-    }
-    public UserDto signUp(KakaoDetails kakaoDetails, SignUpRequestDto request){
-        User user = kakaoDetails.getUser();
-        user.setUserPhone(request.getUserPhone());
-        user.setUserName(request.getUserName());
-        user.setUserEmail(request.getUserEmail());
-        userRepository.save(user);
-        return UserDto.builder()
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .oauth2Id(user.getOauth2Id())
-                .userEmail(user.getUserEmail())
-                .userPhone(request.getUserPhone())
-                .build();
-    }
-
-    public UserDto modifyUserInfo(KakaoDetails kakaoDetails, UserDto request){
-        User user = kakaoDetails.getUser();
-        if(request.getUserId() != user.getUserId()){
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
-        }
-        user = User.builder()
-                .userId(user.getUserId())
-                .userPhone(request.getUserPhone())
-                .userName(request.getUserName())
-                .userEmail(request.getUserEmail())
-                .oauth2Id(user.getOauth2Id())
-                .build();
-        userRepository.save(user);
-        UserDto dto = UserDto.builder()
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .oauth2Id(user.getOauth2Id())
-                .userPhone(user.getUserPhone())
-                .build();
-        return dto;
-    }
 
     @Bean
     @Profile("test")
@@ -146,5 +95,7 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         ).loadUserByUsername(username);
         return userDetailsService;
     }
+
+
 
 }
