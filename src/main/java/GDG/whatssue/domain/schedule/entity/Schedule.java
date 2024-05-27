@@ -116,7 +116,6 @@ public class Schedule extends BaseEntity {
         if (this.attendanceStatus != AttendanceStatus.ONGOING) {
             //출석 진행중이 아님 예외
         }
-
         this.attendanceStatus = AttendanceStatus.COMPLETE;
     }
 

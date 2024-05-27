@@ -43,7 +43,7 @@ public class AttendanceService {
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
 
         // 출석 가능 여부 확인 및 예외 처리
-        schedule.checkIsAttendanced();
+        schedule.startAttendance();
         // 출석을 진행하기 전, 모든 멤버의 해당 일정의 출석 상태를 absence 으로 변경
         initializeMemberAttendance(clubId);
 
