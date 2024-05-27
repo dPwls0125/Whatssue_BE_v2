@@ -28,7 +28,7 @@ public class UserServiceFacade {
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(
-                () -> new CommonException(UserErrorCode.USER_NOT_FOUND)
+                () -> new CommonException(UserErrorCode.EX1100)
         );
     }
 

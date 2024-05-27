@@ -52,7 +52,7 @@ public class PostService {
         //사진 이미지 반환 TODO
 
         Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new CommonException(PostErrorCode.POST_NOT_FOUND_ERROR));
+            .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));
 
         return GetPostResponse.builder()
             .postId(post.getId())

@@ -88,17 +88,17 @@ public class ScheduleService {
 
     private Club getClub(Long clubId) {
         return clubRepository.findById(clubId)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.CLUB_NOT_FOUND_ERROR));
+            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3100));
     }
 
     private ClubMember findMember(Long clubId, Long userId) {
         return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
-            .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
+            .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
     }
 
     private Schedule findSchedule(Long scheduleId) {
         return scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
+            .orElseThrow(() -> new CommonException(ScheduleErrorCode.EX4100));
     }
 }
 

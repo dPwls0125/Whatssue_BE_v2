@@ -21,16 +21,13 @@ public class ClubMemberService {
 
     public void modifyClubMember(Long memberId, ClubMemberDto requestDto) {
         ClubMember clubMember = clubMemberRepository.findById(memberId)
-                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
-        try{
-            clubMember.updateProfile(requestDto.getMemberName(),
-                    requestDto.getMemberIntro(),
-                    requestDto.isEmailPublic(),
-                    requestDto.isPhonePublic());
-            clubMemberRepository.save(clubMember);
-        }catch(Exception e){
-            throw new CommonException(ClubMemberErrorCode.CLUB_MEMBER_COULD_NOT_MODIFY_ERROR);
-        }
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
+
+        clubMember.updateProfile(requestDto.getMemberName(),
+                requestDto.getMemberIntro(),
+                requestDto.isEmailPublic(),
+                requestDto.isPhonePublic());
+        clubMemberRepository.save(clubMember);
     }
 
     // TDDO
@@ -38,7 +35,7 @@ public class ClubMemberService {
     public MemberProfileDto getMemberProfile(Long memberId, Long userId) {
 
         ClubMember member = clubMemberRepository.findById(memberId)
-                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.CLUB_MEMBER_NOT_FOUND_ERROR));
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->new RuntimeException("User Not Found"));
 

@@ -34,7 +34,7 @@ public class OauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         Long userId = kakaoDetails.getUser().getUserId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(UserErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CommonException(UserErrorCode.EX1100));
 
         if( user.getUserPhone()==null || user.getUserEmail()==null ){
 
