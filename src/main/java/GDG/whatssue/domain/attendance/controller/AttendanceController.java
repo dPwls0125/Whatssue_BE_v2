@@ -60,7 +60,7 @@ public class AttendanceController {
 
     @Operation(summary = "출석하기 _ user")
     @PostMapping("/schedules/{scheduleId}/attendance/{memberId}")
-    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @PathVariable Long memberId, AttendanceNumRequestDto requestDto) {
+    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @PathVariable Long memberId, @RequestBody AttendanceNumRequestDto requestDto) {
         try {
             attendanceService.doAttendance(clubId, scheduleId, memberId, requestDto);
         } catch (Exception e) {
