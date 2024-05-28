@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class GetScheduleDetailResponse {
+public class ScheduleDetailResponse {
 
     private Long scheduleId;
 
@@ -30,7 +30,7 @@ public class GetScheduleDetailResponse {
     private AttendanceStatus attendanceStatus;
 
     @Builder
-    public GetScheduleDetailResponse(
+    public ScheduleDetailResponse(
         Long scheduleId, String scheduleName, String scheduleContent,
         LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace,
         String registerName, String registerProfileImage, LocalDateTime registerTime, AttendanceStatus attendanceStatus) {

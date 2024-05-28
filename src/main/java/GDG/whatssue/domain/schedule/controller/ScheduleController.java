@@ -3,13 +3,13 @@ package GDG.whatssue.domain.schedule.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
-import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
+import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
+import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.common.annotation.ClubManager;
-import GDG.whatssue.global.common.annotation.LoginMember;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,11 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Interceptor
- *  - ClubCheckInterceptor : 클럽 유효성 체크, 멤버 여부 체크, 관리자 여부 체크
- *  - ScheduleCheckInterceptor : 스케줄 유효성 체크, 스케줄-클럽 권한 체크
- */
 @Tag(name = "ScheduleController", description = "모임의 일정에 관련된 api")
 @RestController
 @RequiredArgsConstructor
@@ -49,17 +44,16 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @ClubManager
-    @Operation(summary = "일정 추가", description = "날짜 패턴 yyyy-MM-dd HH:ss")
+    @Operation(summary = "일정 추가", description = "날짜= yyyy-MM-dd, 시간= HH:mm")
     @PostMapping
-    public ResponseEntity<String> addSchedule (
+    public ResponseEntity<AddScheduleResponse> addSchedule (
         @PathVariable(name = "clubId") Long clubId,
         @LoginUser Long userId,
         @Valid @RequestBody AddScheduleRequest requestDto) {
-        scheduleService.saveSchedule(clubId, userId, requestDto);
 
         return ResponseEntity
             .status(OK)
-            .body("ok");
+            .body(scheduleService.saveSchedule(clubId, userId, requestDto));
     }
 
     @ClubManager
@@ -89,8 +83,8 @@ public class ScheduleController {
     
     @Operation(summary = "일정 상세조회")
     @GetMapping("/{scheduleId}")
-    public ResponseEntity<GetScheduleDetailResponse> getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleDetailResponse scheduleDto = scheduleService.findScheduleById(scheduleId);
+    public ResponseEntity<ScheduleDetailResponse> getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
+        ScheduleDetailResponse scheduleDto = scheduleService.findScheduleById(scheduleId);
 
         return ResponseEntity
             .status(OK)
