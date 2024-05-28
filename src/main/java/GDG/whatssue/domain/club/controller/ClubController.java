@@ -9,6 +9,7 @@ import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -45,7 +46,7 @@ public class ClubController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createClub(
         @LoginUser Long userId,
-        @RequestPart("request") ClubCreateRequest request,
+        @Valid @RequestPart("request") ClubCreateRequest request,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
         //Validation 및 예외처리 TODO
@@ -60,7 +61,7 @@ public class ClubController {
     @PatchMapping(value = "/{clubId}/info",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity updateClubInfo(@PathVariable("clubId") Long clubId,
-        @RequestPart("request") UpdateClubInfoRequest request,
+        @Valid @RequestPart("request") UpdateClubInfoRequest request,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
         clubService.updateClubInfo(clubId, request, profileImage);

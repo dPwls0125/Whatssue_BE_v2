@@ -13,21 +13,20 @@ import lombok.Getter;
 @Getter
 public class AddScheduleRequest {
 
-    @NotBlank(message = "일정명은 필수 입력값입니다.")
-    @Size(min = 2, max = 30, message = "일정명은 최소 2글자, 최대 30글자까지입니다.")
+    @Size(min = 2, max = 30, message = "일정명은 최소 2자, 최대 30자까지입니다.")
     private String scheduleName;
     @NotNull
-    @Size(max = 1000, message = "일정 내용은 최대 1000글자까지입니다.")
+    @Size(max = 1000, message = "일정 내용은 최대 1000자까지입니다.")
     private String scheduleContent;
     @NotNull
-    @Size(max = 30, message = "일정 장소는 최대 30글자까지입니다.")
+    @Size(max = 30, message = "일정 장소는 최대 30자까지입니다.")
     private String schedulePlace;
 
-    @NotBlank(message = "일정 날짜는 필수입니다.")
+    @NotNull(message = "일정 날짜는 필수 입력값입니다.")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate scheduleDate;
 
-    @NotBlank(message = "일정 시간은 필수입니다.")
+    @NotNull(message = "일정 시간은 필수 입력값입니다.")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime scheduleTime;
 
