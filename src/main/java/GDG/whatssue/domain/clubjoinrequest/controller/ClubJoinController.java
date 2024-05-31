@@ -1,6 +1,9 @@
 package GDG.whatssue.domain.clubjoinrequest.controller;
 
 import GDG.whatssue.domain.clubjoinrequest.dto.ClubJoinRequest;
+import GDG.whatssue.domain.clubjoinrequest.dto.GetClubInfoByPrivateCodeResponse;
+import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinRequestsResponse;
+import GDG.whatssue.domain.clubjoinrequest.dto.GetRejectionReasonResponse;
 import GDG.whatssue.domain.clubjoinrequest.service.ClubJoinService;
 import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
 import GDG.whatssue.global.common.annotation.LoginUser;
@@ -36,14 +39,12 @@ public class ClubJoinController {
 
     @Operation(summary = "모임가입 코드로 모임 정보 조회")
     @GetMapping("/club")
-    public ResponseEntity<String> findClubByPrivateCode(
+    public ResponseEntity<GetClubInfoByPrivateCodeResponse> findClubByPrivateCode(
         @RequestParam("privateCode")
             @NotBlank(message = "가입코드는 필수 입력값입니다.")
                 @Size(min = 6, max = 6, message = "클럽 가입코드는 6자리입니다") String privateCode) {
 
-        clubJoinService.findClubByPrivateCode(privateCode);
-
-        return ResponseEntity.status(HttpStatus.OK).body("ok");
+        return ResponseEntity.status(HttpStatus.OK).body(clubJoinService.findClubByPrivateCode(privateCode));
     }
 
     @Operation(summary = "모임가입 신청")
@@ -52,21 +53,21 @@ public class ClubJoinController {
 
         clubJoinService.joinClub(userId, clubId);
 
-        return new ResponseEntity("ok", HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
 
     @Operation(summary = "모임가입 신청내역 조회")
     @GetMapping("/requests")
-    public ResponseEntity getJoinRequests(@LoginUser Long userId, Pageable pageable) {
+    public ResponseEntity<Page<GetJoinRequestsResponse>> getJoinRequests(@LoginUser Long userId, Pageable pageable) {
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(clubJoinService.getJoinRequests(userId, pageable));
     }
     
-    @Operation(summary = "모임가입 신청 내역 상세조회")
+    @Operation(summary = "모임가입 신청 거절 사유 조회")
     @GetMapping("/requests/{joinRequestId}")
-    public ResponseEntity getJoinRequestDetail(@LoginUser Long userId, @PathVariable(name = "joinRequestId") Long joinRequestId) {
+    public ResponseEntity<GetRejectionReasonResponse> getJoinRequestDetail(@LoginUser Long userId, @PathVariable(name = "joinRequestId") Long joinRequestId) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(clubJoinService.getJoinRequestRejectionReason(userId, joinRequestId));
