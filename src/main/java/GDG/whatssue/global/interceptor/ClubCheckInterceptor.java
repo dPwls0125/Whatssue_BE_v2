@@ -72,13 +72,7 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
     }
 
     private Long getClubId(HttpServletRequest request) {
-        String clubId = extractPathVariableFromRequest(request, "clubId");
-
-        try {
-            return Long.parseLong(clubId);
-        } catch (Exception e) {
-            throw new CommonException(EX0300);
-        }
+        return Long.parseLong(extractPathVariableFromRequest(request, "clubId"));
     }
 
     private Long getUserId() {

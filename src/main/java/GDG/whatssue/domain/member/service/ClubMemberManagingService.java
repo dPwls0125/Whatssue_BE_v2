@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.member.service;
 
-//import GDG.whatssue.domain.member.dto.ClubJoinRequestDto;
+//import GDG.whatssue.domain.member.dto.ClubJoinRequest;
 //import GDG.whatssue.domain.member.entity.ClubJoinRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.member.dto.ClubMemberDto;

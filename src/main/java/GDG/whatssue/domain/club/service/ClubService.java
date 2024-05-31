@@ -9,6 +9,7 @@ import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubRepository;
+import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
@@ -20,6 +21,8 @@ import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +35,12 @@ public class ClubService {
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final ClubMemberRepository clubMemberRepository;
+
+
+    public Page<GetJoinClubResponse> getJoinClubList(Long userId, Pageable pageable) {
+        return clubMemberRepository.getJoinClubList(userId, pageable);
+    }
 
     @Transactional
     public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
@@ -88,7 +97,9 @@ public class ClubService {
             .namePolicy(club.getNamePolicy())
             .privateCode(club.getPrivateCode())
             .clubProfileImage(clubProfileImage)
-            .memberCount(club.getMemberCount())
+            .memberCount(
+                clubMemberRepository.getClubMemberCount(club.getId())
+            )
             .isPrivate(club.isPrivate()).build();
     }
 
