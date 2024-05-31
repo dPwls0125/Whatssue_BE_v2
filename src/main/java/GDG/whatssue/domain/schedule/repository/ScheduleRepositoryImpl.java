@@ -33,6 +33,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
                 SchedulesResponse.class,
                 schedule.id,
                 schedule.scheduleName,
+                schedule.attendanceStatus,
                 schedule.scheduleDate,
                 schedule.scheduleTime))
             .from(schedule)

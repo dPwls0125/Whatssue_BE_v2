@@ -13,6 +13,7 @@ public class SchedulesResponse {
 
     private Long scheduleId;
     private String scheduleName;
+    private AttendanceStatus attendanceStatus;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate scheduleDate;
 
@@ -21,9 +22,10 @@ public class SchedulesResponse {
 
     @Builder
     public SchedulesResponse(
-        Long scheduleId, String scheduleName, LocalDate scheduleDate, LocalTime scheduleTime) {
+        Long scheduleId, String scheduleName, AttendanceStatus attendanceStatus, LocalDate scheduleDate, LocalTime scheduleTime) {
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
+        this.attendanceStatus = attendanceStatus;
         this.scheduleDate = scheduleDate;
         this.scheduleTime = scheduleTime;
     }
