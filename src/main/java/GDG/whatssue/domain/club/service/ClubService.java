@@ -32,6 +32,7 @@ public class ClubService {
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final ClubMemberRepository clubMemberRepository;
 
     @Transactional
     public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
@@ -88,7 +89,9 @@ public class ClubService {
             .namePolicy(club.getNamePolicy())
             .privateCode(club.getPrivateCode())
             .clubProfileImage(clubProfileImage)
-            .memberCount(club.getMemberCount())
+            .memberCount(
+                clubMemberRepository.getClubMemberCount(club.getId())
+            )
             .isPrivate(club.isPrivate()).build();
     }
 

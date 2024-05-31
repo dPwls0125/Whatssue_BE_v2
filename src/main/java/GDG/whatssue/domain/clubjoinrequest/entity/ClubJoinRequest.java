@@ -1,17 +1,20 @@
-package GDG.whatssue.domain.club.entity;
+package GDG.whatssue.domain.clubjoinrequest.entity;
 
+import GDG.whatssue.domain.club.entity.Club;
+import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,16 +36,29 @@ public class ClubJoinRequest extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    private String rejectionReason;
+
+    @Enumerated(EnumType.STRING)
+    private ClubJoinRequestStatus status;
+
     //==생성메서드==//
     private ClubJoinRequest(Club club, User user) {
         this.club = club;
-        club.getClubJoinRequestList().add(this); //연관관계 편의 메서드
-
         this.user = user;
-        user.getClubJoinRequestList().add(this); //연관관계 편의 메서드
+        this.rejectionReason = null;
+        this.status = ClubJoinRequestStatus.WAITING;
     }
 
-    public static ClubJoinRequest of(Club club, User user) {
+    public static ClubJoinRequest createClubJoinRequest(Club club, User user) {
         return new ClubJoinRequest(club, user);
+    }
+
+    //==비즈니스 로직==//
+    public String fetchRejectionReason() {
+        if (status != ClubJoinRequestStatus.REJECTED) {
+            throw new CommonException(ClubErrorCode.EX3202);
+        }
+
+        return rejectionReason;
     }
 }

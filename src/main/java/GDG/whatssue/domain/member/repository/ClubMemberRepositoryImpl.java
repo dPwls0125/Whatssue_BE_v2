@@ -2,7 +2,7 @@ package GDG.whatssue.domain.member.repository;
 
 import static GDG.whatssue.domain.member.entity.QClubMember.clubMember;
 
-import GDG.whatssue.domain.user.dto.GetJoinClubResponse;
+import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
 import GDG.whatssue.global.util.S3Utils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;

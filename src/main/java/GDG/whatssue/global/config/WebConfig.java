@@ -28,9 +28,9 @@ public class WebConfig implements WebMvcConfigurer {
             .order(1)
             .addPathPatterns("/api/clubs/{clubId}/**");
 
-        registry.addInterceptor(scheduleCheckInterceptor)
-            .order(2)
-            .addPathPatterns("/api/clubs/{clubId}/schedules/{scheduleId}/**");
+//        registry.addInterceptor(scheduleCheckInterceptor)
+//            .order(2)
+//            .addPathPatterns("/api/clubs/{clubId}/schedules/{scheduleId}/**");
     }
 
     @Override

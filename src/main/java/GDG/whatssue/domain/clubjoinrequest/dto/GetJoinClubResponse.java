@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.user.dto;
+package GDG.whatssue.domain.clubjoinrequest.dto;
 
 import GDG.whatssue.domain.member.entity.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;

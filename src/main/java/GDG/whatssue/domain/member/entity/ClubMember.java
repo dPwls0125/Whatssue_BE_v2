@@ -69,10 +69,6 @@ public class ClubMember extends BaseEntity {
         this.user = user;
     }
 
-    public void updateClub(Club club) {
-        club.getClubMemberList().add(this);
-        this.club = club;
-    }
     public void setProfileImage(UploadFile profileImage) {
         this.profileImage = profileImage;
         profileImage.setClubMember(this);
@@ -80,9 +76,9 @@ public class ClubMember extends BaseEntity {
 
     //==생성메서드==//
     private ClubMember(Club club, User user) {
-        updateClub(club);
         updateUser(user);
 
+        this.club = club;
         this.role = Role.MEMBER;
         this.memberName = user.getUserName();
         this.isPhonePublic = false;
@@ -123,9 +119,4 @@ public class ClubMember extends BaseEntity {
     public boolean checkManagerRole() {
         return role == Role.MANAGER;
     }
-
-    public void setClub(Club club) {
-        this.club = club;
-    }
-
 }
