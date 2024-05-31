@@ -60,9 +60,6 @@ public class ClubMember extends BaseEntity {
     @OneToMany(mappedBy = "clubMember", cascade = CascadeType.REMOVE)
     private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "writer")
-    private List<Post> postList = new ArrayList<>();
-
     //==연관관계 메서드==//
     public void updateUser(User user) {
         user.getClubMemberList().add(this);

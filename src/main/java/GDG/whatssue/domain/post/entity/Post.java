@@ -59,16 +59,6 @@ public class Post extends BaseEntity {
     private List<Comment> commentList = new ArrayList<>();
     
     //연관관계 메서드
-    private void updateWriter(ClubMember writer) {
-        writer.getPostList().add(this);
-        this.writer = writer;
-    }
-
-    private void updateClub(Club club) {
-        club.getPostList().add(this);
-        this.club = club;
-    }
-
     public void addPostImageFile(UploadFile uploadFile) {
         uploadFile.setPost(this);
         this.postImageFiles.add(uploadFile);
@@ -76,9 +66,8 @@ public class Post extends BaseEntity {
     
     //==생성 메서드==//
     private Post(Club club, ClubMember writer, String postTitle, String postContent, PostCategory postCategory) {
-        updateWriter(writer);
-        updateClub(club);
-
+        this.club = club;
+        this.writer = writer;
         this.postTitle = postTitle;
         this.postContent = postContent;
         this.postCategory = postCategory;
@@ -87,12 +76,11 @@ public class Post extends BaseEntity {
     public static Post createPost(Club club, ClubMember writer, String postTitle,
         String postContent, PostCategory postCategory) {
 
-        if (postCategory == PostCategory.NOTICE && writer.getRole() == Role.MEMBER) {
+        if (postCategory == PostCategory.NOTICE && !writer.checkManagerRole()) {
             //예외처리
         }
 
         return new Post(club, writer, postTitle, postContent, postCategory);
-
     }
 
 

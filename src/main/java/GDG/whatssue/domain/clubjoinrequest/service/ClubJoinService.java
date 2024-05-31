@@ -30,10 +30,6 @@ public class ClubJoinService {
     private final ClubJoinRequestRepository clubJoinRequestRepository;
     private final ClubMemberRepository clubMemberRepository;
 
-    public Page<GetJoinClubResponse> getJoinClubList(Long userId, Pageable pageable) {
-        return clubMemberRepository.getJoinClubList(userId, pageable);
-    }
-
     @Transactional
     public void joinClub(Long userId, Long clubId) {
         User loginUser = userRepository.findById(userId).get();
