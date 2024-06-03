@@ -47,24 +47,11 @@ public class Club extends BaseEntity {
     @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) //지연 로딩
     private UploadFile profileImage;
 
-    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
-    private List<Schedule> scheduleList = new ArrayList<>();
-
     //==연관관계 메서드==//
 
     public void changeProfileImage(UploadFile profileImage) {
         profileImage.setClub(this); //연관관계 편의 메서드
         this.profileImage = profileImage;
-    }
-
-    public void addSchedule(Schedule schedule) {
-        schedule.setClub(this);
-        scheduleList.add(schedule);
-    }
-
-    public void removeSchedule(Schedule schedule) {
-        schedule.setClub(null);
-        scheduleList.remove(schedule);
     }
 
     //==생성메서드==//
