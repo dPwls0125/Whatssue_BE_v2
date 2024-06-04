@@ -8,16 +8,23 @@ import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.post.dto.AddPostRequest;
 import GDG.whatssue.domain.post.dto.GetPostResponse;
 import GDG.whatssue.domain.post.dto.UpdatePostRequest;
 import GDG.whatssue.domain.post.entity.Post;
+import GDG.whatssue.domain.post.entity.PostCategory;
 import GDG.whatssue.domain.post.exception.PostErrorCode;
+import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.post.repository.PostRepository;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
+import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.List;
+
+import GDG.whatssue.global.util.S3Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +47,12 @@ public class PostService {
         Club club = clubRepository.findById(clubId).get();
         ClubMember writer = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId).get();
 
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
+
+        if (request.getPostCategory() == PostCategory.NOTICE && clubMember.getRole() != Role.MANAGER) {
+            throw new CommonException(PostErrorCode.EX7200);//공지 게시글 작성 권한이 없습니다.
+        }
         //게시글 db 저장
         Post post = request.toEntity(club, writer);
         postRepository.save(post);
@@ -49,20 +62,30 @@ public class PostService {
     }
 
     public GetPostResponse getPost(Long postId) {
-        //사진 이미지 반환 TODO
 
         Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));
+            .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
+
+        //게시글 이미지 Path List
+        List <String> postImages = new ArrayList<>();
+        List <UploadFile> storeFileNames = post.getPostImageFiles();
+        if (storeFileNames != null) {
+            for (UploadFile storeFileName : storeFileNames){
+                postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+            }
+        }
+
+        //작성자 프로필 이미지 Path
+        String memberProfileImage = S3Utils.getFullPath(post.getWriter().getProfileImage().getStoreFileName());
 
         return GetPostResponse.builder()
             .postId(post.getId())
             .writerName(post.getWriter().getMemberName())
             .postCategory(post.getPostCategory())
             .postTitle(post.getPostTitle())
-            .postContent(post.getPostContent()).build();
-//            .writerProfileImage()
-//            .uploadImage()
-
+            .postContent(post.getPostContent())
+            .writerProfileImage(memberProfileImage)
+            .uploadImage(postImages).build();
     }
 
     @Transactional
@@ -77,16 +100,55 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postId) throws IOException {
-        Post post = postRepository.findById(postId).get();
-        if(post ==null){
-            //postId에 해당하는 게시글이 null일 경우 에러반환 TODO
+    public void deletePostImages(Post post) throws IOException {
+        List <String> deleteImagesNames = new ArrayList<>();
+        List<UploadFile> deleteImages = post.getPostImageFiles();
+        if(deleteImages != null){
+            for(UploadFile deleteImage : deleteImages){
+                fileUploadService.deleteFile(deleteImage.getStoreFileName());
+            }
+            post.clearPostImageFiles();
         }
-
-        postRepository.delete(post);
     }
 
-    public void updatePost(Long clubId, Long memberId, Long postId, UpdatePostRequest request, List<MultipartFile> postImages) {
-    //기존 post에 수정 사항을 적용하는 메소드 작성 TODO
+    @Transactional
+    public void deletePost(Long memberId, Long postId) throws IOException {
+        ClubMember clubMember = clubMemberRepository.findById(memberId)
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
+
+        if (post.getPostCategory() == PostCategory.NOTICE && !clubMember.checkManagerRole()) {
+                throw new CommonException(PostErrorCode.EX7202);//공지 삭제 권한 X
+            }
+        if (post.getWriter().getId() != clubMember.getId() && !clubMember.checkManagerRole()) {
+            throw new CommonException(PostErrorCode.EX7204);//작성자만 삭제 가능
+        }
+            //이미지 삭제 = CasCadeType.REMOVE
+
+            postRepository.delete(post);
+    }
+
+    public void updatePost(Long clubId, Long memberId, Long postId, UpdatePostRequest request, List<MultipartFile> postImages) throws IOException {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, memberId)
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
+        if (post.getPostCategory() == PostCategory.NOTICE && !clubMember.checkManagerRole()) {
+            throw new CommonException(PostErrorCode.EX7201);//공지 수정 권한 X
+        }
+        if (post.getWriter().getId() != clubMember.getId() && !clubMember.checkManagerRole()) {
+            throw new CommonException(PostErrorCode.EX7203);//작성자만 수정 가능
+        }
+
+        post.updatePost(request.getPostTitle(), request.getPostContent(), request.getPostCategory(), clubMember);
+
+        //기존 이미지 삭제 TODO
+        deletePostImages(post);
+
+        //새로운 이미지 s3 업로드, db 저장
+        uploadPostImages(postImages, post);
+        postRepository.save(post);
     }
 }
