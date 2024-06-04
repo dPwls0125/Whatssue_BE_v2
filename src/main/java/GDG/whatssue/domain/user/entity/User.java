@@ -35,13 +35,6 @@ public class User extends BaseEntity {
     @Column
     private String userPhone;
 
-    @OneToMany(mappedBy = "user")
-    private List<ClubJoinRequest> clubJoinRequestList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ClubMember> clubMemberList = new ArrayList<>();
-
-
     public UserDto entityToUserDto() {
         return UserDto.builder()
                 .userId(this.userId)

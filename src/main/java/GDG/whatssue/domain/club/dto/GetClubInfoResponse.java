@@ -14,11 +14,11 @@ public class GetClubInfoResponse {
     private NamePolicy namePolicy;
     private String privateCode;
     private String clubProfileImage;
-    private int memberCount;
+    private long memberCount;
 
     @Builder
     public GetClubInfoResponse(String clubName, String clubIntro, Boolean isPrivate,
-        String contactMeans, NamePolicy namePolicy, String privateCode, String clubProfileImage, int memberCount) {
+        String contactMeans, NamePolicy namePolicy, String privateCode, String clubProfileImage, long memberCount) {
         this.clubName = clubName;
         this.clubIntro = clubIntro;
         this.isPrivate = isPrivate;

@@ -49,11 +49,18 @@ public class ClubJoinService {
     }
 
     public GetRejectionReasonResponse getJoinRequestRejectionReason(Long userId, Long joinRequestId) {
-        ClubJoinRequest joinRequest = clubJoinRequestRepository
-            .findByIdAndUser_UserId(joinRequestId, userId)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3102));
+        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(
+            userId, joinRequestId);
 
         return new GetRejectionReasonResponse(joinRequest.getId(), joinRequest.fetchRejectionReason());
+    }
+
+    @Transactional
+    public void cancelJoinRequest(Long userId, Long joinRequestId) {
+        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(
+            userId, joinRequestId);
+
+        joinRequest.cancel();
     }
 
     public GetClubInfoByPrivateCodeResponse findClubByPrivateCode(String privateCode) {
@@ -73,6 +80,23 @@ public class ClubJoinService {
             .createdAt(LocalDate.from(club.getCreateAt()))
             .clubIntro(club.getClubIntro())
             .build();
+    }
+
+    @Transactional
+    public void deleteJoinRequest(Long userId, Long joinRequestId) {
+        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(userId,
+            joinRequestId);
+
+        joinRequest.validateDeletable();
+
+        clubJoinRequestRepository.delete(joinRequest);
+    }
+
+    private ClubJoinRequest getJoinRequestByUserIdAndRequestId(Long userId, Long joinRequestId) {
+        ClubJoinRequest joinRequest = clubJoinRequestRepository.findByIdAndUser_UserId(
+                joinRequestId, userId)
+            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3102));
+        return joinRequest;
     }
 
     private void checkJoinRequestDuplicate(Long userId, Long clubId) {

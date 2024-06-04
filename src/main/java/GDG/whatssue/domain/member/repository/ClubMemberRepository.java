@@ -16,5 +16,5 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long>, C
     Optional<List<ClubMember>> findByClubId(Long clubId);
 
     @Query("SELECT COUNT(m) FROM ClubMember m WHERE m.club.id = :clubId")
-    int getClubMemberCount(@Param("clubId") Long clubId);
+    long getClubMemberCount(@Param("clubId") Long clubId);
 }

@@ -74,7 +74,7 @@ public class ScheduleController {
     @Operation(summary = "일정 삭제")
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity<String> deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        scheduleService.deleteSchedule(clubId, scheduleId);
+        scheduleService.deleteSchedule(scheduleId);
 
         return ResponseEntity
             .status(OK)

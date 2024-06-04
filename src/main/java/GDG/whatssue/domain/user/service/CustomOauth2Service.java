@@ -46,8 +46,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
                 .orElseGet(() -> userRepository.save(User.builder()
                         .oauth2Id(oauth2Id)
                         .userName(name)
-                        .clubMemberList(new ArrayList<>())
-                        .clubJoinRequestList(new ArrayList<>())
                         .build()));
     }
 
@@ -60,7 +58,6 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
         User user = findOrSaveUser(oAuth2User, userRequest.getClientRegistration().getRegistrationId(), profile.get("nickname").toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        List<ClubMember> clubMemberList = user.getClubMemberList();
 
 //        for (ClubMember clubMember : clubMemberList) {
 //            authorities.add((GrantedAuthority) () -> {
