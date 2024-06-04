@@ -61,4 +61,18 @@ public class ClubJoinRequest extends BaseEntity {
 
         return rejectionReason;
     }
+
+    public void cancel() {
+        if (status != ClubJoinRequestStatus.WAITING) {
+            throw new CommonException(ClubErrorCode.EX3203);
+        }
+
+        status = ClubJoinRequestStatus.CANCELED;
+    }
+
+    public void validateDeletable() {
+        if (status == ClubJoinRequestStatus.WAITING) {
+            throw new CommonException(ClubErrorCode.EX3204);
+        }
+    }
 }

@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,4 +73,26 @@ public class ClubJoinController {
             .status(HttpStatus.OK)
             .body(clubJoinService.getJoinRequestRejectionReason(userId, joinRequestId));
     }
+
+    @Operation(summary = "모임가입 신청 삭제")
+    @DeleteMapping("/requests/{joinRequestId}")
+    public ResponseEntity<String> deleteJoinRequest(@LoginUser Long userId, @PathVariable(name = "joinRequestId") Long joinRequestId) {
+        clubJoinService.deleteJoinRequest(userId, joinRequestId);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("ok");
+    }
+
+    @Operation(summary = "모임가입 신청 취소")
+    @PostMapping("/requests/{joinRequestId}/cancel")
+    public ResponseEntity<String> cancelJoinRequest(@LoginUser Long userId, @PathVariable(name = "joinRequestId") Long joinRequestId) {
+        clubJoinService.cancelJoinRequest(userId, joinRequestId);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("ok");
+    }
+
+
 }
