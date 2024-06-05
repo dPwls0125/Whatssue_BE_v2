@@ -128,4 +128,5 @@ public class Schedule extends BaseEntity {
     public void setClub(Club club) {
         this.club = club;
     }
+
 }

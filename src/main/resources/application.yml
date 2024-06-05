@@ -61,6 +61,8 @@ logging:
 server:
   url: ${SERVER_URL}
   servlet:
+    session:
+      timeout: 86400
     encoding:
       charset: UTF-8
       force: true
