@@ -23,13 +23,13 @@ public class ScheduleFacade {
     public List<Schedule> getSchedule(Long clubId){
         List<Schedule>scheduleList =  scheduleRepository.findByClub_Id(clubId)
                 .orElseThrow(
-                        () -> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
+                        () -> new CommonException(ScheduleErrorCode.EX4100));
         return scheduleList;
     }
 
     public Schedule getSchedule(Long clubId, Long scheduleId){
         return scheduleRepository.findById(scheduleId)
                 .orElseThrow(
-                        () -> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
+                        () -> new CommonException(ScheduleErrorCode.EX4100));
     }
 }

@@ -1,11 +1,10 @@
-package GDG.whatssue.domain.club.service;
+package GDG.whatssue.domain.clubjoinrequest.service;
 
-import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.club.entity.ClubJoinRequest;
+import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.club.repository.ClubJoinRequestRepository;
+import GDG.whatssue.domain.clubjoinrequest.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-import GDG.whatssue.domain.club.dto.ClubJoinRequestGetDto;
+import GDG.whatssue.domain.clubjoinrequest.dto.ClubJoinRequestGetDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MemberJoinService {
+public class ClubJoinManageService {
     private final ClubJoinRequestRepository clubJoinRequestRepository;
     private final ClubMemberRepository clubMemberRepository;
 

@@ -5,7 +5,9 @@ import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.entity.Role;
+import GDG.whatssue.domain.post.exception.PostErrorCode;
 import GDG.whatssue.global.common.BaseEntity;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,41 +61,42 @@ public class Post extends BaseEntity {
     private List<Comment> commentList = new ArrayList<>();
     
     //연관관계 메서드
-    private void updateWriter(ClubMember writer) {
-        writer.getPostList().add(this);
-        this.writer = writer;
-    }
-
-    private void updateClub(Club club) {
-        club.getPostList().add(this);
-        this.club = club;
-    }
-
     public void addPostImageFile(UploadFile uploadFile) {
         uploadFile.setPost(this);
         this.postImageFiles.add(uploadFile);
     }
-    
+    public void clearPostImageFiles() {
+        if (this.postImageFiles != null) {
+            this.postImageFiles.clear();
+        }
+    }
+
     //==생성 메서드==//
     private Post(Club club, ClubMember writer, String postTitle, String postContent, PostCategory postCategory) {
-        updateWriter(writer);
-        updateClub(club);
-
+        this.club = club;
+        this.writer = writer;
         this.postTitle = postTitle;
         this.postContent = postContent;
         this.postCategory = postCategory;
     }
 
-    public static Post createPost(Club club, ClubMember writer, String postTitle,
-        String postContent, PostCategory postCategory) {
+    public static Post createPost(Club club, ClubMember writer, String postTitle, String postContent, PostCategory postCategory) {
 
-        if (postCategory == PostCategory.NOTICE && writer.getRole() == Role.MEMBER) {
-            //예외처리
+        if (postCategory == PostCategory.NOTICE && !writer.checkManagerRole()){
+            throw new CommonException(PostErrorCode.EX7200);//관리자만 작성 가능
         }
 
         return new Post(club, writer, postTitle, postContent, postCategory);
 
     }
+    //업데이트 메소드
+    public void updatePost(String postTitle, String postContent, PostCategory postCategory, ClubMember updater) {
 
-
+        if (this.postCategory == PostCategory.NOTICE && !writer.checkManagerRole()) {
+            throw new CommonException(PostErrorCode.EX7203);//관리자만 업데이트 가능
+        }
+        this.postTitle = postTitle;
+        this.postContent = postContent;
+        this.postCategory = postCategory;
+    }
 }

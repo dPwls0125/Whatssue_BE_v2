@@ -33,6 +33,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
                 SchedulesResponse.class,
                 schedule.id,
                 schedule.scheduleName,
+                schedule.attendanceStatus,
                 schedule.scheduleDate,
                 schedule.scheduleTime))
             .from(schedule)
@@ -43,12 +44,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
             .orderBy(schedule.scheduleDate.asc(), schedule.scheduleTime.asc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
-
-//        for (Sort.Order o : pageable.getSort()) {
-//            PathBuilder pathBuilder = new PathBuilder(schedule.getType(), schedule.getMetadata());
-//            query.orderBy(new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
-//                pathBuilder.get(o.getProperty())));
-//        }
 
         List<SchedulesResponse> results = query.fetch();
 

@@ -4,7 +4,7 @@ import GDG.whatssue.domain.user.dto.SignUpRequestDto;
 import GDG.whatssue.domain.user.dto.UserDto;
 import GDG.whatssue.domain.user.dto.UserModifiyRequestDto;
 import GDG.whatssue.global.common.BaseEntity;
-import GDG.whatssue.domain.club.entity.ClubJoinRequest;
+import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import jakarta.persistence.*;
 
@@ -35,13 +35,6 @@ public class User extends BaseEntity {
 
     @Column
     private String userPhone;
-
-    @OneToMany(mappedBy = "user")
-    private List<ClubJoinRequest> clubJoinRequestList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ClubMember> clubMemberList = new ArrayList<>();
-
 
     public UserDto entityToUserDto() {
         return UserDto.builder()

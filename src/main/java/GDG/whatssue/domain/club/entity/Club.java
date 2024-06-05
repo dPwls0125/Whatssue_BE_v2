@@ -2,6 +2,7 @@ package GDG.whatssue.domain.club.entity;
 
 
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
+import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.entity.Post;
@@ -46,33 +47,11 @@ public class Club extends BaseEntity {
     @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) //지연 로딩
     private UploadFile profileImage;
 
-    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL)
-    private List<ClubMember> clubMemberList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "club")
-    private List<ClubJoinRequest> clubJoinRequestList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
-    private List<Schedule> scheduleList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "club", cascade = CascadeType.REMOVE)
-    private List<Post> postList = new ArrayList<>();
-
     //==연관관계 메서드==//
 
     public void changeProfileImage(UploadFile profileImage) {
         profileImage.setClub(this); //연관관계 편의 메서드
         this.profileImage = profileImage;
-    }
-
-    public void addSchedule(Schedule schedule) {
-        schedule.setClub(this);
-        scheduleList.add(schedule);
-    }
-
-    public void removeSchedule(Schedule schedule) {
-        schedule.setClub(null);
-        scheduleList.remove(schedule);
     }
 
     //==생성메서드==//
@@ -115,12 +94,5 @@ public class Club extends BaseEntity {
      */
     public void createNewPrivateCode() {
         this.privateCode = UUID.randomUUID().toString().substring(0, 6);
-    }
-
-    /**
-     * 가입 멤버 수 반환
-     */
-    public int getMemberCount() {
-        return clubMemberList.size();
     }
 }

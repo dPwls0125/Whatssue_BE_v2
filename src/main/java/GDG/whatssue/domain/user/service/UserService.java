@@ -35,7 +35,7 @@ public class UserService {
         User user = userServiceFacade.getUserById(userId);
 
         if(modifierId != userId){
-            throw new CommonException(UserErrorCode.CANNOT_MODIFY_OTHER_USER_INFO);
+            throw new CommonException(UserErrorCode.EX1000);
         }
 
         user.setModifyUserInfo(request);

@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.user.dto;
+package GDG.whatssue.domain.clubjoinrequest.dto;
 
 import GDG.whatssue.domain.member.entity.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,9 +17,7 @@ public class GetJoinClubResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime createdAt;
     public Role role;
-
-    //현재 인원 TODO
-
+    public long memberCount;
 
     public void setClubProfileImage(String clubProfileImage) {
         this.clubProfileImage = clubProfileImage;
@@ -27,11 +25,12 @@ public class GetJoinClubResponse {
 
     @Builder
     public GetJoinClubResponse(Long clubId, String clubName, String clubProfileImage,
-        LocalDateTime createdAt, Role role) {
+        LocalDateTime createdAt, Role role, long memberCount) {
         this.clubId = clubId;
         this.clubName = clubName;
         this.clubProfileImage = clubProfileImage;
         this.createdAt = createdAt;
         this.role = role;
+        this.memberCount = memberCount;
     }
 }

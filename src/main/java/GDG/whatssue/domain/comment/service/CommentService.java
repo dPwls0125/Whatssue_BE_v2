@@ -3,6 +3,7 @@ package GDG.whatssue.domain.comment.service;
 import GDG.whatssue.domain.comment.dto.CommentCreateDto;
 import GDG.whatssue.domain.comment.dto.CommentModifyDto;
 import GDG.whatssue.domain.comment.entity.Comment;
+import GDG.whatssue.domain.comment.exception.CommentErrorCode;
 import GDG.whatssue.domain.comment.repository.CommentRepository;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.entity.Role;
@@ -64,9 +65,9 @@ public class CommentService {
     @Transactional
     public Comment getComment(Long commentId) {
         // 댓글 조회
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NullPointerException("댓글이 존재하지 않습니다."));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommonException(CommentErrorCode.EX8100));
         if(comment.isHidden()){
-            throw new CommonException(CommonErrorCode.BAD_REQUEST);
+            throw new CommonException(CommentErrorCode.EX8100);
         }
         return comment;
     }

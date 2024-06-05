@@ -34,7 +34,7 @@ public class PostController {
     private final PostService postService;
     private final ClubMemberRepository clubMemberRepository;
 
-    @Operation
+    @Operation(summary="게시글 작성")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity writePost(
         @PathVariable(name = "clubId") Long clubId,
@@ -48,6 +48,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
+    @Operation(summary="게시글 단일 조회")
     public ResponseEntity getPost(
         @PathVariable(name = "clubId") Long clubId, @PathVariable(name = "postId") Long postId) {
         GetPostResponse responseDto = postService.getPost(postId);
@@ -56,7 +57,8 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}/delete")
-    public ResponseEntity deletePost( //공지 게시글 삭제 메소드 별도 or 통합 TODO
+    @Operation(summary="게시글 삭제")
+    public ResponseEntity deletePost(
         @PathVariable(name = "clubId") Long clubId,
         @PathVariable(name = "postId") Long postId,
         @LoginMember long memberId
@@ -64,53 +66,20 @@ public class PostController {
         GetPostResponse responseDto = postService.getPost(postId);
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,memberId).get();
 
-        if(responseDto.getPostCategory()==PostCategory.NOTICE){ //공지 조건
-            if(clubMember.getRole()== Role.MANAGER){//관리자 조건
-                postService.deletePost(postId);
-                return ResponseEntity.status(200).body("공지글 삭제 완료");
-            }
-            else{
-                //MANAGER가 아닐 경우 공지 삭제 불가 에러 반환 TODO
-                return null;
-            }
-        }
-        if(responseDto.getWriterName() != clubMember.getMemberName()){
-            //일반게시글 작성자와 로그인 유저 불일치 시 삭제 불가 에러 반환 TODO
-            return null;
-        }
-        else{
-            postService.deletePost(postId);
-            return ResponseEntity.status(200).body("게시글 삭제 완료");
-        }
+        postService.deletePost(postId,memberId);
+        return ResponseEntity.status(200).body("게시글 삭제 완료");
     }
 
-    @PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity updatePost (
+    @PatchMapping(value = "/{postId}/modify", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary="게시글 수정")
+    public ResponseEntity updatePost(
             @PathVariable(name = "clubId") Long clubId,
             @PathVariable(name = "postId") Long postId,
             @LoginMember Long memberId,
             @RequestPart("request") UpdatePostRequest request,
-            @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages
-    ) throws IOException {
-        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,memberId).get();
+            @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages) throws IOException {
 
-        if(request.getPostCategory()==PostCategory.NOTICE){ //공지 조건
-            if(clubMember.getRole()== Role.MANAGER){//관리자 조건
-                postService.updatePost(clubId, memberId, postId, request, postImages);
-                return ResponseEntity.status(200).body("공지글 수정 완료");
-            }
-            else{
-                //MANAGER가 아닐 경우 공지 수정 불가 에러 반환 TODO
-                return null;
-            }
-        }
-        if(request.getWriterName() != clubMember.getMemberName()){
-            //일반게시글 작성자와 로그인 유저 불일치 시 삭제 불가 에러 반환 TODO
-            return null;
-        }
-        else{
-            postService.updatePost(clubId, memberId, postId, request, postImages);
-            return ResponseEntity.status(200).body("게시글 수정 완료");
-        }
+        postService.updatePost(clubId, memberId, postId, request, postImages);
+        return ResponseEntity.status(HttpStatus.OK).body("게시글 수정 완료");
     }
 }

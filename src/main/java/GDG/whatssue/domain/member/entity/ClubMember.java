@@ -57,22 +57,7 @@ public class ClubMember extends BaseEntity {
     @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
     private MemberAttendanceResult memberAttendanceResult;
 
-    @OneToMany(mappedBy = "clubMember", cascade = CascadeType.REMOVE)
-    private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "writer")
-    private List<Post> postList = new ArrayList<>();
-
     //==연관관계 메서드==//
-    public void updateUser(User user) {
-        user.getClubMemberList().add(this);
-        this.user = user;
-    }
-
-    public void updateClub(Club club) {
-        club.getClubMemberList().add(this);
-        this.club = club;
-    }
     public void setProfileImage(UploadFile profileImage) {
         this.profileImage = profileImage;
         profileImage.setClubMember(this);
@@ -80,9 +65,8 @@ public class ClubMember extends BaseEntity {
 
     //==생성메서드==//
     private ClubMember(Club club, User user) {
-        updateClub(club);
-        updateUser(user);
-
+        this.user = user;
+        this.club = club;
         this.role = Role.MEMBER;
         this.memberName = user.getUserName();
         this.isPhonePublic = false;
@@ -123,9 +107,4 @@ public class ClubMember extends BaseEntity {
     public boolean checkManagerRole() {
         return role == Role.MANAGER;
     }
-
-    public void setClub(Club club) {
-        this.club = club;
-    }
-
 }

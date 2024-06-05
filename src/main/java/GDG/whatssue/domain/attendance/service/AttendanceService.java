@@ -141,7 +141,7 @@ public class AttendanceService {
 
     private void initializeMemberAttendance(Long clubId) throws RuntimeException {
 
-        List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.NONE_CLUB_MEMBER_ERROR));
+        List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.EX3100));
 
         for(ClubMember clubMember : clubMembers){
             ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
