@@ -4,7 +4,6 @@ import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
-import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.service.AttendanceService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +42,7 @@ public class AttendanceController {
     @PostMapping("/schedules/{scheduleId}/attendance-end")
     public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
-            attendanceService.deleteAttendance(clubId, scheduleId);
+            attendanceService.finishAttendanceOngoing(clubId, scheduleId);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(e);
         }

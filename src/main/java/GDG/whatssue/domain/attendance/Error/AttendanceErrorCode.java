@@ -12,7 +12,9 @@ public enum AttendanceErrorCode  implements ErrorCode {
 
     ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Attendance Not Found"),
     ATTENDANCE_ALREADY_ONGOING(HttpStatus.BAD_REQUEST,"The Attendance is Already Ongoing"),
-    ATTENDANCE_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST,"The Attendance is Already Completed");
+    ATTENDANCE_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST,"The Attendance is Already Completed"),
+    ATTENDANCE_IS_NOT_ONGOING(HttpStatus.BAD_REQUEST,"The Attendance is Not Ongoing"),
+    NONE_ATTENDANCE_NUM_ERROR(HttpStatus.BAD_REQUEST, "There are no attendance numbers");
 
     private final HttpStatus httpStatus;
     private final String message;

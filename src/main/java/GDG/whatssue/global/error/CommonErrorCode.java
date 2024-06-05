@@ -13,6 +13,7 @@ public enum CommonErrorCode implements ErrorCode{
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
     FORBIDDEN_ACCESS_ERROR(HttpStatus.FORBIDDEN, "You do not have access to this resource");
 
+
     private final HttpStatus httpStatus;
     private final String Message;
 }

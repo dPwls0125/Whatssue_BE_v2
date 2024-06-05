@@ -1,6 +1,7 @@
 package GDG.whatssue.domain.schedule.entity;
 
 import GDG.whatssue.domain.attendance.Error.AttendanceErrorCode;
+import GDG.whatssue.domain.attendance.dto.ScheduleDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.global.common.BaseEntity;
@@ -20,6 +21,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +116,7 @@ public class Schedule extends BaseEntity {
      */
     public void finishAttendance() {
         if (this.attendanceStatus != AttendanceStatus.ONGOING) {
-            //출석 진행중이 아님 예외
+            throw new CommonException(AttendanceErrorCode.ATTENDANCE_IS_NOT_ONGOING);
         }
         this.attendanceStatus = AttendanceStatus.COMPLETE;
     }
@@ -133,4 +135,5 @@ public class Schedule extends BaseEntity {
     public void setClub(Club club) {
         this.club = club;
     }
+
 }
