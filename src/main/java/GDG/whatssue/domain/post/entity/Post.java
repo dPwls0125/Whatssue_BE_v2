@@ -3,6 +3,7 @@ package GDG.whatssue.domain.post.entity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.file.entity.UploadFile;
+import GDG.whatssue.domain.like.entity.PostLike;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.post.exception.PostErrorCode;
@@ -59,6 +60,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<PostLike> postLikeList = new ArrayList<>();
     
     //연관관계 메서드
     public void addPostImageFile(UploadFile uploadFile) {

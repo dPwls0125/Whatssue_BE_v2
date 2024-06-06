@@ -12,13 +12,19 @@ import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginMember;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -81,5 +87,21 @@ public class PostController {
 
         postService.updatePost(clubId, memberId, postId, request, postImages);
         return ResponseEntity.status(HttpStatus.OK).body("게시글 수정 완료");
+    }
+    @Operation(summary = "Search posts", description = "Search posts by keyword, date range, and sorting.")
+    @GetMapping("/search")
+    public ResponseEntity<Page<GetPostResponse>> searchPosts(
+            @PathVariable Long clubId,
+            @Parameter(description = "Search keyword", in = ParameterIn.QUERY, required = false)
+            @RequestParam(required = false) String keyword,
+            @Parameter(description = "Start date for the search range", in = ParameterIn.QUERY, required = true)
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @Parameter(description = "End date for the search range", in = ParameterIn.QUERY, required = true)
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @Parameter(description = "Sorting criteria", in = ParameterIn.QUERY, required = true)
+            @RequestParam String sortBy,
+            @Parameter(hidden = true) Pageable pageable) {
+        Page<GetPostResponse> posts = postService.getPostList(clubId, keyword, startDate, endDate, sortBy, pageable);
+        return ResponseEntity.ok(posts);
     }
 }

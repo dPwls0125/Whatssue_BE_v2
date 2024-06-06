@@ -15,17 +15,23 @@ import GDG.whatssue.domain.post.dto.GetPostResponse;
 import GDG.whatssue.domain.post.dto.UpdatePostRequest;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.domain.post.entity.PostCategory;
+import GDG.whatssue.domain.like.entity.PostLike;
 import GDG.whatssue.domain.post.exception.PostErrorCode;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
+import GDG.whatssue.domain.post.repository.PostQueryRepository;
 import GDG.whatssue.domain.post.repository.PostRepository;
 import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import java.lang.reflect.Member;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import GDG.whatssue.global.util.S3Utils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +46,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final FileUploadService fileUploadService;
     private final FileRepository fileRepository;
+    private final PostQueryRepository postQueryRepository;
 
     @Transactional
     public void addPost(Long clubId, Long userId, AddPostRequest request, List<MultipartFile> postImages)
@@ -78,6 +85,9 @@ public class PostService {
         //작성자 프로필 이미지 Path
         String memberProfileImage = S3Utils.getFullPath(post.getWriter().getProfileImage().getStoreFileName());
 
+        // 좋아요 목록 가져오기
+        Long postLikeCount = Long.valueOf(post.getPostLikeList().size());
+
         return GetPostResponse.builder()
             .postId(post.getId())
             .writerName(post.getWriter().getMemberName())
@@ -85,7 +95,8 @@ public class PostService {
             .postTitle(post.getPostTitle())
             .postContent(post.getPostContent())
             .writerProfileImage(memberProfileImage)
-            .uploadImage(postImages).build();
+            .uploadImage(postImages)
+            .postLikeCount(postLikeCount).build();
     }
 
     @Transactional
@@ -150,5 +161,18 @@ public class PostService {
         //새로운 이미지 s3 업로드, db 저장
         uploadPostImages(postImages, post);
         postRepository.save(post);
+    }
+    public Page<GetPostResponse> getPostList(Long clubId, String keyword, LocalDateTime startDate, LocalDateTime endDate, String sortBy, Pageable pageable) {
+        Page<Post> posts = postQueryRepository.findPosts(clubId, keyword, startDate, endDate, sortBy, pageable);
+        return posts.map(post -> GetPostResponse.builder()
+                .postId(post.getId())
+                .writerName(post.getWriter().getMemberName())
+                .postCategory(post.getPostCategory())
+                .postTitle(post.getPostTitle())
+                .postContent(post.getPostContent())
+                .writerProfileImage(post.getWriter().getProfileImage() != null ? post.getWriter().getProfileImage().getStoreFileName() : null)
+                .uploadImage(post.getPostImageFiles().stream().map(file -> file.getStoreFileName()).collect(Collectors.toList()))
+                .postLikeCount((long)post.getPostLikeList().size())
+                .build());
     }
 }

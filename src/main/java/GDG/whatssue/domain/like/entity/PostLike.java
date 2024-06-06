@@ -4,10 +4,12 @@ import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.entity.Post;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
