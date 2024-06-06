@@ -19,6 +19,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -34,13 +35,6 @@ public class User extends BaseEntity {
 
     @Column
     private String userPhone;
-
-    @OneToMany(mappedBy = "user")
-    private List<ClubJoinRequest> clubJoinRequestList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ClubMember> clubMemberList = new ArrayList<>();
-
 
     public UserDto entityToUserDto() {
         return UserDto.builder()

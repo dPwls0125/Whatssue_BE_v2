@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.schedule.dto;
 
+import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -31,9 +32,8 @@ public class AddScheduleRequest {
     private LocalTime scheduleTime;
 
 
-    public Schedule toEntity(ClubMember register) {
-        return Schedule.createSchedule(
-            register, scheduleName,
+    public Schedule toEntity(Club club, ClubMember register) {
+        return Schedule.createSchedule(club, register, scheduleName,
             scheduleContent, scheduleDate, scheduleTime, schedulePlace);
     }
 }

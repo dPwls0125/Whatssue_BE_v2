@@ -12,12 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserServiceFacade userServiceFacade;
 
-    @Transactional
     public UserDto getUserInfo(Long userId) {
         User user = userServiceFacade.getUserById(userId);
         // user정보를 Repository에서 가져와야 signup 이후의 정보(phone, name)를 가져올 수 있음.

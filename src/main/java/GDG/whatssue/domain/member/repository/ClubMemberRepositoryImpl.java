@@ -1,11 +1,16 @@
 package GDG.whatssue.domain.member.repository;
 
+import static GDG.whatssue.domain.club.entity.QClub.*;
 import static GDG.whatssue.domain.member.entity.QClubMember.clubMember;
+import static com.querydsl.core.types.ExpressionUtils.count;
 
 import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
+import GDG.whatssue.domain.member.entity.QClubMember;
 import GDG.whatssue.global.util.S3Utils;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -22,13 +27,23 @@ public class ClubMemberRepositoryImpl implements ClubMemberRepositoryCustom{
 
     @Override
     public Page<GetJoinClubResponse> getJoinClubList(Long userId, Pageable pageable) {
-        JPAQuery<GetJoinClubResponse> query = queryFactory.select(Projections.constructor(
-                GetJoinClubResponse.class,
-                clubMember.club.id,
-                clubMember.club.clubName,
-                clubMember.club.profileImage.storeFileName,
-                clubMember.createAt,
-                clubMember.role))
+        QClubMember subClubMember = new QClubMember("subClubMember"); //서브쿼리를 위한 구분
+
+        JPAQuery<GetJoinClubResponse> query = queryFactory.select(
+                Projections.constructor(
+                    GetJoinClubResponse.class,
+                    clubMember.club.id.as("clubId"),
+                    clubMember.club.clubName,
+                    clubMember.club.profileImage.storeFileName,
+                    clubMember.createAt,
+                    clubMember.role,
+                    ExpressionUtils.as( //memberCount 서브쿼리
+                        JPAExpressions.select(count(subClubMember))
+                            .from(subClubMember)
+                            .where(subClubMember.club.eq(clubMember.club)), "memberCount"
+                    )
+                )
+            )
             .from(clubMember)
             .where(filterByUserId(userId))
             .orderBy(clubMember.createAt.asc())

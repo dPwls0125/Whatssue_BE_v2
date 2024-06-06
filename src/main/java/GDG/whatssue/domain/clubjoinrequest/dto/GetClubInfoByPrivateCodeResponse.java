@@ -13,14 +13,14 @@ public class GetClubInfoByPrivateCodeResponse {
     private Long clubId;
     private String clubProfileImage;
     private String clubName;
-    private int clubMemberCount;
+    private long clubMemberCount;
     private NamePolicy namePolicy;
     private LocalDate createdAt;
     private String clubIntro;
 
     @Builder
     public GetClubInfoByPrivateCodeResponse(Long clubId, String clubProfileImage, String clubName,
-        int clubMemberCount, NamePolicy namePolicy, LocalDate createdAt, String clubIntro) {
+        long clubMemberCount, NamePolicy namePolicy, LocalDate createdAt, String clubIntro) {
         this.clubId = clubId;
         this.clubProfileImage = clubProfileImage;
         this.clubName = clubName;
