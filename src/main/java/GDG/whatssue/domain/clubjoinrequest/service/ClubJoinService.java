@@ -9,7 +9,6 @@ import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.clubjoinrequest.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.error.CommonException;
@@ -37,10 +36,12 @@ public class ClubJoinService {
             .orElseThrow(() -> new CommonException(ClubErrorCode.EX3100));
 
         //중복 신청 또는 이미 가입 체크
-        checkJoinDuplicate(userId, clubId);
-        checkJoinRequestDuplicate(userId, clubId);
+        validateJoinDuplicate(userId, clubId);
+        validateJoinRequestDuplicate(userId, clubId);
 
-        //가입 신청 만들기
+        club.validateJoinable();
+
+        //가입 신청
         clubJoinRequestRepository.save(ClubJoinRequest.createClubJoinRequest(club, loginUser));
     }
 
@@ -49,8 +50,7 @@ public class ClubJoinService {
     }
 
     public GetRejectionReasonResponse getJoinRequestRejectionReason(Long userId, Long joinRequestId) {
-        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(
-            userId, joinRequestId);
+        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(userId, joinRequestId);
 
         return new GetRejectionReasonResponse(joinRequest.getId(), joinRequest.fetchRejectionReason());
     }
@@ -99,13 +99,13 @@ public class ClubJoinService {
         return joinRequest;
     }
 
-    private void checkJoinRequestDuplicate(Long userId, Long clubId) {
+    private void validateJoinRequestDuplicate(Long userId, Long clubId) {
         if (clubJoinRequestRepository.existsByClub_IdAndUser_UserId(clubId, userId)) {
             throw new CommonException(ClubErrorCode.EX3201);
         }
     }
 
-    private void checkJoinDuplicate(Long userId, Long clubId) {
+    private void validateJoinDuplicate(Long userId, Long clubId) {
         if (clubMemberRepository.existsByClub_IdAndUser_UserId(clubId, userId)) {
             throw new CommonException(ClubErrorCode.EX3200);
         }
