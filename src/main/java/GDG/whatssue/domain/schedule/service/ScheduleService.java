@@ -41,8 +41,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void updateSchedule(Long scheduleId, ModifyScheduleRequest requestDto) {
-        findSchedule(scheduleId).update(
+    public void updateSchedule(Long clubId, Long scheduleId, ModifyScheduleRequest requestDto) {
+        findSchedule(scheduleId, clubId).update(
             requestDto.getScheduleName(),
             requestDto.getScheduleContent(),
             requestDto.getScheduleDate(),
@@ -51,12 +51,12 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deleteSchedule(Long scheduleId) {
-        scheduleRepository.deleteById(scheduleId);
+    public void deleteSchedule(Long clubId, Long scheduleId) {
+        scheduleRepository.delete(findSchedule(clubId, scheduleId));
     }
 
-    public ScheduleDetailResponse findScheduleById(Long scheduleId) {
-        return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId));
+    public ScheduleDetailResponse getScheduleDetail(Long clubId, Long scheduleId) {
+        return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId, clubId));
     }
 
     public Page<SchedulesResponse> findAllSchedule(Long clubId, String query, String sDate, String eDate, Pageable pageable) {
@@ -96,8 +96,8 @@ public class ScheduleService {
             .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
     }
 
-    private Schedule findSchedule(Long scheduleId) {
-        return scheduleRepository.findById(scheduleId)
+    private Schedule findSchedule(Long scheduleId, Long clubId) {
+        return scheduleRepository.findByIdAndClub_Id(scheduleId, clubId)
             .orElseThrow(() -> new CommonException(ScheduleErrorCode.EX4100));
     }
 }
