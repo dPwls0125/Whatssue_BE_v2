@@ -2,15 +2,11 @@ package GDG.whatssue.domain.club.entity;
 
 
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
-import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
+import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.file.entity.UploadFile;
-import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.post.entity.Post;
-import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.BaseEntity;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import java.util.UUID;
 import lombok.*;
@@ -49,7 +45,11 @@ public class Club extends BaseEntity {
 
     //==연관관계 메서드==//
 
-    public void changeProfileImage(UploadFile profileImage) {
+    public void updateProfileImage(UploadFile profileImage) {
+        if (this.profileImage != null) {
+            this.profileImage.setClub(null);
+        }
+
         profileImage.setClub(this); //연관관계 편의 메서드
         this.profileImage = profileImage;
     }
@@ -62,7 +62,7 @@ public class Club extends BaseEntity {
         this.contactMeans = contactMeans;
         this.namePolicy = namePolicy;
 
-        this.createNewPrivateCode();
+        this.updatePrivateCode();
     }
 
     /**
@@ -92,7 +92,16 @@ public class Club extends BaseEntity {
     /**
      * 모임코드 갱신
      */
-    public void createNewPrivateCode() {
-        this.privateCode = UUID.randomUUID().toString().substring(0, 6);
+    public void updatePrivateCode() {
+        this.privateCode = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+    }
+
+    /**
+     * 가입 신청 가능 검증
+     */
+    public void validateJoinable() {
+        if (!isPrivate) {
+            throw new CommonException(ClubErrorCode.EX3205);
+        }
     }
 }
