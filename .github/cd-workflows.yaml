@@ -35,6 +35,8 @@ jobs:
           coolsms.api.secret: ${{ secrets.COOLSMS_API_SECRET }}
           coolsms.api.key: ${{ secrets.COOLSMS_API_KEY }}
           cloud.aws.s3.bucket: ${{ secrets.S3_BUCKET }}
+          spring.redis.data.host: ${{ secrets.REDIS_HOST }}
+          spring.redis.data.host.password: ${{ secrets.REDIS_PASSWORD }}
           cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           cloud.aws.region.static: ap-northeast-2
