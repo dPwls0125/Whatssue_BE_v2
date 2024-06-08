@@ -85,7 +85,7 @@ public class AttendanceService {
         // Map에서 출석 번호 삭제
         if(attendanceNumMap.containsKey(clubId) && attendanceNumMap.get(clubId).containsKey(scheduleId))
             attendanceNumMap.get(clubId).remove(scheduleId);
-        else throw new CommonException(AttendanceErrorCode.NONE_ATTENDANCE_NUM_ERROR);
+        else throw new CommonException(AttendanceErrorCode.EX5203);
 
     }
 
