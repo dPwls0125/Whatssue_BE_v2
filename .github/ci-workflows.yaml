@@ -42,8 +42,6 @@ jobs:
           spring.datasource.url: ${{ secrets.DEV_SERVER_DNS }}
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
-          spring.redis.data.host: ${{ secrets.REDIS_HOST }}
-          spring.redis.data.host.password: ${{ secrets.REDIS_PASSWORD }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
