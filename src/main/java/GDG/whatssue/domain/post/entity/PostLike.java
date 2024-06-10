@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.like.entity;
+package GDG.whatssue.domain.post.entity;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.member.entity.ClubMember;
@@ -16,21 +16,18 @@ public class PostLike {
     @Column(name = "like_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "club_id", nullable = false)
-    private Club club;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "club_member_id", nullable = false)
     private ClubMember clubMember;
 
-    public PostLike(Post post, ClubMember clubMember, Club club) {
+    public PostLike(Post post, ClubMember clubMember) {
         this.post = post;
         this.clubMember = clubMember;
-        this.club = club;
     }
 }
+

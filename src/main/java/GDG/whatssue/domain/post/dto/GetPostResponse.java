@@ -1,6 +1,5 @@
 package GDG.whatssue.domain.post.dto;
 
-import GDG.whatssue.domain.like.entity.PostLike;
 import GDG.whatssue.domain.post.entity.PostCategory;
 import java.util.List;
 import lombok.Builder;
@@ -19,11 +18,12 @@ public class GetPostResponse {
     private List<String> uploadImage;
     private PostCategory postCategory;
     private Long postLikeCount;
+    private Boolean isLiked;
 
     @Builder
     public GetPostResponse(Long postId, String writerProfileImage, String writerName,
         String postTitle,
-        String postContent, List<String> uploadImage, PostCategory postCategory, Long postLikeCount) {
+        String postContent, List<String> uploadImage, PostCategory postCategory, Long postLikeCount, Boolean isLiked) {
         this.postId = postId;
         this.writerProfileImage = writerProfileImage;
         this.writerName = writerName;
@@ -32,5 +32,6 @@ public class GetPostResponse {
         this.uploadImage = uploadImage;
         this.postCategory = postCategory;
         this.postLikeCount = postLikeCount;
+        this.isLiked = isLiked;
     }
 }

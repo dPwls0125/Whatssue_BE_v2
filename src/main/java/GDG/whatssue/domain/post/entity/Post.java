@@ -3,9 +3,7 @@ package GDG.whatssue.domain.post.entity;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.file.entity.UploadFile;
-import GDG.whatssue.domain.like.entity.PostLike;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.post.exception.PostErrorCode;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
@@ -24,7 +22,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

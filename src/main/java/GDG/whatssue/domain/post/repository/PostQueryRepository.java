@@ -30,7 +30,7 @@ public class PostQueryRepository {
                         containsKeyword(keyword),
                         betweenDates(startDate, endDate)
                 )
-                .orderBy(sortBy.equals("mostLiked") ? post.postLikeList.size().desc() : post.createAt.desc()) // 좋아요순 또는 최신순 정렬
+                .orderBy(sortBy.equals("Like") ? post.postLikeList.size().desc() : post.createAt.desc()) // 좋아요순 또는 최신순 정렬
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

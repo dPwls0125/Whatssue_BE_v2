@@ -16,7 +16,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -56,8 +59,10 @@ public class PostController {
     @GetMapping("/{postId}")
     @Operation(summary="게시글 단일 조회")
     public ResponseEntity getPost(
-        @PathVariable(name = "clubId") Long clubId, @PathVariable(name = "postId") Long postId) {
-        GetPostResponse responseDto = postService.getPost(postId);
+        @PathVariable(name = "clubId") Long clubId,
+        @PathVariable(name = "postId") Long postId,
+        @LoginUser Long userId) {
+        GetPostResponse responseDto = postService.getPost(userId, postId);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -67,12 +72,12 @@ public class PostController {
     public ResponseEntity deletePost(
         @PathVariable(name = "clubId") Long clubId,
         @PathVariable(name = "postId") Long postId,
-        @LoginMember long memberId
+        @LoginUser Long userId
     )throws IOException {
-        GetPostResponse responseDto = postService.getPost(postId);
-        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,memberId).get();
+        GetPostResponse responseDto = postService.getPost(userId, postId);
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,userId).get();
 
-        postService.deletePost(postId,memberId);
+        postService.deletePost(postId,userId);
         return ResponseEntity.status(200).body("게시글 삭제 완료");
     }
 
@@ -88,20 +93,50 @@ public class PostController {
         postService.updatePost(clubId, memberId, postId, request, postImages);
         return ResponseEntity.status(HttpStatus.OK).body("게시글 수정 완료");
     }
-    @Operation(summary = "Search posts", description = "Search posts by keyword, date range, and sorting.")
+    @Operation(summary = "게시물 검색", description = "검색 : 키워드, 기간(형식 :'yyyy-MM-dd', 기본 1900~2199년), 정렬(default : 최신순(or 'Like' 입력)")
     @GetMapping("/search")
     public ResponseEntity<Page<GetPostResponse>> searchPosts(
-            @PathVariable Long clubId,
-            @Parameter(description = "Search keyword", in = ParameterIn.QUERY, required = false)
-            @RequestParam(required = false) String keyword,
-            @Parameter(description = "Start date for the search range", in = ParameterIn.QUERY, required = true)
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @Parameter(description = "End date for the search range", in = ParameterIn.QUERY, required = true)
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @Parameter(description = "Sorting criteria", in = ParameterIn.QUERY, required = true)
-            @RequestParam String sortBy,
-            @Parameter(hidden = true) Pageable pageable) {
-        Page<GetPostResponse> posts = postService.getPostList(clubId, keyword, startDate, endDate, sortBy, pageable);
+            @PathVariable(name = "clubId") Long clubId,
+            @LoginUser Long userId,
+            @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword,
+            @RequestParam(name = "startDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") String startDate,
+            @RequestParam(name = "endDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") String endDate,
+            @RequestParam(name = "sortBy", required = false, defaultValue = "createAt") String sortBy,
+            Pageable pageable){
+        // 기본값 설정
+        LocalDateTime defaultStartDate = LocalDateTime.of(1900, 1, 1, 0, 0);
+        LocalDateTime defaultEndDate = LocalDateTime.of(2199, 12, 31, 23, 59);
+
+        // 입력 값 변환
+        LocalDateTime startDateTime = (startDate != null) ?
+                LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay() : defaultStartDate;
+        LocalDateTime endDateTime = (endDate != null) ?
+                LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atTime(LocalTime.MAX) : defaultEndDate;
+
+        Page<GetPostResponse> posts = postService.getPostList(clubId, userId, keyword, startDateTime, endDateTime, sortBy, pageable);
         return ResponseEntity.ok(posts);
+    }
+
+    @PostMapping(value="/{postId}/like")
+    @Operation(summary="게시물 좋아요")
+    public ResponseEntity addPostLike(
+            @PathVariable Long clubId,
+            @LoginMember Long memberId,
+            @PathVariable Long postId){
+        postService.createPostLike(memberId, postId);
+        return ResponseEntity.status(200).body("게시물 좋아요 성공");
+
+    }
+    @DeleteMapping(value="/{postId}/like")
+    @Operation(summary="게시물 좋아요 취소")
+    public ResponseEntity deletePostLike(
+            @PathVariable Long clubId,
+            @LoginMember Long memberId,
+            @PathVariable Long postId){
+        postService.deletePostLike(clubId, memberId, postId);
+        return ResponseEntity.status(200).body("게시물 좋아요 취소 성공");
+
     }
 }
