@@ -1,10 +1,9 @@
 package GDG.whatssue.domain.member.repository;
 
-import static GDG.whatssue.domain.club.entity.QClub.*;
 import static GDG.whatssue.domain.member.entity.QClubMember.clubMember;
 import static com.querydsl.core.types.ExpressionUtils.count;
 
-import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
+import GDG.whatssue.domain.club.dto.GetJoinClubResponse;
 import GDG.whatssue.domain.member.entity.QClubMember;
 import GDG.whatssue.global.util.S3Utils;
 import com.querydsl.core.types.ExpressionUtils;

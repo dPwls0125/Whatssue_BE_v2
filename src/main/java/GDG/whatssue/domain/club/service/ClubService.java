@@ -9,7 +9,7 @@ import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubRepository;
-import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
+import GDG.whatssue.domain.club.dto.GetJoinClubResponse;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
@@ -104,7 +104,8 @@ public class ClubService {
             .privateCode(club.getPrivateCode())
             .clubProfileImage(clubProfileImage)
             .memberCount(memberCount)
-            .isPrivate(club.isPrivate()).build();
+            .isPrivate(club.isPrivate())
+            .createdAt(club.getCreateAt()).build();
     }
 
     @Transactional
