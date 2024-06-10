@@ -43,6 +43,9 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
+    /**
+     * 일정 추가 api
+     */
     @ClubManager
     @Operation(summary = "일정 추가", description = "날짜= yyyy-MM-dd, 시간= HH:mm")
     @PostMapping
@@ -56,6 +59,9 @@ public class ScheduleController {
             .body(scheduleService.saveSchedule(clubId, userId, requestDto));
     }
 
+    /**
+     * 일정 수정 api
+     */
     @ClubManager
     @Operation(summary = "일정 수정", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PatchMapping("/{scheduleId}")
@@ -63,18 +69,21 @@ public class ScheduleController {
         @PathVariable(name = "clubId") Long clubId,
         @PathVariable(name = "scheduleId") Long scheduleId,
         @Valid @RequestBody ModifyScheduleRequest requestDto) {
-        scheduleService.updateSchedule(scheduleId, requestDto);
+        scheduleService.updateSchedule(clubId, scheduleId, requestDto);
 
         return ResponseEntity
             .status(OK)
             .body("ok");
     }
 
+    /**
+     * 일정 삭제 api
+     */
     @ClubManager
     @Operation(summary = "일정 삭제")
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity<String> deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        scheduleService.deleteSchedule(scheduleId);
+        scheduleService.deleteSchedule(clubId, scheduleId);
 
         return ResponseEntity
             .status(OK)
@@ -84,7 +93,7 @@ public class ScheduleController {
     @Operation(summary = "일정 상세조회")
     @GetMapping("/{scheduleId}")
     public ResponseEntity<ScheduleDetailResponse> getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        ScheduleDetailResponse scheduleDto = scheduleService.findScheduleById(scheduleId);
+        ScheduleDetailResponse scheduleDto = scheduleService.getScheduleDetail(clubId, scheduleId);
 
         return ResponseEntity
             .status(OK)

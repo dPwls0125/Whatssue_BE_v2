@@ -22,8 +22,7 @@ public class ScheduleFacade {
 
     public List<Schedule> getSchedule(Long clubId){
         List<Schedule>scheduleList =  scheduleRepository.findByClub_Id(clubId)
-                .orElseThrow(
-                        () -> new CommonException(ScheduleErrorCode.EX4100));
+                .orElseGet(() -> new ArrayList<>());
         return scheduleList;
     }
 
