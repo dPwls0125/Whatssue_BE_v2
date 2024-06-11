@@ -5,7 +5,7 @@ import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.service.ClubService;
-import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinClubResponse;
+import GDG.whatssue.domain.club.dto.GetJoinClubResponse;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;

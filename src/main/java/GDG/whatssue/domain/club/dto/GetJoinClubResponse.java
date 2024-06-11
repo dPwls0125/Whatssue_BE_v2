@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.clubjoinrequest.dto;
+package GDG.whatssue.domain.club.dto;
 
 import GDG.whatssue.domain.member.entity.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -14,7 +14,7 @@ public class GetJoinClubResponse {
     public Long clubId;
     public String clubName;
     public String clubProfileImage;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public LocalDateTime createdAt;
     public Role role;
     public long memberCount;
