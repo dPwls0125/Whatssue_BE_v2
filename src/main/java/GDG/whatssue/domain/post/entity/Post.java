@@ -4,7 +4,6 @@ import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.post.exception.PostErrorCode;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
@@ -23,7 +22,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -59,6 +58,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<PostLike> postLikeList = new ArrayList<>();
     
     //연관관계 메서드
     public void addPostImageFile(UploadFile uploadFile) {
