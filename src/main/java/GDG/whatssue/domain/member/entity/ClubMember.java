@@ -54,9 +54,6 @@ public class ClubMember extends BaseEntity {
     @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
     private UploadFile profileImage;
 
-    @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
-    private MemberAttendanceResult memberAttendanceResult;
-
     //==연관관계 메서드==//
     public void setProfileImage(UploadFile profileImage) {
         this.profileImage = profileImage;
