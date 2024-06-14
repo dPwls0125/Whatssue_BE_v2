@@ -35,9 +35,9 @@ public class  UserController {
         return ResponseEntity.status(200).body(userDto);
     }
 
-    @PostMapping("/modification/{modifierId}")
-    public ResponseEntity modifyUserInfo(@LoginUser Long userId, @PathVariable("modifierId") Long modifierId , @RequestBody UserModifiyRequestDto request) {
-        UserDto userDto = userService.modifyUserInfo(userId,modifierId,request);
+    @PostMapping("/modification")
+    public ResponseEntity modifyUserInfo(@LoginUser Long userId,  @RequestBody UserModifiyRequestDto request) {
+        UserDto userDto = userService.modifyUserInfo(userId,request);
         return ResponseEntity.status(200).body(userDto);
     }
 

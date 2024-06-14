@@ -31,13 +31,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto modifyUserInfo(Long userId, Long modifierId, UserModifiyRequestDto request) {
+    public UserDto modifyUserInfo(Long userId, UserModifiyRequestDto request) {
         User user = userServiceFacade.getUserById(userId);
-
-        if(modifierId != userId){
-            throw new CommonException(UserErrorCode.EX1000);
-        }
-
         user.setModifyUserInfo(request);
 
         UserDto dto = user.entityToUserDto();
