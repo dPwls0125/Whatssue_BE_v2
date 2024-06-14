@@ -64,11 +64,13 @@ public class AttendanceService {
 
         List<ScheduleDto> scheduleDtoList = new ArrayList<>();
         List<Schedule> scheduleList =  scheduleFacade.getSchedule(clubId);
-
         for(Schedule schedule : scheduleList){
-            if(schedule.getAttendanceStatus() == AttendanceStatus.ONGOING
-             && attendanceNumMap.get(clubId).containsKey(schedule.getId())) {
-                scheduleDtoList.add(ScheduleDto.of(schedule));
+            if(schedule.getAttendanceStatus() == AttendanceStatus.ONGOING){
+                if (attendanceNumMap.get(clubId).containsKey(schedule.getId())){
+                    scheduleDtoList.add(ScheduleDto.of(schedule));
+                }else{
+                    throw new CommonException(AttendanceErrorCode.EX5204);
+                }
             }
         }
             return scheduleDtoList;
