@@ -27,10 +27,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(clubCheckInterceptor)
             .order(1)
             .addPathPatterns("/api/clubs/{clubId}/**");
-
-//        registry.addInterceptor(scheduleCheckInterceptor)
-//            .order(2)
-//            .addPathPatterns("/api/clubs/{clubId}/schedules/{scheduleId}/**");
     }
 
     @Override
@@ -41,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("http://localhost:3000", "http://3.34.58.135:3000")
                 .allowedHeaders("Content-Type", "X-AUTH-TOKEN", "Authorization", "Bearer")
                 .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name(), HttpMethod.DELETE.name(), HttpMethod.PUT.name(), HttpMethod.PATCH.name(), HttpMethod.OPTIONS.name())
                 .allowCredentials(false);
