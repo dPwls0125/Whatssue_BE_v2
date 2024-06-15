@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -42,6 +43,13 @@ public class OauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
             response.sendRedirect(frontUrl + "/user/signup");
         } else {
             log.info("회원가입 되어 있으므로 메인 페이지로 redirect");
+            Collection<String> cookies = response.getHeaders("Set-Cookie");
+
+            cookies.stream()
+                    .filter(header -> header.contains("JSESSIONID"))
+                    .map(header -> String.format("%s; %s", header, "SameSite=None; Secure"))
+                    .forEach(header -> response.setHeader("Set-Cookie", header));
+
             response.sendRedirect(frontUrl);
 
         }
