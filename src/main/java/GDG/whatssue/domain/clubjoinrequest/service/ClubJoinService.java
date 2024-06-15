@@ -57,29 +57,14 @@ public class ClubJoinService {
 
     @Transactional
     public void cancelJoinRequest(Long userId, Long joinRequestId) {
-        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(
-            userId, joinRequestId);
+        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(userId, joinRequestId);
 
         joinRequest.cancel();
     }
 
     public GetClubInfoByPrivateCodeResponse findClubByPrivateCode(String privateCode) {
-        Club club = clubRepository.findByPrivateCode(privateCode)
+        return clubRepository.findByPrivateCode(privateCode)
             .orElseThrow(() -> new CommonException(ClubErrorCode.EX3101));
-
-        return GetClubInfoByPrivateCodeResponse.builder()
-            .clubId(club.getId())
-            .clubProfileImage(
-                S3Utils.getFullPath(club.getProfileImage().getStoreFileName())
-            )
-            .clubName(club.getClubName())
-            .clubMemberCount(
-                clubMemberRepository.getClubMemberCount(club.getId())
-            )
-            .namePolicy(club.getNamePolicy())
-            .createdAt(LocalDate.from(club.getCreateAt()))
-            .clubIntro(club.getClubIntro())
-            .build();
     }
 
     @Transactional
