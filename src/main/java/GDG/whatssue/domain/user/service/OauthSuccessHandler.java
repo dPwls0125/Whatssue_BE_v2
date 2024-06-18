@@ -37,12 +37,14 @@ public class OauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommonException(UserErrorCode.EX1100));
 
-        Collection<String> cookies = response.getHeaders("Set-Cookie");
+//        Collection<String> cookies = response.getHeaders("Set-Cookie");
+//
+//        cookies.stream()
+//                .filter(header -> header.contains("JSESSIONID"))
+//                .map(header -> String.format("%s; %s", header, "SameSite=None; Secure"))
+//                .forEach(header -> response.setHeader("Set-Cookie", header));
 
-        cookies.stream()
-                .filter(header -> header.contains("JSESSIONID"))
-                .map(header -> String.format("%s; %s", header, "SameSite=None; Secure"))
-                .forEach(header -> response.setHeader("Set-Cookie", header));
+//        log.info("로그인 성공 -> JSESSIONID {}" ,response.getHeader("Set-Cookie"));
 
         if( user.getUserPhone()==null || user.getUserEmail()==null ){
 
