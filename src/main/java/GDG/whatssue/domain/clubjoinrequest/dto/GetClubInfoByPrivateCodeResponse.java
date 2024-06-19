@@ -1,7 +1,10 @@
 package GDG.whatssue.domain.clubjoinrequest.dto;
 
 import GDG.whatssue.domain.club.entity.NamePolicy;
+import GDG.whatssue.global.util.S3Utils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,14 +18,14 @@ public class GetClubInfoByPrivateCodeResponse {
     private String clubName;
     private long clubMemberCount;
     private NamePolicy namePolicy;
-    private LocalDate createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime createdAt;
     private String clubIntro;
 
-    @Builder
-    public GetClubInfoByPrivateCodeResponse(Long clubId, String clubProfileImage, String clubName,
-        long clubMemberCount, NamePolicy namePolicy, LocalDate createdAt, String clubIntro) {
+    public GetClubInfoByPrivateCodeResponse(Long clubId, String storeFileName, String clubName,
+        NamePolicy namePolicy, LocalDateTime createdAt, String clubIntro, long clubMemberCount) {
         this.clubId = clubId;
-        this.clubProfileImage = clubProfileImage;
+        this.clubProfileImage = S3Utils.getFullPath(storeFileName);
         this.clubName = clubName;
         this.clubMemberCount = clubMemberCount;
         this.namePolicy = namePolicy;

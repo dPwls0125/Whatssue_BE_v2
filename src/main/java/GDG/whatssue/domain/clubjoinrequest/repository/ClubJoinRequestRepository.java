@@ -17,10 +17,12 @@ public interface ClubJoinRequestRepository extends JpaRepository<ClubJoinRequest
     Boolean existsByClub_IdAndUser_UserId(Long clubId, Long userId);
     List<ClubJoinRequest> findByClub_Id(Long clubId);
 
-    @Query(value = "select new GDG.whatssue.domain.clubjoinrequest.dto.GetJoinRequestsResponse(r.id, c.id, c.clubName, r.status, r.updateAt) " +
+    @Query("select new GDG.whatssue.domain.clubjoinrequest.dto.GetJoinRequestsResponse(" +
+                                            "r.id, c.id, c.clubName, r.status, r.updateAt" +
+            ") " +
             "from ClubJoinRequest r " +
-            "left join r.user u " +
-            "left join r.club c " +
+                "join r.user u " +
+                "join r.club c " +
             "where u.userId = :userId " +
             "order by r.createAt asc"
     )

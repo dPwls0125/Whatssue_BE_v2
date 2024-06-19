@@ -5,26 +5,11 @@ spring:
       port: 6379
       password: ${REDIS_PASSWORD}
 
-
-#      timeout: 2000
-#      lettuce:
-#      pool:
-#        max-active: 8
-#        max-wait: -1
-#        max-idle: 8
-#        min-idle: 0
-
   datasource:
     username: ${SPRING_DATASOURCE_USERNAME}
     url: jdbc:mysql://localhost:3306/whatssuev2?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
-#  datasource:
-#    driver-class-name: org.h2.Driver
-#    url: jdbc:h2:~/Duett
-#    username: root
-#    password: 1234
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -32,9 +17,10 @@ spring:
       dialect: org.hibernate.dialect.MySQL8Dialect
       generate-ddl: true
       ddl-auto: update
-#    show-sql: true
-  #      jakarta.persistence.jdbc.url: ${SPRING_DATASOURCE_URL}
-
+#    properties:
+#      hibernate:
+#        show_sql: true
+#        format_sql: true
 
   security:
     oauth2:
