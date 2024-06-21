@@ -71,7 +71,7 @@ public class PostService {
         uploadPostImages(postImages, post);
     }
 
-    public GetPostResponse getPost(Long userId, Long postId) {
+    public GetPostResponse getPost(Long userId, Long postId, Long clubId) {
 
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
@@ -92,7 +92,7 @@ public class PostService {
         Long postLikeCount = Long.valueOf(post.getPostLikeList().size());
 
         // 좋아요 여부 체크
-        Boolean postLikeCheck = isLikedCheck(userId, postId);
+        Boolean postLikeCheck = isLikedCheck(userId, postId, clubId);
 
         return GetPostResponse.builder()
                 .postId(post.getId())
@@ -106,11 +106,11 @@ public class PostService {
                 .isLiked(postLikeCheck).build();
     }
 
-    public Boolean isLikedCheck(Long userId, Long postId){
+    public Boolean isLikedCheck(Long userId, Long postId, Long clubId){
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
 
-        ClubMember clubMember = clubMemberRepository.findById(userId)
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
 
         Boolean postLikeCheck = postLikeRepository.findByPostAndClubMember(post, clubMember).isPresent();
@@ -206,7 +206,7 @@ public class PostService {
             Long postLikeCount = (long) post.getPostLikeList().size();
 
             // 좋아요 여부 체크
-            Boolean postLikeCheck = isLikedCheck(userId, post.getId());
+            Boolean postLikeCheck = isLikedCheck(userId, post.getId(), clubId);
 
             GetPostResponse response = GetPostResponse.builder()
                     .postId(post.getId())
