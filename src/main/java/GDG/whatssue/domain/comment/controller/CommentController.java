@@ -17,17 +17,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 public class CommentController {
+
     private final CommentService commentService;
     @Operation(summary = "댓글 작성")
     @PostMapping("/post")
-    public ResponseEntity createComment(CommentCreateDto dto, @PathVariable Long memberId) {
+    public ResponseEntity createComment(@RequestBody CommentCreateDto dto, @PathVariable Long memberId) {
         commentService.createComment(memberId,dto);
         return ResponseEntity.status(200).body("ok");
     }
 
     @Operation(summary = "댓글 수정")
     @PatchMapping("/update")
-    public void updateComment(CommentModifyDto dto, @PathVariable Long memberId, @PathVariable Long commentId) {
+    public void updateComment(@RequestBody CommentModifyDto dto, @PathVariable Long memberId, @PathVariable Long commentId) {
         commentService.updateComment(memberId,dto);
     }
 
@@ -38,14 +39,14 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 조회")
-    @GetMapping("/get")
-    public ResponseEntity getComment(Long commentId) {
+    @GetMapping("/{commentId}")
+    public ResponseEntity getComment( @PathVariable(name = "commentId") Long commentId) {
         return ResponseEntity.status(200).body(commentService.getComment(commentId));
     }
 
     @Operation(summary = "댓글 목록 조회")
-    @GetMapping("/list")
-    public ResponseEntity getCommentList(Long postId) {
+    @GetMapping("/list/{postId}/")
+    public ResponseEntity getCommentList(@PathVariable(name = "postId") Long postId) {
         return ResponseEntity.status(200).body(commentService.getCommentList(postId));
     }
 }

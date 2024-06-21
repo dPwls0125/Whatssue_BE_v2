@@ -35,7 +35,6 @@ public class AttendanceService {
 
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     private final ClubMemberRepository clubMemberRepository;
-    private final ScheduleRepository scheduleRepository;
     private final ScheduleFacade scheduleFacade;
     private final AttendanceFacade attendanceFacade;
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
@@ -49,7 +48,6 @@ public class AttendanceService {
         schedule.startAttendance();
         // 출석을 진행하기 전, 모든 멤버의 해당 일정의 출석 상태를 absence 으로 변경
         initializeMemberAttendance(clubId,scheduleId);
-
         // 출석번호 생성 및 맵에 저장
         int randomInt = putAttendanceNumInMapAndReturn(clubId, scheduleId);
 
@@ -81,6 +79,7 @@ public class AttendanceService {
     public void finishAttendanceOngoing(Long clubId, Long scheduleId) {
 
         Schedule schedule = scheduleFacade.getSchedule(clubId, scheduleId);
+
         // 조건 체크 및 스케줄 상태 변경
         schedule.finishAttendance();
 
@@ -91,38 +90,21 @@ public class AttendanceService {
 
     }
 
-    public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId) throws Exception {
-        List<ScheduleAttendanceResult> attendanceList;
-        attendanceList = scheduleAttendanceResultRepository.findByScheduleId(scheduleId);
-
-        if (attendanceList.isEmpty()) throw new Exception("출석한 멤버가 존재하지 않습니다.");
-        List<ScheduleAttendanceMemberDto> attendedMembers = (List<ScheduleAttendanceMemberDto>) attendanceList.stream().map(m -> {
-            if (m.getAttendanceType().toString().equals("ATTENDANCE")) {
-                return ScheduleAttendanceMemberDto.builder()
-                        .clubId(clubId)
-                        .scheduleId(scheduleId)
-                        .clubMemberId(m.getClubMember().getId())
-                        .attendanceType(m.getAttendanceType())
-                        .build();
-            } else return null;
-        });
-
-        return attendedMembers;
+    public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId) {
+        List<ScheduleAttendanceResult> attendanceList = attendanceFacade.getAttendanceResultbySchedule(scheduleId, AttendanceType.ATTENDANCE);
+        return ScheduleAttendanceMemberDto.of(attendanceList);
     }
 
     @Transactional
-    public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) throws Exception{
-
+    public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) {
         int attendanceNum = attendanceNumMap.get(clubId).get(schduleId);
         int inputValue = requestDto.getAttendanceNum();
 
         if (attendanceNum == inputValue) {
             ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(schduleId, memberId);
             scheduleAttendanceResult.setAttendanceType(AttendanceType.ATTENDANCE);
-        } else throw new Exception(" 출석번호가 일치하지 않습니다. 다시 시도해 주세요");
+        } else throw new CommonException(AttendanceErrorCode.EX5205);
     }
-
-
 
     public void modifyMemberAttendance(Long scheduleId, Long memberId, String attendanceType){
 
@@ -169,6 +151,8 @@ public class AttendanceService {
 
         return randomInt;
     }
+
+
 
 
 }

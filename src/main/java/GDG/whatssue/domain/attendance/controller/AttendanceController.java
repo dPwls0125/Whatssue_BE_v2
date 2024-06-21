@@ -22,10 +22,9 @@ import java.util.*;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
-
     @ClubManager
     @Operation(summary = "출석 열기_manager ",description = "출석을 열면 출석을 진행하지 않았던 경우는 모두 결석 처리 리스트를 생성합니다.")
-    @GetMapping("/schedules/{scheduleId}/attendance-start")
+    @PostMapping("/schedules/{scheduleId}/attendance-start")
     public ResponseEntity openAttendance(@PathVariable("clubId") Long clubId, @PathVariable("scheduleId") Long scheduleId) {
         AttendanceNumResponseDto dto = attendanceService.openAttendance(clubId, scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -46,7 +45,7 @@ public class AttendanceController {
     @ClubManager
     @Operation(summary = "일정별 출석한 멤버 리스트 조회")
     @GetMapping("/schedules/{scheduleId}/attendance-list")
-    public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) throws Exception {
+    public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
@@ -54,11 +53,7 @@ public class AttendanceController {
     @Operation(summary = "출석하기 _ user")
     @PostMapping("/schedules/{scheduleId}/attendance/{memberId}")
     public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @PathVariable Long memberId, @RequestBody AttendanceNumRequestDto requestDto) {
-        try {
             attendanceService.doAttendance(clubId, scheduleId, memberId, requestDto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
-        }
         return ResponseEntity.status(HttpStatus.OK).body("출석이 완료되었습니다.");
     }
 
@@ -80,6 +75,7 @@ public class AttendanceController {
          }
          return ResponseEntity.status(HttpStatus.OK).body("출석이 정정되었습니다.");
     }
+
 
 }
 

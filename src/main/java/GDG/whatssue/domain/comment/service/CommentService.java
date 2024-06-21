@@ -37,7 +37,6 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
-
     }
 
     public void updateComment(Long memberId, CommentModifyDto dto) {
@@ -84,6 +83,7 @@ public class CommentService {
         }
         return comments;
     }
+
 
     private void checkCommentWriterId(Long postMemberId, Long memberId) {
         if(!postMemberId.equals(memberId)){

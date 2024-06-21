@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    @Override
+
     Optional<Comment> findById(Long id);
+
+    Optional<List<Comment>> findByPostIdOrderByCreateAtDesc(Long postId);
+
     Optional<List<Comment>> findByPostId(Long postId);
 }
