@@ -6,33 +6,34 @@ import GDG.whatssue.domain.schedule.entity.Schedule;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
 public class AddScheduleRequest {
 
-    @NotBlank
+    @Size(min = 2, max = 30, message = "일정명은 최소 2자, 최대 30자까지입니다.")
     private String scheduleName;
     @NotNull
+    @Size(max = 1000, message = "일정 내용은 최대 1000자까지입니다.")
     private String scheduleContent;
     @NotNull
+    @Size(max = 30, message = "일정 장소는 최대 30자까지입니다.")
     private String schedulePlace;
 
-    @NotBlank
+    @NotNull(message = "일정 날짜는 필수 입력값입니다.")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate scheduleDate;
 
-    @NotBlank
+    @NotNull(message = "일정 시간은 필수 입력값입니다.")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime scheduleTime;
 
 
-    public Schedule toEntity(ClubMember register) {
-        return Schedule.createSchedule(
-            register, scheduleName,
+    public Schedule toEntity(Club club, ClubMember register) {
+        return Schedule.createSchedule(club, register, scheduleName,
             scheduleContent, scheduleDate, scheduleTime, schedulePlace);
     }
 }

@@ -12,14 +12,4 @@ public class UpdatePostRequest {
     private String postContent;
     private String writerName;
     private PostCategory postCategory;
-
-    public Post toEntity(Club club, ClubMember writer) {
-        return Post.builder()
-                .club(club)
-                .writer(writer)
-                .postTitle(this.postTitle)
-                .postCategory(this.postCategory)
-                .postContent(this.postContent)
-                .build();
-    }
 }

@@ -4,7 +4,9 @@ import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.post.exception.PostErrorCode;
 import GDG.whatssue.global.common.BaseEntity;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +22,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,7 +49,7 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private String postContent;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<UploadFile> postImageFiles = new ArrayList<>();
 
     @Column(nullable = false)
@@ -56,23 +58,47 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<PostLike> postLikeList = new ArrayList<>();
     
     //연관관계 메서드
     public void addPostImageFile(UploadFile uploadFile) {
+        uploadFile.setPost(this);
         this.postImageFiles.add(uploadFile);
-        uploadFile.setPost(this); //연관관계 편의 메서드
+    }
+    public void clearPostImageFiles() {
+        if (this.postImageFiles != null) {
+            this.postImageFiles.clear();
+        }
     }
 
-    @Builder
-    public Post(Long id, ClubMember writer, Club club, String postTitle, String postContent,
-        PostCategory postCategory) {
-        this.id = id;
-        this.writer = writer;
+    //==생성 메서드==//
+    private Post(Club club, ClubMember writer, String postTitle, String postContent, PostCategory postCategory) {
         this.club = club;
+        this.writer = writer;
         this.postTitle = postTitle;
         this.postContent = postContent;
         this.postCategory = postCategory;
     }
 
+    public static Post createPost(Club club, ClubMember writer, String postTitle, String postContent, PostCategory postCategory) {
 
+        if (postCategory == PostCategory.NOTICE && !writer.checkManagerRole()){
+            throw new CommonException(PostErrorCode.EX7200);//관리자만 작성 가능
+        }
+
+        return new Post(club, writer, postTitle, postContent, postCategory);
+
+    }
+    //업데이트 메소드
+    public void updatePost(String postTitle, String postContent, PostCategory postCategory, ClubMember updater) {
+
+        if (this.postCategory == PostCategory.NOTICE && !writer.checkManagerRole()) {
+            throw new CommonException(PostErrorCode.EX7203);//관리자만 업데이트 가능
+        }
+        this.postTitle = postTitle;
+        this.postContent = postContent;
+        this.postCategory = postCategory;
+    }
 }

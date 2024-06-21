@@ -5,12 +5,16 @@ import GDG.whatssue.domain.club.dto.ClubCreateResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.service.ClubService;
+import GDG.whatssue.domain.club.dto.GetJoinClubResponse;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +49,7 @@ public class ClubController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createClub(
         @LoginUser Long userId,
-        @RequestPart("request") ClubCreateRequest request,
+        @Valid @RequestPart("request") ClubCreateRequest request,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
         //Validation 및 예외처리 TODO
@@ -55,12 +59,21 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @Operation(summary = "가입한 모임 조회")
+    @GetMapping
+    public ResponseEntity<Page<GetJoinClubResponse>> getJoinClubList(@LoginUser Long userId, Pageable pageable) {
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(clubService.getJoinClubList(userId, pageable));
+    }
+
     @ClubManager
     @Operation(summary = "모임 정보 수정", description = "기본 사진일 시 profileImage 헤더 x")
     @PatchMapping(value = "/{clubId}/info",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity updateClubInfo(@PathVariable("clubId") Long clubId,
-        @RequestPart("request") UpdateClubInfoRequest request,
+        @Valid @RequestPart("request") UpdateClubInfoRequest request,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
         clubService.updateClubInfo(clubId, request, profileImage);

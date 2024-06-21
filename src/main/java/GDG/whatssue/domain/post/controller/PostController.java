@@ -10,14 +10,24 @@ import GDG.whatssue.domain.post.entity.PostCategory;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginMember;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,94 +43,100 @@ public class PostController {
     private final PostService postService;
     private final ClubMemberRepository clubMemberRepository;
 
-    @Operation
+    @Operation(summary="게시글 작성")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity writePost(
         @PathVariable(name = "clubId") Long clubId,
-        @LoginMember Long memberId,
+        @LoginUser Long userId,
         @RequestPart("request") AddPostRequest request,
         @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages)
         throws IOException {
-        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,memberId).get();
 
-        if(request.getPostCategory()==PostCategory.NOTICE){ //공지 조건
-            if(clubMember.getRole()== Role.MANAGER){//관리자 조건
-                postService.addPost(clubId, memberId, request, postImages);
-                return ResponseEntity.status(200).body("공지글 작성 완료");
-            }
-            else{
-                //MANAGER가 아닐 경우 공지 작성 불가 에러 반환 TODO
-                return null;
-            }
-        }
-        postService.addPost(clubId, memberId, request, postImages);
+        postService.addPost(clubId, userId, request, postImages);
         return ResponseEntity.status(200).body("게시글 작성 완료");
     }
 
     @GetMapping("/{postId}")
+    @Operation(summary="게시글 단일 조회")
     public ResponseEntity getPost(
-        @PathVariable(name = "clubId") Long clubId, @PathVariable(name = "postId") Long postId) {
-        GetPostResponse responseDto = postService.getPost(postId);
+        @PathVariable(name = "clubId") Long clubId,
+        @PathVariable(name = "postId") Long postId,
+        @LoginUser Long userId) {
+        GetPostResponse responseDto = postService.getPost(userId, postId);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @DeleteMapping("/{postId}/delete")
-    public ResponseEntity deletePost( //공지 게시글 삭제 메소드 별도 or 통합 TODO
+    @Operation(summary="게시글 삭제")
+    public ResponseEntity deletePost(
         @PathVariable(name = "clubId") Long clubId,
         @PathVariable(name = "postId") Long postId,
-        @LoginMember long memberId
+        @LoginUser Long userId
     )throws IOException {
-        GetPostResponse responseDto = postService.getPost(postId);
-        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,memberId).get();
+        GetPostResponse responseDto = postService.getPost(userId, postId);
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,userId).get();
 
-        if(responseDto.getPostCategory()==PostCategory.NOTICE){ //공지 조건
-            if(clubMember.getRole()== Role.MANAGER){//관리자 조건
-                postService.deletePost(postId);
-                return ResponseEntity.status(200).body("공지글 삭제 완료");
-            }
-            else{
-                //MANAGER가 아닐 경우 공지 삭제 불가 에러 반환 TODO
-                return null;
-            }
-        }
-        if(responseDto.getWriterName() != clubMember.getMemberName()){
-            //일반게시글 작성자와 로그인 유저 불일치 시 삭제 불가 에러 반환 TODO
-            return null;
-        }
-        else{
-            postService.deletePost(postId);
-            return ResponseEntity.status(200).body("게시글 삭제 완료");
-        }
+        postService.deletePost(postId,userId);
+        return ResponseEntity.status(200).body("게시글 삭제 완료");
     }
 
-    @PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity updatePost (
+    @PatchMapping(value = "/{postId}/modify", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary="게시글 수정")
+    public ResponseEntity updatePost(
             @PathVariable(name = "clubId") Long clubId,
             @PathVariable(name = "postId") Long postId,
             @LoginMember Long memberId,
             @RequestPart("request") UpdatePostRequest request,
-            @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages
-    ) throws IOException {
-        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,memberId).get();
+            @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages) throws IOException {
 
-        if(request.getPostCategory()==PostCategory.NOTICE){ //공지 조건
-            if(clubMember.getRole()== Role.MANAGER){//관리자 조건
-                postService.updatePost(clubId, memberId, postId, request, postImages);
-                return ResponseEntity.status(200).body("공지글 수정 완료");
-            }
-            else{
-                //MANAGER가 아닐 경우 공지 수정 불가 에러 반환 TODO
-                return null;
-            }
-        }
-        if(request.getWriterName() != clubMember.getMemberName()){
-            //일반게시글 작성자와 로그인 유저 불일치 시 삭제 불가 에러 반환 TODO
-            return null;
-        }
-        else{
-            postService.updatePost(clubId, memberId, postId, request, postImages);
-            return ResponseEntity.status(200).body("게시글 수정 완료");
-        }
+        postService.updatePost(clubId, memberId, postId, request, postImages);
+        return ResponseEntity.status(HttpStatus.OK).body("게시글 수정 완료");
+    }
+    @Operation(summary = "게시물 검색", description = "검색 : 키워드, 기간(형식 :'yyyy-MM-dd', 기본 1900~2199년), 정렬(default : 최신순(or 'Like' 입력)")
+    @GetMapping("/search")
+    public ResponseEntity<Page<GetPostResponse>> searchPosts(
+            @PathVariable(name = "clubId") Long clubId,
+            @LoginUser Long userId,
+            @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword,
+            @RequestParam(name = "startDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") String startDate,
+            @RequestParam(name = "endDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") String endDate,
+            @RequestParam(name = "sortBy", required = false, defaultValue = "createAt") String sortBy,
+            Pageable pageable){
+        // 기본값 설정
+        LocalDateTime defaultStartDate = LocalDateTime.of(1900, 1, 1, 0, 0);
+        LocalDateTime defaultEndDate = LocalDateTime.of(2199, 12, 31, 23, 59);
+
+        // 입력 값 변환
+        LocalDateTime startDateTime = (startDate != null) ?
+                LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay() : defaultStartDate;
+        LocalDateTime endDateTime = (endDate != null) ?
+                LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atTime(LocalTime.MAX) : defaultEndDate;
+
+        Page<GetPostResponse> posts = postService.getPostList(clubId, userId, keyword, startDateTime, endDateTime, sortBy, pageable);
+        return ResponseEntity.ok(posts);
+    }
+
+    @PostMapping(value="/{postId}/like")
+    @Operation(summary="게시물 좋아요")
+    public ResponseEntity addPostLike(
+            @PathVariable Long clubId,
+            @LoginMember Long memberId,
+            @PathVariable Long postId){
+        postService.createPostLike(memberId, postId);
+        return ResponseEntity.status(200).body("게시물 좋아요 성공");
+
+    }
+    @DeleteMapping(value="/{postId}/like")
+    @Operation(summary="게시물 좋아요 취소")
+    public ResponseEntity deletePostLike(
+            @PathVariable Long clubId,
+            @LoginMember Long memberId,
+            @PathVariable Long postId){
+        postService.deletePostLike(clubId, memberId, postId);
+        return ResponseEntity.status(200).body("게시물 좋아요 취소 성공");
+
     }
 }

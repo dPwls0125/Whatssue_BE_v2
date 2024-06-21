@@ -67,7 +67,7 @@ public class WebSecurityConfig {
                         response.setStatus(HttpStatus.FAILED_DEPENDENCY.value()); // 403
                     })
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FAILED_DEPENDENCY) // 403
-                ); // 권한 없음
+                )); // 권한 없음
         return http.build();
     }
 

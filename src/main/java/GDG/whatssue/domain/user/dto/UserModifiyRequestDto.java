@@ -2,15 +2,15 @@ package GDG.whatssue.domain.user.dto;
 
 import lombok.*;
 
-@RequiredArgsConstructor
-@Getter
-@Setter
 @Builder
 @AllArgsConstructor
-public class modifiyRequestDto {
+@Getter
+public class UserModifiyRequestDto {
+
     private String userName;
     private String userPhone;
-    private String Role;
+    private String userEmail;
+
 }
 
 

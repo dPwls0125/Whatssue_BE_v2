@@ -32,7 +32,7 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
 
         //스케줄 존재 및 클럽 소유여부 체크
         if (!scheduleService.isClubSchedule(clubId, scheduleId)) {
-            throw new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR);
+            throw new CommonException(ScheduleErrorCode.EX4100);
         }
 
         //인터셉터 통과
@@ -46,13 +46,7 @@ public class ScheduleCheckInterceptor implements HandlerInterceptor {
     }
 
     private Long getScheduleId(HttpServletRequest request) {
-        String scheduleId = extractPathVariableFromRequest(request, "scheduleId");
-
-        try {
-            return Long.parseLong(scheduleId);
-        } catch (Exception e) {
-            throw new CommonException(BAD_REQUEST);
-        }
+        return Long.parseLong(extractPathVariableFromRequest(request, "scheduleId"));
     }
 
     private String extractPathVariableFromRequest(HttpServletRequest request, String pathVariable) {

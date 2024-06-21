@@ -1,6 +1,5 @@
 package GDG.whatssue.global.config;
 
-import GDG.whatssue.global.argumentresolver.LoginMemberArgumentResolver;
 import GDG.whatssue.global.argumentresolver.LoginUserArgumentResolver;
 import GDG.whatssue.global.interceptor.ClubCheckInterceptor;
 import GDG.whatssue.global.interceptor.ScheduleCheckInterceptor;
@@ -22,32 +21,26 @@ public class WebConfig implements WebMvcConfigurer {
     private final ClubCheckInterceptor clubCheckInterceptor;
     private final ScheduleCheckInterceptor scheduleCheckInterceptor;
     private final LoginUserArgumentResolver loginUserArgumentResolver;
-    private final LoginMemberArgumentResolver loginMemberArgumentResolver;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(clubCheckInterceptor)
             .order(1)
             .addPathPatterns("/api/clubs/{clubId}/**");
-
-        registry.addInterceptor(scheduleCheckInterceptor)
-            .order(2)
-            .addPathPatterns("/api/clubs/{clubId}/schedules/{scheduleId}/**");
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(loginUserArgumentResolver);
-        resolvers.add(loginMemberArgumentResolver);
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("http://localhost:3000", "http://3.34.58.135:3000")
                 .allowedHeaders("Content-Type", "X-AUTH-TOKEN", "Authorization", "Bearer")
                 .allowedMethods(HttpMethod.POST.name(), HttpMethod.GET.name(), HttpMethod.DELETE.name(), HttpMethod.PUT.name(), HttpMethod.PATCH.name(), HttpMethod.OPTIONS.name())
-                .allowCredentials(false);
+                .allowCredentials(true);
 //                .exposedHeaders("Authorization", "X-AUTH-TOKEN", "Bearer")
 //                .maxAge(3000);
     }

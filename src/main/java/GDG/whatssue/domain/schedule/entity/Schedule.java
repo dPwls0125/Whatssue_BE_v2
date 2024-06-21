@@ -1,11 +1,9 @@
 package GDG.whatssue.domain.schedule.entity;
 
-import GDG.whatssue.domain.attendance.Error.AttendanceErrorCode;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
+import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,14 +15,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 
 @Getter
 @Entity
@@ -62,18 +58,13 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private AttendanceStatus attendanceStatus;
 
-    @OneToMany(mappedBy = "schedule")
-    private List<ScheduleAttendanceResult> attendanceResultList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "schedule")
-    private List<OfficialAbsenceRequest> OfficialAbsenceRequestList = new ArrayList<>();
-
     //==연관관계 메서드==//
 
     //==생성 메서드==//
-    private Schedule(ClubMember register, String scheduleName, String scheduleContent,
+    private Schedule(Club club, ClubMember register, String scheduleName, String scheduleContent,
         LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
 
+        this.club = club;
         this.register = register;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
@@ -86,23 +77,23 @@ public class Schedule extends BaseEntity {
     /**
      * 정적 팩토리 메서드 패턴
      */
-    public static Schedule createSchedule(ClubMember register, String scheduleName,
+    public static Schedule createSchedule(Club club, ClubMember register, String scheduleName,
         String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
 
-        return new Schedule(register, scheduleName, scheduleContent, scheduleDate, scheduleTime, schedulePlace);
+        return new Schedule(club, register, scheduleName, scheduleContent, scheduleDate, scheduleTime, schedulePlace);
     }
 
     //==비즈니스 로직==//
     /**
      * 일정 출석 시작
      */
-    public void checkIsAttendanced() {
+    public void startAttendance() {
         if (this.attendanceStatus == AttendanceStatus.ONGOING) {
-            throw new CommonException(AttendanceErrorCode.ATTENDANCE_ALREADY_ONGOING);
+            throw new CommonException(ScheduleErrorCode.EX4200);
         }
 
         if (this.attendanceStatus == AttendanceStatus.COMPLETE) {
-            throw new CommonException(AttendanceErrorCode.ATTENDANCE_ALREADY_COMPLETED);
+            throw new CommonException(ScheduleErrorCode.EX4201);
         }
 
         this.attendanceStatus = AttendanceStatus.ONGOING;
@@ -113,7 +104,7 @@ public class Schedule extends BaseEntity {
      */
     public void finishAttendance() {
         if (this.attendanceStatus != AttendanceStatus.ONGOING) {
-            //출석 진행중이 아님 예외
+            throw new CommonException(ScheduleErrorCode.EX4202);
         }
         this.attendanceStatus = AttendanceStatus.COMPLETE;
     }
@@ -132,4 +123,5 @@ public class Schedule extends BaseEntity {
     public void setClub(Club club) {
         this.club = club;
     }
+
 }

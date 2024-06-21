@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -34,7 +35,16 @@ public class OauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         Long userId = kakaoDetails.getUser().getUserId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(UserErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CommonException(UserErrorCode.EX1100));
+
+//        Collection<String> cookies = response.getHeaders("Set-Cookie");
+//
+//        cookies.stream()
+//                .filter(header -> header.contains("JSESSIONID"))
+//                .map(header -> String.format("%s; %s", header, "SameSite=None; Secure"))
+//                .forEach(header -> response.setHeader("Set-Cookie", header));
+
+//        log.info("로그인 성공 -> JSESSIONID {}" ,response.getHeader("Set-Cookie"));
 
         if( user.getUserPhone()==null || user.getUserEmail()==null ){
 

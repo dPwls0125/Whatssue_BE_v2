@@ -17,12 +17,14 @@ import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
-import java.time.LocalDateTime;
 
+import GDG.whatssue.domain.schedule.service.ScheduleFacade;
 import GDG.whatssue.global.error.CommonException;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 
 @Service
@@ -33,90 +35,75 @@ public class AttendanceService {
 
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     private final ClubMemberRepository clubMemberRepository;
-    private final ScheduleRepository scheduleRepository;
+    private final ScheduleFacade scheduleFacade;
+    private final AttendanceFacade attendanceFacade;
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
     public final static Random random = new Random();
 
     @Transactional
-    public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) throws RuntimeException {
+    public AttendanceNumResponseDto openAttendance(Long clubId, Long scheduleId) {
 
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
-        AttendanceStatus status = schedule.getAttendanceStatus();
-
+        Schedule schedule = scheduleFacade.getSchedule(clubId, scheduleId);
         // 출석 가능 여부 확인 및 예외 처리
-        schedule.checkIsAttendanced();
-
+        schedule.startAttendance();
         // 출석을 진행하기 전, 모든 멤버의 해당 일정의 출석 상태를 absence 으로 변경
-        initializeMemberAttendance(clubId);
-
+        initializeMemberAttendance(clubId,scheduleId);
         // 출석번호 생성 및 맵에 저장
-        int randomInt = putAttendanceNumInMap(clubId, scheduleId);
+        int randomInt = putAttendanceNumInMapAndReturn(clubId, scheduleId);
 
         AttendanceNumResponseDto responseDto = AttendanceNumResponseDto.of(clubId, scheduleId, randomInt);
 
         return responseDto;
+
     }
 
     //현재 진행중인 일정 리스트
     public List<ScheduleDto> currentAttendanceList(Long clubId) {
-        List<ScheduleDto> scheduleIdList = new ArrayList<>();
-        if (attendanceNumMap.containsKey(clubId)) {
-            for (Long scheduleId : attendanceNumMap.get(clubId).keySet()) {
-                Schedule schedule = scheduleRepository.findById(scheduleId).get();
-                ScheduleDto dto = ScheduleDto.builder()
-                        .scheduleId(schedule.getId())
-                        .clubId(schedule.getClub().getId())
-                        .scheduleName(schedule.getScheduleName())
-                        .scheduleContent(schedule.getScheduleContent())
-                        .scheduleDateTime(LocalDateTime.of(schedule.getScheduleDate(), schedule.getScheduleTime()))
-                        .attendanceStatus(schedule.getAttendanceStatus())
-                        .build();
-                scheduleIdList.add(dto);
+
+        List<ScheduleDto> scheduleDtoList = new ArrayList<>();
+        List<Schedule> scheduleList =  scheduleFacade.getSchedule(clubId);
+        for(Schedule schedule : scheduleList){
+            if(schedule.getAttendanceStatus() == AttendanceStatus.ONGOING){
+                if (attendanceNumMap.get(clubId).containsKey(schedule.getId())){
+                    scheduleDtoList.add(ScheduleDto.of(schedule));
+                }else{
+                    throw new CommonException(AttendanceErrorCode.EX5204);
+                }
             }
         }
-        return scheduleIdList;
+            return scheduleDtoList;
     }
+
     /*Delete 시에 결석자 명단을 업로드해야할까?*/
-    public void deleteAttendance(Long clubId, Long scheduleId) throws Exception {
-        if (attendanceNumMap.containsKey(clubId)) {
-            if (attendanceNumMap.get(clubId).containsKey(scheduleId))
-                attendanceNumMap.get(clubId).remove(scheduleId);
-            else
-                throw new Exception("출석이 진행중이지 않습니다.");
-        } else {
-            throw new Exception("출석이 진행중이지 않습니다.");
-        }
+    @Transactional
+    public void finishAttendanceOngoing(Long clubId, Long scheduleId) {
+
+        Schedule schedule = scheduleFacade.getSchedule(clubId, scheduleId);
+
+        // 조건 체크 및 스케줄 상태 변경
+        schedule.finishAttendance();
+
+        // Map에서 출석 번호 삭제
+        if(attendanceNumMap.containsKey(clubId) && attendanceNumMap.get(clubId).containsKey(scheduleId))
+            attendanceNumMap.get(clubId).remove(scheduleId);
+        else throw new CommonException(AttendanceErrorCode.EX5203);
+
     }
-    public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId) throws Exception {
-        List<ScheduleAttendanceResult> attendanceList;
-        attendanceList = scheduleAttendanceResultRepository.findByScheduleId(scheduleId);
 
-        if (attendanceList.isEmpty()) throw new Exception("출석한 멤버가 존재하지 않습니다.");
-        List<ScheduleAttendanceMemberDto> attendedMembers = (List<ScheduleAttendanceMemberDto>) attendanceList.stream().map(m -> {
-            if (m.getAttendanceType().toString().equals("ATTENDANCE")) {
-                return ScheduleAttendanceMemberDto.builder()
-                        .clubId(clubId)
-                        .scheduleId(scheduleId)
-                        .clubMemberId(m.getClubMember().getId())
-                        .attendanceType(m.getAttendanceType())
-                        .build();
-            } else return null;
-        });
-
-        return attendedMembers;
+    public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId) {
+        List<ScheduleAttendanceResult> attendanceList = attendanceFacade.getAttendanceResultbySchedule(scheduleId, AttendanceType.ATTENDANCE);
+        return ScheduleAttendanceMemberDto.of(attendanceList);
     }
-    public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) throws Exception{
 
+    @Transactional
+    public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) {
         int attendanceNum = attendanceNumMap.get(clubId).get(schduleId);
         int inputValue = requestDto.getAttendanceNum();
 
         if (attendanceNum == inputValue) {
-            ScheduleAttendanceResult scheduleAttendanceResult = scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(schduleId, memberId)
-                    .orElseThrow(() -> new Exception("해당 일정에 대한 출석 결과가 존재하지 않습니다."));
+            ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(schduleId, memberId);
             scheduleAttendanceResult.setAttendanceType(AttendanceType.ATTENDANCE);
-            scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
-        }else throw new Exception(" 출석번호가 일치하지 않습니다. 다시 시도해 주세요");
-
+        } else throw new CommonException(AttendanceErrorCode.EX5205);
     }
 
     public void modifyMemberAttendance(Long scheduleId, Long memberId, String attendanceType){
@@ -138,23 +125,21 @@ public class AttendanceService {
         scheduleAttendanceResultRepository.save(attendanceResult);
     }
 
-    private void initializeMemberAttendance(Long clubId) throws RuntimeException {
+    private void initializeMemberAttendance(Long clubId, Long scheduleId) throws RuntimeException {
 
-        List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.NONE_CLUB_MEMBER_ERROR));
+        List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.EX3100));
 
         for(ClubMember clubMember : clubMembers){
-
             ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
                     .clubMember(clubMember)
+                    .schedule(scheduleFacade.getSchedule(clubId, scheduleId))
                     .attendanceType(AttendanceType.ABSENCE)
                     .build();
-
             scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
-
         }
     }
 
-    private int putAttendanceNumInMap(Long clubId, Long scheduleId){
+    private int putAttendanceNumInMapAndReturn(Long clubId, Long scheduleId){
 
         AttendanceService.attendanceNumMap.put(clubId, new HashMap<>());
 
@@ -166,4 +151,8 @@ public class AttendanceService {
 
         return randomInt;
     }
+
+
+
+
 }

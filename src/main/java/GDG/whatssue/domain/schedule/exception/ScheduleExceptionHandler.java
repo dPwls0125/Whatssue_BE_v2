@@ -13,7 +13,7 @@ public class ScheduleExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResult> scheduleDateTimePatternExHandle(HttpMessageNotReadableException e, HttpServletRequest request) {
-        ScheduleErrorCode errorCode = ScheduleErrorCode.INVALID_SCHEDULE_DATETIME_PATTERN_ERROR;
+        ScheduleErrorCode errorCode = ScheduleErrorCode.EX4300;
         ErrorResult errorResult = ErrorResult.builder()
             .code(errorCode.name())
             .message(errorCode.getMessage())
