@@ -62,7 +62,7 @@ public class PostController {
         @PathVariable(name = "clubId") Long clubId,
         @PathVariable(name = "postId") Long postId,
         @LoginUser Long userId) {
-        GetPostResponse responseDto = postService.getPost(userId, postId);
+        GetPostResponse responseDto = postService.getPost(userId, postId, clubId);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -74,7 +74,7 @@ public class PostController {
         @PathVariable(name = "postId") Long postId,
         @LoginUser Long userId
     )throws IOException {
-        GetPostResponse responseDto = postService.getPost(userId, postId);
+        GetPostResponse responseDto = postService.getPost(userId, postId, clubId);
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,userId).get();
 
         postService.deletePost(postId,userId);
