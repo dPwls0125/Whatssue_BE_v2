@@ -62,7 +62,7 @@ public class PostController {
         @PathVariable(name = "clubId") Long clubId,
         @PathVariable(name = "postId") Long postId,
         @LoginUser Long userId) {
-        GetPostResponse responseDto = postService.getPost(userId, postId);
+        GetPostResponse responseDto = postService.getPost(clubId, userId, postId);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -74,10 +74,10 @@ public class PostController {
         @PathVariable(name = "postId") Long postId,
         @LoginUser Long userId
     )throws IOException {
-        GetPostResponse responseDto = postService.getPost(userId, postId);
+        GetPostResponse responseDto = postService.getPost(clubId, userId, postId);
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId,userId).get();
 
-        postService.deletePost(postId,userId);
+        postService.deletePost(clubId,userId,postId);
         return ResponseEntity.status(200).body("게시글 삭제 완료");
     }
 
@@ -86,15 +86,15 @@ public class PostController {
     public ResponseEntity updatePost(
             @PathVariable(name = "clubId") Long clubId,
             @PathVariable(name = "postId") Long postId,
-            @LoginMember Long memberId,
+            @LoginUser Long userId,
             @RequestPart("request") UpdatePostRequest request,
             @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages) throws IOException {
 
-        postService.updatePost(clubId, memberId, postId, request, postImages);
+        postService.updatePost(clubId, userId, postId, request, postImages);
         return ResponseEntity.status(HttpStatus.OK).body("게시글 수정 완료");
     }
     @Operation(summary = "게시물 검색", description = "검색 : 키워드, 기간(형식 :'yyyy-MM-dd', 기본 1900~2199년), 정렬(default : 최신순(or 'Like' 입력)")
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<GetPostResponse>> searchPosts(
             @PathVariable(name = "clubId") Long clubId,
             @LoginUser Long userId,
@@ -123,9 +123,9 @@ public class PostController {
     @Operation(summary="게시물 좋아요")
     public ResponseEntity addPostLike(
             @PathVariable Long clubId,
-            @LoginMember Long memberId,
+            @LoginUser Long userId,
             @PathVariable Long postId){
-        postService.createPostLike(memberId, postId);
+        postService.createPostLike(clubId,userId, postId);
         return ResponseEntity.status(200).body("게시물 좋아요 성공");
 
     }
@@ -133,9 +133,9 @@ public class PostController {
     @Operation(summary="게시물 좋아요 취소")
     public ResponseEntity deletePostLike(
             @PathVariable Long clubId,
-            @LoginMember Long memberId,
+            @LoginUser Long userId,
             @PathVariable Long postId){
-        postService.deletePostLike(clubId, memberId, postId);
+        postService.deletePostLike(clubId, userId, postId);
         return ResponseEntity.status(200).body("게시물 좋아요 취소 성공");
 
     }
