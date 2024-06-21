@@ -93,7 +93,7 @@ public class PostController {
         postService.updatePost(clubId, userId, postId, request, postImages);
         return ResponseEntity.status(HttpStatus.OK).body("게시글 수정 완료");
     }
-    @Operation(summary = "게시물 검색", description = "검색 : 키워드, 기간(형식 :'yyyy-MM-dd', 기본 1900~2199년), 정렬(default : 최신순(or 'Like' 입력)")
+    @Operation(summary = "게시물 검색", description = "검색 : 키워드, 기간(형식 :'yyyy-MM-dd', 기본 1900~2199년), 정렬(default : 최신순(or 'Like' 입력), 카테고리(NOTICE or FREE)")
     @GetMapping
     public ResponseEntity<Page<GetPostResponse>> searchPosts(
             @PathVariable(name = "clubId") Long clubId,
@@ -104,6 +104,7 @@ public class PostController {
             @RequestParam(name = "endDate", required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd") String endDate,
             @RequestParam(name = "sortBy", required = false, defaultValue = "createAt") String sortBy,
+            @RequestParam(name = "category") PostCategory category,
             Pageable pageable){
         // 기본값 설정
         LocalDateTime defaultStartDate = LocalDateTime.of(1900, 1, 1, 0, 0);
@@ -115,7 +116,7 @@ public class PostController {
         LocalDateTime endDateTime = (endDate != null) ?
                 LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atTime(LocalTime.MAX) : defaultEndDate;
 
-        Page<GetPostResponse> posts = postService.getPostList(clubId, userId, keyword, startDateTime, endDateTime, sortBy, pageable);
+        Page<GetPostResponse> posts = postService.getPostList(clubId, userId, keyword, startDateTime, endDateTime, sortBy, category, pageable);
         return ResponseEntity.ok(posts);
     }
 
