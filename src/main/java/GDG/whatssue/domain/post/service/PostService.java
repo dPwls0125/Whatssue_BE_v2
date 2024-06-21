@@ -71,7 +71,7 @@ public class PostService {
         uploadPostImages(postImages, post);
     }
 
-    public GetPostResponse getPost(Long userId, Long postId, Long clubId) {
+    public GetPostResponse getPost(Long clubId, Long userId, Long postId) {
 
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
@@ -147,8 +147,8 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long memberId, Long postId) throws IOException {
-        ClubMember clubMember = clubMemberRepository.findById(memberId)
+    public void deletePost(Long clubId, Long userId, Long postId) throws IOException {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
 
         Post post = postRepository.findById(postId)
@@ -165,8 +165,8 @@ public class PostService {
             postRepository.delete(post);
     }
 
-    public void updatePost(Long clubId, Long memberId, Long postId, UpdatePostRequest request, List<MultipartFile> postImages) throws IOException {
-        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, memberId)
+    public void updatePost(Long clubId, Long userId, Long postId, UpdatePostRequest request, List<MultipartFile> postImages) throws IOException {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
@@ -225,8 +225,8 @@ public class PostService {
         return new PageImpl<>(getPostResponses, pageable, posts.getTotalElements());
     }
     @Transactional
-    public void createPostLike(Long memberId, Long postId) {
-        ClubMember clubMember = clubMemberRepository.findById(memberId)
+    public void createPostLike(Long clubId, Long userId, Long postId) {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100)); // 존재하지 않는 멤버
 
         Post post = postRepository.findById(postId)
@@ -240,8 +240,8 @@ public class PostService {
         postLikeRepository.save(postLike);
     }
     @Transactional
-    public void deletePostLike(Long clubId, Long memberId, Long postId) {
-        ClubMember clubMember = clubMemberRepository.findById(memberId)
+    public void deletePostLike(Long clubId, Long userId, Long postId) {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100)); // 존재하지 않는 멤버
 
         Post post = postRepository.findById(postId)

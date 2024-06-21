@@ -102,14 +102,14 @@ public class ScheduleController {
 
     @Operation(summary = "일정 조회(검색 : 검색어, 기간)")
     @GetMapping
-    @Parameter(name = "q", description = "검색어. 일정명으로 검색", in = ParameterIn.QUERY)
-    @Parameter(name = "sDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", in = ParameterIn.QUERY)
-    @Parameter(name = "eDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
+    @Parameter(name = "keyword", description = "검색어. 일정명으로 검색", in = ParameterIn.QUERY)
+    @Parameter(name = "startDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", in = ParameterIn.QUERY)
+    @Parameter(name = "endDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
     public ResponseEntity<Page<SchedulesResponse>> findSchedules(
         @PathVariable(name = "clubId") Long clubId,
-        @RequestParam(name = "q", required = false, defaultValue = "") String query,
-        @RequestParam(name = "sDate", required = false, defaultValue = "1900-01-01") String sDate,
-        @RequestParam(name = "eDate", required = false, defaultValue = "2199-12-31") String eDate,
+        @RequestParam(name = "keyword", required = false, defaultValue = "") String query,
+        @RequestParam(name = "startDate", required = false, defaultValue = "1900-01-01") String sDate,
+        @RequestParam(name = "endDate", required = false, defaultValue = "2199-12-31") String eDate,
         Pageable pageable) {
 
         //유효성 체크
