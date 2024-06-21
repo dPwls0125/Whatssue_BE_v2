@@ -1,6 +1,8 @@
 package GDG.whatssue.domain.post.dto;
 
 import GDG.whatssue.domain.post.entity.PostCategory;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,12 +20,13 @@ public class GetPostResponse {
     private List<String> uploadImage;
     private PostCategory postCategory;
     private Long postLikeCount;
+    private Long commentCount;
     private Boolean isLiked;
-
+    private LocalDateTime createdAt;
     @Builder
     public GetPostResponse(Long postId, String writerProfileImage, String writerName,
         String postTitle,
-        String postContent, List<String> uploadImage, PostCategory postCategory, Long postLikeCount, Boolean isLiked) {
+        String postContent, List<String> uploadImage, PostCategory postCategory, Long postLikeCount, Long commentCount, Boolean isLiked, LocalDateTime createdAt) {
         this.postId = postId;
         this.writerProfileImage = writerProfileImage;
         this.writerName = writerName;
@@ -32,6 +35,8 @@ public class GetPostResponse {
         this.uploadImage = uploadImage;
         this.postCategory = postCategory;
         this.postLikeCount = postLikeCount;
+        this.commentCount = commentCount;
         this.isLiked = isLiked;
+        this.createdAt = createdAt;
     }
 }

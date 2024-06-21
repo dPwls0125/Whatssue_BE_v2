@@ -88,8 +88,11 @@ public class PostService {
         //작성자 프로필 이미지 Path
         String memberProfileImage = S3Utils.getFullPath(post.getWriter().getProfileImage().getStoreFileName());
 
-        // 좋아요 목록 가져오기
+        // 좋아요 수 가져오기
         Long postLikeCount = Long.valueOf(post.getPostLikeList().size());
+
+        // 댓글 수 가져오기
+        Long commentCount = Long.valueOf(post.getCommentList().size());
 
         // 좋아요 여부 체크
         Boolean postLikeCheck = isLikedCheck(userId, postId, clubId);
@@ -103,7 +106,10 @@ public class PostService {
                 .writerProfileImage(memberProfileImage)
                 .uploadImage(postImages)
                 .postLikeCount(postLikeCount)
-                .isLiked(postLikeCheck).build();
+                .commentCount(commentCount)
+                .isLiked(postLikeCheck)
+                .createdAt(post.getCreateAt())
+                .build();
     }
 
     public Boolean isLikedCheck(Long userId, Long postId, Long clubId){
@@ -186,8 +192,8 @@ public class PostService {
         uploadPostImages(postImages, post);
         postRepository.save(post);
     }
-    public Page<GetPostResponse> getPostList(Long clubId, Long userId, String keyword, LocalDateTime startDate, LocalDateTime endDate, String sortBy, Pageable pageable) {
-        Page<Post> posts = postQueryRepository.findPosts(clubId, keyword, startDate, endDate, sortBy, pageable);
+    public Page<GetPostResponse> getPostList(Long clubId, Long userId, String keyword, LocalDateTime startDate, LocalDateTime endDate, String sortBy, PostCategory category, Pageable pageable) {
+        Page<Post> posts = postQueryRepository.findPosts(clubId, keyword, startDate, endDate, sortBy, category, pageable);
         List<GetPostResponse> getPostResponses = new ArrayList<>(); //getPost와 비교 TODO
 
         for (Post post : posts) {
@@ -205,6 +211,9 @@ public class PostService {
             // 좋아요 수
             Long postLikeCount = (long) post.getPostLikeList().size();
 
+            // 댓글 수 가져오기
+            Long commentCount = Long.valueOf(post.getCommentList().size());
+
             // 좋아요 여부 체크
             Boolean postLikeCheck = isLikedCheck(userId, post.getId(), clubId);
 
@@ -217,7 +226,9 @@ public class PostService {
                     .writerProfileImage(memberProfileImage)
                     .uploadImage(postImages)
                     .postLikeCount(postLikeCount)
+                    .commentCount(commentCount)
                     .isLiked(postLikeCheck)
+                    .createdAt(post.getCreateAt())
                     .build();
 
             getPostResponses.add(response);
