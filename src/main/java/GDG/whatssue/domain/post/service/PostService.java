@@ -31,9 +31,7 @@ import java.util.stream.Collectors;
 
 import GDG.whatssue.global.util.S3Utils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -194,7 +192,7 @@ public class PostService {
     }
     public Page<GetPostResponse> getPostList(Long clubId, Long userId, String keyword, LocalDateTime startDate, LocalDateTime endDate, String sortBy, PostCategory category, Pageable pageable) {
         Page<Post> posts = postQueryRepository.findPosts(clubId, keyword, startDate, endDate, sortBy, category, pageable);
-        List<GetPostResponse> getPostResponses = new ArrayList<>(); //getPost와 비교 TODO
+        List<GetPostResponse> getPostResponses = new ArrayList<>();
 
         for (Post post : posts) {
             // 게시글 이미지 Path List
@@ -262,5 +260,107 @@ public class PostService {
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7205)); // 좋아요를 누르지 않은 게시물
 
         postLikeRepository.delete(postLike);
+    }
+
+    public Page<GetPostResponse> getMyPosts(Long clubId, Long userId, PostCategory postCategory, Pageable pageable) {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100)); // 존재하지 않는 멤버
+
+        Club club = clubMember.getClub();
+
+
+        Page<Post> posts = postRepository.findByClubAndWriterAndPostCategory(club, clubMember, postCategory, pageable);
+
+
+        List<GetPostResponse> getPostResponses = new ArrayList<>();
+
+        for (Post post : posts) {
+            // 게시글 이미지 Path List
+            List<String> postImages = new ArrayList<>();
+            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            if (storeFileNames != null) {
+                for (UploadFile storeFileName : storeFileNames) {
+                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                }
+            }
+            // 작성자 프로필 이미지 Path
+            String memberProfileImage = post.getWriter().getProfileImage() != null ? S3Utils.getFullPath(post.getWriter().getProfileImage().getStoreFileName()) : null;
+
+            // 좋아요 수
+            Long postLikeCount = (long) post.getPostLikeList().size();
+
+            // 댓글 수 가져오기
+            Long commentCount = Long.valueOf(post.getCommentList().size());
+
+            // 좋아요 여부 체크
+            Boolean postLikeCheck = isLikedCheck(userId, post.getId(), clubId);
+
+            GetPostResponse response = GetPostResponse.builder()
+                    .postId(post.getId())
+                    .writerName(post.getWriter().getMemberName())
+                    .postCategory(post.getPostCategory())
+                    .postTitle(post.getPostTitle())
+                    .postContent(post.getPostContent())
+                    .writerProfileImage(memberProfileImage)
+                    .uploadImage(postImages)
+                    .postLikeCount(postLikeCount)
+                    .commentCount(commentCount)
+                    .isLiked(postLikeCheck)
+                    .createdAt(post.getCreateAt())
+                    .build();
+
+            getPostResponses.add(response);
+        }
+        return new PageImpl<>(getPostResponses, pageable, posts.getTotalElements());
+    }
+    public Page<GetPostResponse> getLikedPosts(Long userId, Long clubId, PostCategory postCategory, Pageable pageable) {
+        ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100)); // 존재하지 않는 멤버
+        Club club = clubMember.getClub();
+
+        Page<Post> posts = postRepository.findByPostLikeList_ClubMemberAndClubAndPostCategory(clubMember, club, postCategory, pageable);
+
+
+
+        List<GetPostResponse> getPostResponses = new ArrayList<>();
+
+        for (Post post : posts) {
+            // 게시글 이미지 Path List
+            List<String> postImages = new ArrayList<>();
+            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            if (storeFileNames != null) {
+                for (UploadFile storeFileName : storeFileNames) {
+                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                }
+            }
+            // 작성자 프로필 이미지 Path
+            String memberProfileImage = post.getWriter().getProfileImage() != null ? S3Utils.getFullPath(post.getWriter().getProfileImage().getStoreFileName()) : null;
+
+            // 좋아요 수
+            Long postLikeCount = (long) post.getPostLikeList().size();
+
+            // 댓글 수 가져오기
+            Long commentCount = Long.valueOf(post.getCommentList().size());
+
+            // 좋아요 여부 체크
+            Boolean postLikeCheck = isLikedCheck(userId, post.getId(), clubId);
+
+            GetPostResponse response = GetPostResponse.builder()
+                    .postId(post.getId())
+                    .writerName(post.getWriter().getMemberName())
+                    .postCategory(post.getPostCategory())
+                    .postTitle(post.getPostTitle())
+                    .postContent(post.getPostContent())
+                    .writerProfileImage(memberProfileImage)
+                    .uploadImage(postImages)
+                    .postLikeCount(postLikeCount)
+                    .commentCount(commentCount)
+                    .isLiked(postLikeCheck)
+                    .createdAt(post.getCreateAt())
+                    .build();
+
+            getPostResponses.add(response);
+        }
+        return new PageImpl<>(getPostResponses, pageable, posts.getTotalElements());
     }
 }
