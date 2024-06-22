@@ -7,10 +7,12 @@ import GDG.whatssue.domain.post.dto.AddPostRequest;
 import GDG.whatssue.domain.post.dto.GetPostResponse;
 import GDG.whatssue.domain.post.dto.UpdatePostRequest;
 import GDG.whatssue.domain.post.entity.PostCategory;
+import GDG.whatssue.domain.post.exception.PostErrorCode;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginMember;
 import GDG.whatssue.global.common.annotation.LoginUser;
+import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -27,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -139,5 +143,25 @@ public class PostController {
         postService.deletePostLike(clubId, userId, postId);
         return ResponseEntity.status(200).body("게시물 좋아요 취소 성공");
 
+    }
+    @GetMapping(value="/my_posts")
+    @Operation(summary="내가 쓴 글", description = "sort : [\"createAt,desc\"] or [\"createAt,asc\"] 올바르지 않은 값 500에러")
+    public ResponseEntity getMyPosts(
+            @PathVariable Long clubId,
+            @LoginUser Long userId,
+            @RequestParam PostCategory postCategory,
+            Pageable pageable) {
+        Page<GetPostResponse> posts = postService.getMyPosts(clubId, userId, postCategory, pageable);
+        return ResponseEntity.ok(posts);
+    }
+    @GetMapping(value="/my_like_posts")
+    @Operation(summary="내가 좋아요한 글", description = "sort : [\"createAt,desc\"] or [\"createAt,asc\"] 올바르지 않은 값 500에러")
+    public ResponseEntity getMyLikePosts(
+            @PathVariable Long clubId,
+            @LoginUser Long userId,
+            @RequestParam PostCategory postCategory,
+            Pageable pageable) {
+        Page<GetPostResponse> posts = postService.getLikedPosts(clubId, userId, postCategory, pageable);
+        return ResponseEntity.ok(posts);
     }
 }
