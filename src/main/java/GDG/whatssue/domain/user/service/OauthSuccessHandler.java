@@ -47,7 +47,6 @@ public class OauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 //        log.info("로그인 성공 -> JSESSIONID {}" ,response.getHeader("Set-Cookie"));
 
         if( user.getUserPhone()==null || user.getUserEmail()==null ){
-
             log.info("회원가입 안되어있음 -> 회원가입 페이지로 redirect");
             response.sendRedirect(frontUrl + "/user/signup");
         } else {
