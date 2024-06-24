@@ -58,7 +58,6 @@ public class AttendanceService {
         return responseDto;
 
     }
-
     //현재 진행중인 일정 리스트
     public List<ScheduleDto> currentAttendanceList(Long clubId) {
 
@@ -134,8 +133,10 @@ public class AttendanceService {
     private void initializeMemberAttendance(Long clubId, Long scheduleId) throws RuntimeException {
 
         List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.EX3100));
-
         for(ClubMember clubMember : clubMembers){
+            if(scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId, clubMember.getId()).isPresent()){
+                break;
+            }
             ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
                     .clubMember(clubMember)
                     .schedule(scheduleFacade.getSchedule(clubId, scheduleId))
@@ -157,7 +158,6 @@ public class AttendanceService {
 
         return randomInt;
     }
-
 
     private Long getClubMemberId(Long clubId, Long userId) {
         return clubMemberService.getClubMemberId(clubId, userId);
