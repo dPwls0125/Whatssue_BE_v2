@@ -7,6 +7,7 @@ import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType;
 import GDG.whatssue.domain.officialabsence.repository.OfficialAbsenceRequestRepository;
@@ -38,6 +39,7 @@ public class AttendanceService {
     private final ScheduleFacade scheduleFacade;
     private final AttendanceFacade attendanceFacade;
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
+    private final ClubMemberService clubMemberService;
     public final static Random random = new Random();
 
     @Transactional
@@ -96,14 +98,18 @@ public class AttendanceService {
     }
 
     @Transactional
-    public void doAttendance(Long clubId, Long schduleId, Long memberId, AttendanceNumRequestDto requestDto) {
+    public void doAttendance(Long clubId, Long schduleId, Long userId, AttendanceNumRequestDto requestDto) {
+
         int attendanceNum = attendanceNumMap.get(clubId).get(schduleId);
         int inputValue = requestDto.getAttendanceNum();
 
         if (attendanceNum == inputValue) {
-            ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(schduleId, memberId);
+            ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(schduleId, getClubMemberId(clubId, userId));
+            if(scheduleAttendanceResult.getAttendanceType() == AttendanceType.ATTENDANCE){
+                throw new CommonException(AttendanceErrorCode.EX5205);
+            }
             scheduleAttendanceResult.setAttendanceType(AttendanceType.ATTENDANCE);
-        } else throw new CommonException(AttendanceErrorCode.EX5205);
+        }else throw new CommonException(AttendanceErrorCode.EX5204);
     }
 
     public void modifyMemberAttendance(Long scheduleId, Long memberId, String attendanceType){
@@ -152,6 +158,10 @@ public class AttendanceService {
         return randomInt;
     }
 
+
+    private Long getClubMemberId(Long clubId, Long userId) {
+        return clubMemberService.getClubMemberId(clubId, userId);
+    }
 
 
 

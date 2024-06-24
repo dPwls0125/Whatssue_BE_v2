@@ -1,12 +1,15 @@
 package GDG.whatssue.domain.comment.entity;
 
-import GDG.whatssue.domain.comment.dto.CommentCreateDto;
+import GDG.whatssue.domain.comment.dto.CommentAddDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
+import org.aspectj.weaver.Member;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,8 +45,7 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_content",nullable = false)
     private String content;
 
-    @Column(name = "comment_hidden", nullable = false)
-    private boolean hidden;
-
+    @Column
+    private LocalDateTime deleteAt;
 
 }

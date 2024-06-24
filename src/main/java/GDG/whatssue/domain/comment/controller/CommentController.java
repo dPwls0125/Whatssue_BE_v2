@@ -1,52 +1,37 @@
 package GDG.whatssue.domain.comment.controller;
 
-import GDG.whatssue.domain.comment.dto.CommentBaseDto;
-import GDG.whatssue.domain.comment.dto.CommentCreateDto;
-import GDG.whatssue.domain.comment.dto.CommentModifyDto;
+import GDG.whatssue.domain.comment.dto.ChildCommentAddDto;
+import GDG.whatssue.domain.comment.dto.CommentAddDto;
 import GDG.whatssue.domain.comment.service.CommentService;
+import GDG.whatssue.domain.comment.service.CommentServiceImpl;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.Member;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
-@RequestMapping("/api/{clubId}/member/{memberId}/comment")
 @RequiredArgsConstructor
-@Slf4j
+@RequestMapping("/api/clubs/{clubId}/comment")
 public class CommentController {
 
-    private final CommentService commentService;
-    @Operation(summary = "댓글 작성")
-    @PostMapping("/post")
-    public ResponseEntity createComment(@RequestBody CommentCreateDto dto, @PathVariable Long memberId) {
-        commentService.createComment(memberId,dto);
-        return ResponseEntity.status(200).body("ok");
+    @Qualifier("commentServiceImpl")
+    private final CommentService  commentService;
+    @Operation(summary = "부모 댓글 생성(대댓글 x)")
+    @PostMapping
+    public ResponseEntity createComment(@RequestBody CommentAddDto dto, @LoginUser Long userId, @PathVariable Long clubId) {
+        commentService.createComment(dto, userId, clubId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @Operation(summary = "댓글 수정")
-    @PatchMapping("/update")
-    public void updateComment(@RequestBody CommentModifyDto dto, @PathVariable Long memberId, @PathVariable Long commentId) {
-        commentService.updateComment(memberId,dto);
+    @Operation(summary = "대댓글 생성")
+    @PostMapping("/child")
+    public ResponseEntity createChildComment(@RequestBody ChildCommentAddDto dto, @LoginUser Long userId, @PathVariable Long clubId) {
+        commentService.createChildComment(dto, userId, clubId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @Operation(summary = "댓글 삭제")
-    public void deleteComment(Long memberId, Long commentId) {
-        commentService.deleteComment(memberId, commentId);
-        // 댓글 삭제
-    }
 
-    @Operation(summary = "댓글 조회")
-    @GetMapping("/{commentId}")
-    public ResponseEntity getComment( @PathVariable(name = "commentId") Long commentId) {
-        return ResponseEntity.status(200).body(commentService.getComment(commentId));
-    }
-
-    @Operation(summary = "댓글 목록 조회")
-    @GetMapping("/list/{postId}/")
-    public ResponseEntity getCommentList(@PathVariable(name = "postId") Long postId) {
-        return ResponseEntity.status(200).body(commentService.getCommentList(postId));
-    }
 }
