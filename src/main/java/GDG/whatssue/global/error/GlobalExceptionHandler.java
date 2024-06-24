@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResult> allExHandle(Exception e, HttpServletRequest request) {
-        log.warn("exception= {}", e.getMessage());
+        log.warn("exception= {}", e);
         ErrorCode errorCode = CommonErrorCode.EX0400;
         ErrorResult errorResult = ErrorResult.builder()
             .code(errorCode.getCode())

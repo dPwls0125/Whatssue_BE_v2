@@ -64,7 +64,6 @@ public class ClubMemberService {
     public boolean isClubManager(Long clubId, Long userId) {
         return getClubMember(clubId, userId).checkManagerRole();
     }
-
     public boolean isFirstVisit(Long clubId, Long userId) {
         return getClubMember(clubId, userId).isFirstVisit();
     }
@@ -76,4 +75,6 @@ public class ClubMemberService {
     public ClubMember getClubMember(Long clubId, Long userId) {
         return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId).orElse(null);
     }
+
+
 }

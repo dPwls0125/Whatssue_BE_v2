@@ -363,4 +363,9 @@ public class PostService {
         }
         return new PageImpl<>(getPostResponses, pageable, posts.getTotalElements());
     }
+
+    public Post getPost(Long postId){
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
+    }
 }

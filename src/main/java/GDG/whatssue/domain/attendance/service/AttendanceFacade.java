@@ -16,19 +16,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AttendanceFacade {
 
-    private final ScheduleAttendanceResultRepository attendanceResultRepository;
+    private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     public ScheduleAttendanceResult getAttendanceResult(Long scheduleId, Long memberId){
-        return attendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId, memberId)
+        return scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId, memberId)
                 .orElseThrow(() -> new CommonException(AttendanceErrorCode.EX5100));
     }
 
     public List<ScheduleAttendanceResult> getAttendanceResult(Long memberId){
         // 찾은 객체가 없을 경우에는 빈 배열 반환
-        return attendanceResultRepository.findByClubMemberId(memberId);
+        return scheduleAttendanceResultRepository.findByClubMemberId(memberId);
     }
 
     public List<ScheduleAttendanceResult> getAttendanceResultbySchedule(Long scheduleId, AttendanceType attendenceType){
-        return attendanceResultRepository.findByScheduleIdAndAttendanceType(scheduleId, attendenceType);
+        return scheduleAttendanceResultRepository.findByScheduleIdAndAttendanceType(scheduleId, attendenceType);
     }
 
 }
