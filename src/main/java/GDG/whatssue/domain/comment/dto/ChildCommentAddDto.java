@@ -11,4 +11,6 @@ public class ChildCommentAddDto extends CommentAddDto{
         super(postId, content);
         this.parentId = parentId;
     }
+
+
 }

@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Entity
-@Getter
 @AllArgsConstructor
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Transactional
-@Setter
 public class Comment extends BaseEntity {
 
     @Id
