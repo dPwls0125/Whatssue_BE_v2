@@ -2,8 +2,10 @@ package GDG.whatssue.domain.comment.dto;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class CommentAddDto {
 
     private Long postId;
