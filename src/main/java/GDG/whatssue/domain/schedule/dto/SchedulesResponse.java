@@ -22,11 +22,11 @@ public class SchedulesResponse {
 
     @Builder
     public SchedulesResponse(
-        Long scheduleId, String scheduleName, AttendanceStatus attendanceStatus, LocalDate scheduleDate, LocalTime scheduleTime) {
+        Long scheduleId, String scheduleName, AttendanceStatus attendanceStatus, LocalDateTime scheduleDate) {
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
         this.attendanceStatus = attendanceStatus;
-        this.scheduleDate = scheduleDate;
-        this.scheduleTime = scheduleTime;
+        this.scheduleDate = scheduleDate.toLocalDate();
+        this.scheduleTime = scheduleDate.toLocalTime();
     }
 }
