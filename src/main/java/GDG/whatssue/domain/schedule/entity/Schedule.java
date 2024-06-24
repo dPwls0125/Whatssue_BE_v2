@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,10 +47,7 @@ public class Schedule extends BaseEntity {
     private String scheduleContent;
 
     @Column(nullable = false)
-    private LocalDate scheduleDate;
-
-    @Column(nullable = false)
-    private LocalTime scheduleTime;
+    private LocalDateTime scheduleDate;
 
     @Column(nullable = false)
     private String schedulePlace;
@@ -68,8 +66,7 @@ public class Schedule extends BaseEntity {
         this.register = register;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
-        this.scheduleDate = scheduleDate;
-        this.scheduleTime = scheduleTime;
+        this.scheduleDate = LocalDateTime.of(scheduleDate, scheduleTime);
         this.schedulePlace = schedulePlace;
         this.attendanceStatus = AttendanceStatus.BEFORE;
     }
@@ -115,8 +112,7 @@ public class Schedule extends BaseEntity {
     public void update(String scheduleName, String scheduleContent, LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace) {
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
-        this.scheduleDate = scheduleDate;
-        this.scheduleTime = scheduleTime;
+        this.scheduleDate = LocalDateTime.of(scheduleDate, scheduleTime);
         this.schedulePlace = schedulePlace;
     }
 

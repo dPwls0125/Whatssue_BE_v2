@@ -32,13 +32,13 @@ public class ScheduleDetailResponse {
     @Builder
     public ScheduleDetailResponse(
         Long scheduleId, String scheduleName, String scheduleContent,
-        LocalDate scheduleDate, LocalTime scheduleTime, String schedulePlace,
+        LocalDateTime scheduleDate, String schedulePlace,
         String registerName, String registerProfileImage, LocalDateTime registerTime, AttendanceStatus attendanceStatus) {
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
         this.scheduleContent = scheduleContent;
-        this.scheduleDate = scheduleDate;
-        this.scheduleTime = scheduleTime;
+        this.scheduleDate = scheduleDate.toLocalDate();
+        this.scheduleTime = scheduleDate.toLocalTime();
         this.schedulePlace = schedulePlace;
         this.registerName = registerName;
         this.registerProfileImage = registerProfileImage;

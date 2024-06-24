@@ -3,13 +3,12 @@ package GDG.whatssue.domain.attendance.service;
 import GDG.whatssue.domain.attendance.Error.AttendanceErrorCode;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
-import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
+import GDG.whatssue.domain.attendance.service.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
