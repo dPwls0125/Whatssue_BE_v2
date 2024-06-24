@@ -8,6 +8,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +36,13 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
                 schedule.id,
                 schedule.scheduleName,
                 schedule.attendanceStatus,
-                schedule.scheduleDate,
-                schedule.scheduleTime))
+                schedule.scheduleDate))
             .from(schedule)
             .where(
                 filterClub(clubId),
                 filterQuery(searchQuery),
                 filterDate(sDate, eDate))
-            .orderBy(schedule.scheduleDate.asc(), schedule.scheduleTime.asc())
+            .orderBy(schedule.scheduleDate.asc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
 
@@ -76,6 +77,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
         LocalDate startDate = LocalDate.parse(sDate, formatter);
         LocalDate endDate = LocalDate.parse(eDate, formatter);
 
-        return schedule.scheduleDate.between(startDate, endDate);
+        return schedule.scheduleDate.between(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.MAX).withNano(0));
     }
 }

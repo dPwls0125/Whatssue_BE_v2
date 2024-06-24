@@ -1,12 +1,7 @@
 package GDG.whatssue.domain.officialabsence.service;
 
-import static GDG.whatssue.domain.attendance.entity.AttendanceType.ABSENCE;
-import static GDG.whatssue.domain.attendance.entity.AttendanceType.OFFICIAL_ABSENCE;
-
-import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
-import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
+import GDG.whatssue.domain.attendance.service.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceAddRequestDto;
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceGetRequestDto;
@@ -18,7 +13,6 @@ import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

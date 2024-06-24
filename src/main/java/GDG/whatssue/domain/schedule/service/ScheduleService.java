@@ -78,7 +78,6 @@ public class ScheduleService {
             .scheduleName(schedule.getScheduleName())
             .scheduleContent(schedule.getScheduleContent())
             .scheduleDate(schedule.getScheduleDate())
-            .scheduleTime(schedule.getScheduleTime())
             .schedulePlace(schedule.getSchedulePlace())
             .registerName(register.getMemberName())
             .registerProfileImage(registerProfileImage)

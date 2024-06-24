@@ -16,8 +16,7 @@ import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
-import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
+import GDG.whatssue.domain.attendance.service.repository.ScheduleAttendanceResultRepository;
 
 import GDG.whatssue.domain.schedule.service.ScheduleFacade;
 import GDG.whatssue.global.error.CommonException;

@@ -32,7 +32,7 @@ public class ScheduleDto {
                 .clubId(schedule.getClub().getId())
                 .scheduleName(schedule.getScheduleName())
                 .scheduleContent(schedule.getScheduleContent())
-                .scheduleDateTime(LocalDateTime.of(schedule.getScheduleDate(), schedule.getScheduleTime()))
+                .scheduleDateTime(schedule.getScheduleDate())
                 .attendanceStatus(schedule.getAttendanceStatus())
                 .build();
 

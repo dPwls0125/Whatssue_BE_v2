@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.attendance.repository;
+package GDG.whatssue.domain.attendance.service.repository;
 
 import GDG.whatssue.domain.attendance.entity.MemberAttendanceResult;
 import org.springframework.data.jpa.repository.JpaRepository;
