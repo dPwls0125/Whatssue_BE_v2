@@ -16,12 +16,7 @@ import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-<<<<<<< HEAD
-import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
-=======
 import GDG.whatssue.domain.attendance.service.repository.ScheduleAttendanceResultRepository;
-
->>>>>>> 95348490ea9b84aec57215633fc3cb77a01fb9ab
 import GDG.whatssue.domain.schedule.service.ScheduleFacade;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
