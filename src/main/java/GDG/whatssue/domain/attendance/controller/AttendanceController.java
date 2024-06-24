@@ -6,6 +6,7 @@ import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
 import GDG.whatssue.domain.attendance.service.AttendanceService;
 import GDG.whatssue.global.common.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/{clubId}")
+@RequestMapping("/api/clubs/{clubId}")
 @RestController
 @Slf4j
 public class AttendanceController {
@@ -51,9 +52,9 @@ public class AttendanceController {
     }
 
     @Operation(summary = "출석하기 _ user")
-    @PostMapping("/schedules/{scheduleId}/attendance/{memberId}")
-    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @PathVariable Long memberId, @RequestBody AttendanceNumRequestDto requestDto) {
-            attendanceService.doAttendance(clubId, scheduleId, memberId, requestDto);
+    @PostMapping("/schedules/{scheduleId}/attendance/")
+    public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @LoginUser Long userId , @RequestBody AttendanceNumRequestDto requestDto) {
+        attendanceService.doAttendance(clubId, scheduleId, userId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("출석이 완료되었습니다.");
     }
 
