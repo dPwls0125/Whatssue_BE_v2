@@ -28,7 +28,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, String sDate, String eDate, Pageable pageable) {
+    public Page<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, LocalDate sDate, LocalDate eDate, Pageable pageable) {
 
         JPAQuery<SchedulesResponse> query = queryFactory
             .select(Projections.constructor(
@@ -72,11 +72,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
         return null;
     }
 
-    private BooleanExpression filterDate(String sDate, String eDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate startDate = LocalDate.parse(sDate, formatter);
-        LocalDate endDate = LocalDate.parse(eDate, formatter);
-
-        return schedule.scheduleDate.between(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.MAX).withNano(0));
+    private BooleanExpression filterDate(LocalDate sDate, LocalDate eDate) {
+        return schedule.scheduleDate.between(sDate.atStartOfDay(), LocalDateTime.of(eDate, LocalTime.MAX).withNano(0));
     }
 }

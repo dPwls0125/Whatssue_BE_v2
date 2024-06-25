@@ -7,23 +7,21 @@ import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
 import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
-import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
-import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-import jakarta.validation.constraints.Pattern;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}/schedules")
 @CrossOrigin
-@Validated
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -110,11 +107,13 @@ public class ScheduleController {
     public ResponseEntity<Page<SchedulesResponse>> findSchedules(
         @PathVariable(name = "clubId") Long clubId,
         @RequestParam(name = "keyword", required = false, defaultValue = "") String query,
-        @Pattern(regexp = "yyyy-MM-dd", message = "날짜 또는 시간이 형식에 맞지 않습니다.")
-        @RequestParam(name = "startDate", required = false, defaultValue = "1900-01-01") String sDate,
-        @Pattern(regexp = "yyyy-MM-dd", message = "날짜 또는 시간이 형식에 맞지 않습니다.")
-        @RequestParam(name = "endDate", required = false, defaultValue = "2199-12-31") String eDate,
+        @RequestParam(name = "startDate", defaultValue = "1900-01-01") String startDate,
+        @RequestParam(name = "endDate", required = false, defaultValue = "2199-12-31") String endDate,
         Pageable pageable) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate sDate = LocalDate.parse(startDate, formatter);
+        LocalDate eDate = LocalDate.parse(endDate, formatter);
 
         return ResponseEntity
             .status(OK)
