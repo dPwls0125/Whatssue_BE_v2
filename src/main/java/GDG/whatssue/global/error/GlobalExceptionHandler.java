@@ -3,6 +3,7 @@ package GDG.whatssue.global.error;
 import GDG.whatssue.global.error.ErrorResult.ValidationError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -111,9 +112,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
     }
 
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ErrorResult> dateTimeParseExHandle(DateTimeParseException e, HttpServletRequest request) {
+        log.warn("exception= {}", e.getMessage());
+        ErrorCode errorCode = CommonErrorCode.EX0304;
+
+        ErrorResult errorResult = ErrorResult.builder()
+            .code(errorCode.getCode())
+            .message(errorCode.getMessage())
+            .path(request.getRequestURI())
+            .build();
+
+        return new ResponseEntity<>(errorResult, errorCode.getHttpStatus());
+    }
+
     @ExceptionHandler
     public ResponseEntity<ErrorResult> allExHandle(Exception e, HttpServletRequest request) {
-        log.warn("exception= {}", e.getMessage());
+        log.warn("exception= {}", e);
         ErrorCode errorCode = CommonErrorCode.EX0400;
         ErrorResult errorResult = ErrorResult.builder()
             .code(errorCode.getCode())

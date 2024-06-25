@@ -16,6 +16,7 @@ import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,8 +60,8 @@ public class ScheduleService {
         return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId, clubId));
     }
 
-    public Page<SchedulesResponse> findAllSchedule(Long clubId, String query, String sDate, String eDate, Pageable pageable) {
-        return scheduleRepository.findAllSchedule(clubId, query, sDate, eDate, pageable);
+    public Page<SchedulesResponse> findAllSchedule(Long clubId, String keyword, LocalDate sDate, LocalDate eDate, Pageable pageable) {
+        return scheduleRepository.findAllSchedule(clubId, keyword, sDate, eDate, pageable);
     }
 
     public boolean isClubSchedule(Long clubId, Long scheduleId) {

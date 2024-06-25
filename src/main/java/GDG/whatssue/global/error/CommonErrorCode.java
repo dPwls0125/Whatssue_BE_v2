@@ -17,6 +17,7 @@ public enum CommonErrorCode implements ErrorCode{
     EX0301("0301", HttpStatus.BAD_REQUEST, "요청 데이터가 조건에 부합합니다"),
     EX0302("0302", HttpStatus.BAD_REQUEST, "요청 파라미터의 데이터가 조건에 부합합니다"),
     EX0303("0303", HttpStatus.BAD_REQUEST, "요청 파라미터는 필수입니다."),
+    EX0304("0304", HttpStatus.BAD_REQUEST, "날짜 또는 시간의 형식이 잘못되었습니다."),
 
     EX0400("0400", HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다.");
 
