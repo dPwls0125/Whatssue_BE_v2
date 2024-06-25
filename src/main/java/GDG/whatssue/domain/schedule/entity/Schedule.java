@@ -56,6 +56,10 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private AttendanceStatus attendanceStatus;
 
+    public void setClub(Club club) {
+        this.club = club;
+    }
+
     //==연관관계 메서드==//
 
     //==생성 메서드==//
@@ -85,11 +89,11 @@ public class Schedule extends BaseEntity {
      * 일정 출석 시작
      */
     public void startAttendance() {
-        if (this.attendanceStatus == AttendanceStatus.ONGOING) {
+        if (this.attendanceStatus == AttendanceStatus.ONGOING) { //이미 출석 진행 중
             throw new CommonException(ScheduleErrorCode.EX4200);
         }
 
-        if (this.attendanceStatus == AttendanceStatus.COMPLETE) {
+        if (this.attendanceStatus == AttendanceStatus.COMPLETE) { //이미 출석 완료
             throw new CommonException(ScheduleErrorCode.EX4201);
         }
 
@@ -100,7 +104,7 @@ public class Schedule extends BaseEntity {
      * 일정 출석 종료
      */
     public void finishAttendance() {
-        if (this.attendanceStatus != AttendanceStatus.ONGOING) {
+        if (this.attendanceStatus != AttendanceStatus.ONGOING) { //출석 진행중이 아닐 경우
             throw new CommonException(ScheduleErrorCode.EX4202);
         }
         this.attendanceStatus = AttendanceStatus.COMPLETE;
@@ -115,9 +119,4 @@ public class Schedule extends BaseEntity {
         this.scheduleDate = LocalDateTime.of(scheduleDate, scheduleTime);
         this.schedulePlace = schedulePlace;
     }
-
-    public void setClub(Club club) {
-        this.club = club;
-    }
-
 }
