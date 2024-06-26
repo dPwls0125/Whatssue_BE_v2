@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.attendance.service.repository;
+package GDG.whatssue.domain.attendance.repository;
 
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
@@ -13,4 +13,6 @@ public interface ScheduleAttendanceResultRepository extends JpaRepository<Schedu
     List<ScheduleAttendanceResult> findByScheduleId(Long scheduleId);
     List<ScheduleAttendanceResult> findByClubMemberId(Long clubMemberId);
     List<ScheduleAttendanceResult> findByScheduleIdAndAttendanceType(Long scheduleId, AttendanceType attendanceType);
+    void deleteByScheduleId(Long scheduleId);
+
 }

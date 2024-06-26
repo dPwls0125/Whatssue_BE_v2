@@ -119,4 +119,8 @@ public class Schedule extends BaseEntity {
         this.scheduleDate = LocalDateTime.of(scheduleDate, scheduleTime);
         this.schedulePlace = schedulePlace;
     }
+
+    public void initAttendance() {
+        this.attendanceStatus = AttendanceStatus.BEFORE;
+    }
 }
