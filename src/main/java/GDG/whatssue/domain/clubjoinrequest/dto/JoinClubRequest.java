@@ -1,6 +1,7 @@
 package GDG.whatssue.domain.clubjoinrequest.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,12 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ClubJoinRequest {
+public class JoinClubRequest {
 
-    @NotBlank(message = "가입코드는 필수 입력값입니다.")
-    @Size(min = 6, max = 6, message = "클럽 가입코드는 6자리입니다")
-    private String privateCode;
+    @NotNull(message = "가입하려는 모임 id는 필수 입력 값입니다.")
+    private Long clubId;
 }

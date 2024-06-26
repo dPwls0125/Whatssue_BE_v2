@@ -1,7 +1,6 @@
 package GDG.whatssue.domain.clubjoinrequest.service;
 
 import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.clubjoinrequest.dto.GetClubInfoByPrivateCodeResponse;
 import GDG.whatssue.domain.clubjoinrequest.dto.GetRejectionReasonResponse;
 import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinRequestsResponse;
 import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
@@ -12,8 +11,6 @@ import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.error.CommonException;
-import GDG.whatssue.global.util.S3Utils;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,11 +57,6 @@ public class ClubJoinService {
         ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(userId, joinRequestId);
 
         joinRequest.cancel();
-    }
-
-    public GetClubInfoByPrivateCodeResponse findClubByPrivateCode(String privateCode) {
-        return clubRepository.findByPrivateCode(privateCode)
-            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3101));
     }
 
     @Transactional
