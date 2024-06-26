@@ -1,6 +1,7 @@
 package GDG.whatssue.domain.member.service;
 
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
+import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
@@ -19,7 +20,7 @@ public class ClubMemberService {
     private final ClubMemberRepository clubMemberRepository;
     private final UserRepository userRepository;
 
-    public void modifyClubMember(Long memberId, ClubMemberDto requestDto) {
+    public void modifyClubMember(Long memberId, ClubMemberInfoDto requestDto) {
         ClubMember clubMember = clubMemberRepository.findById(memberId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
 
@@ -59,6 +60,13 @@ public class ClubMemberService {
     }
 
 
+    public ClubMemberDto getMemberIdAndRole(Long clubId, Long userId) {
+        ClubMember clubMember = getClubMember(clubId, userId);
+        return ClubMemberDto.builder()
+                .memberId(clubMember.getId())
+                .role(clubMember.getRole())
+                .build();
+    }
 
     public boolean isClubMember(Long clubId, Long userId) {
         return getClubMember(clubId, userId) != null;

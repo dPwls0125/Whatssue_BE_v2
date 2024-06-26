@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.member.controller;
 
-import GDG.whatssue.domain.member.dto.ClubMemberDto;
+import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
@@ -47,7 +47,7 @@ public class ClubMemberController {
 
     @PatchMapping("/member/{memberId}")
     @Operation(summary = "멤버 정보 수정")
-    public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberDto dto) {
+    public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberInfoDto dto) {
         clubMemberSerivce.modifyClubMember(memberId,dto);
         return new ResponseEntity("ok", HttpStatus.OK);
     }
