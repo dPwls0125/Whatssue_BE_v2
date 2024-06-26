@@ -34,8 +34,6 @@ public class ClubMemberService {
     @Transactional
     public MemberProfileDto getMemberProfile(Long clubId, Long userId) {
 
-        Long memberId = getClubMemberId(clubId, userId);
-
         ClubMember clubMember = getClubMember(clubId, userId);
 
         User user = userRepository.findById(userId)
@@ -45,7 +43,7 @@ public class ClubMemberService {
         String memberProfileImage = S3Utils.getFullPath(storeFileName);
 
         MemberProfileDto profile = MemberProfileDto.builder()
-                .memberId(memberId)
+                .memberId(clubMember.getId())
                 .userName(user.getUserName())
                 .userPhone(user.getUserPhone())
                 .userEmail(user.getUserEmail())
@@ -59,6 +57,8 @@ public class ClubMemberService {
 
         return profile;
     }
+
+
 
     public boolean isClubMember(Long clubId, Long userId) {
         return getClubMember(clubId, userId) != null;

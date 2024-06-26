@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/clubs/{clubId}/schedules/{scheduleId}")
+@RequestMapping("/api/clubs/{clubId}/schedules")
 @RestController
 @Slf4j
 public class AttendanceController {
@@ -25,7 +25,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
     @ClubManager
     @Operation(summary = "출석 열기_manager ",description = "출석을 열면 출석을 진행하지 않았던 경우는 모두 결석 처리 리스트를 생성합니다.")
-    @PostMapping("/attendance-start")
+    @PostMapping("/{scheduleId}/attendance-start")
     public ResponseEntity openAttendance(@PathVariable("clubId") Long clubId, @PathVariable("scheduleId") Long scheduleId) {
         AttendanceNumResponseDto dto = attendanceService.openAttendance(clubId, scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -33,7 +33,7 @@ public class AttendanceController {
 
     @ClubManager
     @Operation(summary = "출석 종료")
-    @PostMapping("/attendance-end")
+    @PostMapping("/{scheduleId}/attendance-end")
     public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         try{
             attendanceService.finishAttendanceOngoing(clubId, scheduleId);
@@ -45,14 +45,14 @@ public class AttendanceController {
 
     @ClubManager
     @Operation(summary = "일정별 출석한 멤버 리스트 조회")
-    @GetMapping("/attendance-list")
+    @GetMapping("/{scheduleId}/attendance-list")
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
     @Operation(summary = "출석하기 _ user")
-    @PostMapping("/attendance/")
+    @PostMapping("/{scheduleId}/attendance/")
     public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @LoginUser Long userId , @RequestBody AttendanceNumRequestDto requestDto) {
         attendanceService.doAttendance(clubId, scheduleId, userId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("출석이 완료되었습니다.");
@@ -60,13 +60,13 @@ public class AttendanceController {
 
     @Operation(summary = "현재 출석 진행 중인 스케줄")
     @GetMapping("/attendance-ongoing")
-    public ResponseEntity currentAttendanceList(@PathVariable Long clubId, @PathVariable Long scheduleId) {
-        List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId,scheduleId);
+    public ResponseEntity currentAttendanceList(@PathVariable Long clubId) {
+        List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
     @Operation(summary = "출석 초기화")
-    @GetMapping("/attendance-reset")
+    @GetMapping("/{scheduleId}/attendance-reset")
     public ResponseEntity resetAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
         attendanceService.initAttendance(clubId, scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body("출석이 초기화되었습니다.");
@@ -74,7 +74,7 @@ public class AttendanceController {
 
     @ClubManager
     @Operation(summary = "출석 정정")
-    @PutMapping("/attendance/{memberId}/{attendanceType}")
+    @PutMapping("/{scheduleId}/attendance/{memberId}/{attendanceType}")
     public ResponseEntity modifyMemberAttendance(@PathVariable Long scheduleId, @PathVariable Long memberId, @PathVariable String attendanceType){
         try {
              attendanceService.modifyMemberAttendance(scheduleId, memberId, attendanceType);

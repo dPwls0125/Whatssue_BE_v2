@@ -57,7 +57,7 @@ public class AttendanceService {
     }
 
     //현재 진행중인 일정 리스트
-    public List<ScheduleDto> currentAttendanceList(Long clubId,Long scheduleId) {
+    public List<ScheduleDto> currentAttendanceList(Long clubId) {
 
         List<Schedule> scheduleList =  scheduleFacade.getSchedule(clubId, AttendanceStatus.ONGOING);
 
