@@ -1,4 +1,4 @@
-package GDG.whatssue.domain.clubjoinrequest.dto;
+package GDG.whatssue.domain.club.dto;
 
 import GDG.whatssue.domain.club.entity.NamePolicy;
 import GDG.whatssue.global.util.S3Utils;

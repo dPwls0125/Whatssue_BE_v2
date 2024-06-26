@@ -4,6 +4,7 @@ import static GDG.whatssue.domain.file.FileConst.*;
 
 import GDG.whatssue.domain.club.dto.ClubCreateRequest;
 import GDG.whatssue.domain.club.dto.ClubCreateResponse;
+import GDG.whatssue.domain.club.dto.GetClubInfoByPrivateCodeResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.entity.Club;
@@ -40,6 +41,11 @@ public class ClubService {
 
     public Page<GetJoinClubResponse> getJoinClubList(Long userId, Pageable pageable) {
         return clubMemberRepository.getJoinClubList(userId, pageable);
+    }
+
+    public GetClubInfoByPrivateCodeResponse findClubByPrivateCode(String privateCode) {
+        return clubRepository.findByPrivateCode(privateCode)
+            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3101));
     }
 
     @Transactional
