@@ -128,11 +128,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResult> allExHandle(Exception e, HttpServletRequest request) {
-        log.warn("exception= {}", e);
+        log.warn("exception= {}", e.getMessage());
         ErrorCode errorCode = CommonErrorCode.EX0400;
         ErrorResult errorResult = ErrorResult.builder()
             .code(errorCode.getCode())
-            .message(errorCode.getMessage())
+            .message(e.getMessage())
             .path(request.getRequestURI())
             .build();
 
