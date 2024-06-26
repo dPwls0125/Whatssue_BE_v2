@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.schedule.service;
 
+import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
@@ -30,5 +31,10 @@ public class ScheduleFacade {
         return scheduleRepository.findById(scheduleId)
                 .orElseThrow(
                         () -> new CommonException(ScheduleErrorCode.EX4100));
+    }
+
+    public List<Schedule> getSchedule(Long clubId, AttendanceStatus attendanceStatus){
+        return scheduleRepository.findByClub_IdAndAttendanceStatus(clubId, attendanceStatus)
+                .orElseGet(() -> new ArrayList<>());
     }
 }
