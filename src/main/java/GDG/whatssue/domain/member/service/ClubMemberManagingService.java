@@ -1,18 +1,13 @@
 package GDG.whatssue.domain.member.service;
 
-//import GDG.whatssue.domain.member.dto.JoinClubRequest;
-//import GDG.whatssue.domain.member.entity.JoinClubRequest;
-import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.member.dto.ClubMemberDto;
+
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.entity.Role;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
-//import GDG.whatssue.domain.member.repository.ClubJoinRequestRepository;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 @Service
 @RequiredArgsConstructor
 public class ClubMemberManagingService {

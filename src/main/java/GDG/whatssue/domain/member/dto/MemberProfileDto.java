@@ -15,6 +15,7 @@ import java.net.URL;
 @AllArgsConstructor
 public class MemberProfileDto {
 
+    private String clubName;
     private Long memberId;
     private String userName;
     private String userEmail;
