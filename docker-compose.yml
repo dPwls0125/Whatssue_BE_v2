@@ -1,0 +1,24 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - my-network
+    restart: unless-stopped
+
+  springboot:
+    image: ghcr.io/onion-city/whatssue_be_v2/whatssue:latest
+    depends_on:
+      - redis
+    environment:
+      SPRING_REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+    restart: unless-stopped
+
+networks:
+  my-network:
