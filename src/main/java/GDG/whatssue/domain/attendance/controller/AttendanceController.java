@@ -65,6 +65,13 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
+    @Operation(summary = "출석 초기화")
+    @GetMapping("/schedules/{scheduleId}/attendance-reset")
+    public ResponseEntity resetAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
+        attendanceService.initAttendance(clubId, scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).body("출석이 초기화되었습니다.");
+    }
+
     @ClubManager
     @Operation(summary = "출석 정정")
     @PutMapping("/schedules/{scheduleId}/attendance/{memberId}/{attendanceType}")

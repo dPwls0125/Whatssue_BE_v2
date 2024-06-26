@@ -1,6 +1,6 @@
 package GDG.whatssue.domain.officialabsence.service;
 
-import GDG.whatssue.domain.attendance.service.repository.ScheduleAttendanceResultRepository;
+import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceAddRequestDto;

@@ -50,7 +50,6 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
     @Operation(summary = "댓글 리스트 조회")
     @GetMapping("/{postId}")
     public ResponseEntity getCommentList(@PathVariable Long postId, @PathVariable(name = "clubId") Long clubId, @RequestParam int size, @RequestParam int page) {
