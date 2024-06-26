@@ -26,7 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(clubCheckInterceptor)
             .order(1)
-            .addPathPatterns("/api/clubs/{clubId}/**");
+            .addPathPatterns("/api/clubs/{clubId}/**")
+            .excludePathPatterns("/api/clubs/join/**", "/api/clubs/my");
     }
 
     @Override
