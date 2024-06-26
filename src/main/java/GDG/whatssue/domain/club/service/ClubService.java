@@ -80,12 +80,9 @@ public class ClubService {
         fileRepository.save(clubProfileImage);
     }
 
-    /**
-     * true인지 false인지 TODO
-     */
     @Transactional
-    public void updateClubPrivateStatus(Long clubId) {
-        findClub(clubId).updateIsPrivate();
+    public void updateClubPrivateStatus(Long clubId, boolean isPrivate) {
+        findClub(clubId).updateIsPrivate(isPrivate);
     }
 
     public GetClubInfoResponse getClubInfo(Long clubId) {

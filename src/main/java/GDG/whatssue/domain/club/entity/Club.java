@@ -13,7 +13,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Club extends BaseEntity {
 
     @Id
@@ -45,6 +45,9 @@ public class Club extends BaseEntity {
 
     //==연관관계 메서드==//
 
+    /**
+     * 모임 프로필이미지 업데이트
+     */
     public void updateProfileImage(UploadFile profileImage) {
         if (this.profileImage != null) {
             this.profileImage.setClub(null);
@@ -65,9 +68,6 @@ public class Club extends BaseEntity {
         this.updatePrivateCode();
     }
 
-    /**
-     * 팩토리 메서드 패턴
-     */
     public static Club createClub(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
         return new Club(clubName, clubInfo, isPrivate, contactMeans, namePolicy);
     }
@@ -85,8 +85,8 @@ public class Club extends BaseEntity {
     /**
      * 모임 가입신청 on / off
      */
-    public void updateIsPrivate() {
-        this.isPrivate = !this.isPrivate;
+    public void updateIsPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 
     /**

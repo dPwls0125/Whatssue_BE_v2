@@ -16,10 +16,10 @@ public class AddScheduleRequest {
 
     @Size(min = 2, max = 30, message = "일정명은 최소 2자, 최대 30자까지입니다.")
     private String scheduleName;
-    @NotNull
+    @NotNull(message = "일정 내용은 필수 입력값입니다.")
     @Size(max = 1000, message = "일정 내용은 최대 1000자까지입니다.")
     private String scheduleContent;
-    @NotNull
+
     @Size(max = 30, message = "일정 장소는 최대 30자까지입니다.")
     private String schedulePlace;
 
@@ -30,7 +30,6 @@ public class AddScheduleRequest {
     @NotNull(message = "일정 시간은 필수 입력값입니다.")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime scheduleTime;
-
 
     public Schedule toEntity(Club club, ClubMember register) {
         return Schedule.createSchedule(club, register, scheduleName,
