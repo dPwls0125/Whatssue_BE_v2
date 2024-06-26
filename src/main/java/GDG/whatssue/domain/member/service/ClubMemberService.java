@@ -32,25 +32,28 @@ public class ClubMemberService {
 
     // TDDO
     @Transactional
-    public MemberProfileDto getMemberProfile(Long memberId, Long userId) {
+    public MemberProfileDto getMemberProfile(Long clubId, Long userId) {
 
-        ClubMember member = clubMemberRepository.findById(memberId)
-                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
+        Long memberId = getClubMemberId(clubId, userId);
+
+        ClubMember clubMember = getClubMember(clubId, userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->new RuntimeException("User Not Found"));
 
-        String storeFileName = member.getProfileImage().getStoreFileName();
+        String storeFileName = clubMember.getProfileImage().getStoreFileName();
         String memberProfileImage = S3Utils.getFullPath(storeFileName);
 
         MemberProfileDto profile = MemberProfileDto.builder()
+                .memberId(memberId)
                 .userName(user.getUserName())
                 .userPhone(user.getUserPhone())
                 .userEmail(user.getUserEmail())
-                .memberName(member.getMemberName())
-                .memberIntro(member.getMemberIntro())
-                .role(member.getRole())
-                .isMemberEmailPublic(member.isEmailPublic())
-                .isMemberPhonePublic(member.isPhonePublic())
+                .memberName(clubMember.getMemberName())
+                .memberIntro(clubMember.getMemberIntro())
+                .role(clubMember.getRole())
+                .isMemberEmailPublic(clubMember.isEmailPublic())
+                .isMemberPhonePublic(clubMember.isPhonePublic())
                 .profileImage(memberProfileImage)
                 .build();
 

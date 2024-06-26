@@ -14,6 +14,8 @@ import java.net.URL;
 @Setter
 @AllArgsConstructor
 public class MemberProfileDto {
+
+    private Long memberId;
     private String userName;
     private String userEmail;
     private String userPhone;
@@ -23,4 +25,5 @@ public class MemberProfileDto {
     private Boolean isMemberEmailPublic;
     private Boolean isMemberPhonePublic;
     private String profileImage;
+
 }
