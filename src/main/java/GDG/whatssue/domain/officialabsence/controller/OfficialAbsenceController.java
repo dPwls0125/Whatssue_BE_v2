@@ -4,8 +4,11 @@ import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceAddRequestDto;
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceGetRequestDto;
 import GDG.whatssue.domain.officialabsence.service.OfficialAbsenceService;
 import GDG.whatssue.global.common.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,79 +17,92 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{clubId}/official_absence")
+@RequestMapping("/api/{clubId}/official-absence")
 public class OfficialAbsenceController {
     private final OfficialAbsenceService officialAbsenceService;
 
     @PostMapping(value="/request/{scheduleId}")
     @Operation(summary="공결 신청")
     public ResponseEntity addOfficialAbsenceRequest(
-        @PathVariable String clubId,
-        @PathVariable Long scheduleId,
-        @RequestBody OfficialAbsenceAddRequestDto officialAbsenceAddRequestDto) {
-
-        officialAbsenceService.createOfficialAbsenceRequest(scheduleId, officialAbsenceAddRequestDto);
+            @LoginUser Long userId,
+            @PathVariable Long clubId,
+            @PathVariable Long scheduleId,
+            @RequestBody String officialAbsenceContent) {
+        officialAbsenceService.createOfficialAbsenceRequest(userId, clubId, scheduleId, officialAbsenceContent);
         return ResponseEntity.status(200).body("공결 신청 완료");
-
+    }
+    @GetMapping(value="/my-list")
+    @Operation(summary="내 공결 신청 조회")
+    public ResponseEntity<Page<OfficialAbsenceGetRequestDto>> getMyOfficialAbsenceRequestList(
+            @LoginUser Long userId,
+            @PathVariable Long clubId,
+            Pageable pageable){
+        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getMyOfficialAbsenceRequests(userId, clubId, pageable);
+        return ResponseEntity.ok(officialAbsenceRequests);
+    }
+    @DeleteMapping(value="/delete/{officialAbsenceId}")
+    @Operation(summary="내 공결 신청 취소")
+    public ResponseEntity deleteOfficialAbsence(
+            @LoginUser Long userId,
+            @PathVariable Long clubId,
+            @PathVariable Long officialAbsenceId){
+        officialAbsenceService.deleteOfficialAbsences(userId, clubId, officialAbsenceId);
+        return ResponseEntity.status(200).body("공결 신청 취소 완료");
     }
     @GetMapping(value="/list")
-    @Operation(summary="공결 신청, 내역 전체 조회(MANAGER)")
+    @Operation(summary="전체 공결 신청 조회(MANAGER)")
     @ClubManager
-    public ResponseEntity<List<OfficialAbsenceGetRequestDto>> getAllOfficialAbsenceRequestList(@PathVariable String clubId){
-        List<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getAllOfficialAbsenceRequests();
+    public ResponseEntity<Page<OfficialAbsenceGetRequestDto>> getAllOfficialAbsenceRequestList(
+            @PathVariable Long clubId,
+            Pageable pageable){
+        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getAllOfficialAbsenceRequests(clubId, pageable);
         return ResponseEntity.ok(officialAbsenceRequests);
     }
-    @GetMapping(value="/request_list")
-    @Operation(summary="공결 신청 현황 조회(MANAGER)")
+    @GetMapping(value="/request-list")
+    @Operation(summary="대기중인 공결 신청 조회(MANAGER)")
     @ClubManager
-    public ResponseEntity<List<OfficialAbsenceGetRequestDto>> getOfficialAbsenceRequestList(@PathVariable String clubId){
-        List<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getOfficialAbsenceRequests();
+    public ResponseEntity<Page<OfficialAbsenceGetRequestDto>> getWaitingOfficialAbsenceRequestList(
+            @PathVariable Long clubId,
+            Pageable pageable){
+        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getWaitingOfficialAbsenceRequests(clubId, pageable);
         return ResponseEntity.ok(officialAbsenceRequests);
     }
-    @GetMapping(value="/done_list")
-    @Operation(summary="공결 신청 내역 조회(MANAGER)")
+    @GetMapping(value="/done-list")
+    @Operation(summary="과거 공결 신청 내역 조회(MANAGER)")
     @ClubManager
-    public ResponseEntity<List<OfficialAbsenceGetRequestDto>> getDoneOfficialAbsenceRequestList(@PathVariable String clubId){
-        List<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getDoneOfficialAbsenceRequests();
+    public ResponseEntity<Page<OfficialAbsenceGetRequestDto>> getDoneOfficialAbsenceRequestList(
+            @PathVariable Long clubId,
+            Pageable pageable){
+        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getDoneOfficialAbsenceRequests(clubId, pageable);
         return ResponseEntity.ok(officialAbsenceRequests);
     }
     @GetMapping(value="/detail/{officialAbsenceId}")
     @Operation(summary="공결 신청 상세 조회(MANAGER)")
     @ClubManager
-    public ResponseEntity<OfficialAbsenceGetRequestDto> getOfficialAbsenceRequestDetail(@PathVariable String clubId, @PathVariable Long officialAbsenceId){
-        OfficialAbsenceGetRequestDto officialAbsenceRequest = officialAbsenceService.getOfficialAbsenceRequestDetail(officialAbsenceId);
+    public ResponseEntity<OfficialAbsenceGetRequestDto> getOfficialAbsenceRequestDetail(
+            @PathVariable Long clubId,
+            @PathVariable Long officialAbsenceId){
+        OfficialAbsenceGetRequestDto officialAbsenceRequest = officialAbsenceService.getOfficialAbsenceRequestDetail(clubId, officialAbsenceId);
         return ResponseEntity.ok(officialAbsenceRequest);
     }
-    @GetMapping(value="/done_list/{clubMemberId}")
-    @Operation(summary="내 공결 신청 내역 조회")
-    public ResponseEntity<List<OfficialAbsenceGetRequestDto>> getMyDoneOfficialAbsenceRequestList(@PathVariable Long clubMemberId, @PathVariable String clubId){
-        List<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getMyDoneOfficialAbsenceRequests(clubMemberId);
-        return ResponseEntity.ok(officialAbsenceRequests);
-    }
-    @GetMapping(value="/list/{clubMemberId}")
-    @Operation(summary="내 공결 신청 현황 조회")
-    public ResponseEntity<List<OfficialAbsenceGetRequestDto>> getMyOfficialAbsenceRequestList(@PathVariable Long clubMemberId, @PathVariable String clubId){
-        List<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getMyOfficialAbsenceRequests(clubMemberId);
-        return ResponseEntity.ok(officialAbsenceRequests);
-    }
+
     @PostMapping(value="/accept/{officialAbsenceId}")
     @Operation(summary="공결 신청 수락 (MANAGER)")
     @ClubManager
-    public ResponseEntity acceptOfficialAbsence(@PathVariable Long officialAbsenceId,@PathVariable String clubId){
-        officialAbsenceService.acceptResponse(officialAbsenceId);
+    public ResponseEntity acceptOfficialAbsence(
+            @PathVariable Long clubId,
+            @PathVariable Long officialAbsenceId){
+        officialAbsenceService.acceptResponse(clubId, officialAbsenceId);
         return ResponseEntity.status(200).body("공결 신청 수락 완료");
     }
-    @DeleteMapping(value="/delete/{officialAbsenceId}")
-    @Operation(summary="내 공결 신청 취소")
-    public ResponseEntity deleteOfficialAbsence(@PathVariable Long officialAbsenceId,@PathVariable Long clubId){
-        officialAbsenceService.deleteOfficialAbsences(officialAbsenceId, clubId);
-        return ResponseEntity.status(200).body("공결 신청 취소 완료");
-    }
-    @PostMapping(value="/deny/{officialAbsenceId}")
+
+    @PostMapping(value="/reject/{officialAbsenceId}")
     @Operation(summary="공결 신청 거절 (MANAGER)")
     @ClubManager
-    public ResponseEntity denyOfficialAbsence(@PathVariable Long officialAbsenceId,@PathVariable String clubId){
-        officialAbsenceService.denyResponse(officialAbsenceId);
+    public ResponseEntity denyOfficialAbsence(
+            @PathVariable Long clubId,
+            @PathVariable Long officialAbsenceId){
+        officialAbsenceService.denyResponse(clubId, officialAbsenceId);
         return ResponseEntity.status(200).body("공결 신청 거절 완료");
     }
 }

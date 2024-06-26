@@ -2,6 +2,7 @@ package GDG.whatssue.domain.officialabsence.entity;
 
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
+import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Builder
 @Setter
 @AllArgsConstructor
-public class OfficialAbsenceRequest {
+public class OfficialAbsenceRequest extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
