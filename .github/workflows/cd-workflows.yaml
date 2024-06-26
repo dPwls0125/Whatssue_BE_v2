@@ -80,6 +80,8 @@ jobs:
           username: ${{ secrets.DEV_SERVER_USER }}
           script: |
             echo "${{ secrets.GHCR_TOKEN }}" | sudo docker login ghcr.io -u pinetree2 --password-stdin
+            cd /home/ubuntu/docker-compose
+
             if [ "$(docker ps -aq -f name=whatssue-be)" ]; then
                 sudo docker stop whatssue-be
                 sudo docker rm whatssue-be
@@ -88,8 +90,8 @@ jobs:
             if [ "$(docker images -q ghcr.io/onion-city/whatssue_be_v2/whatssue)" ]; then
             sudo docker rmi ghcr.io/onion-city/whatssue_be_v2/whatssue
             fi
-            sudo docker pull ghcr.io/onion-city/whatssue_be_v2/whatssue:latest
+            
             sudo docker-compose down
-            sudo docker-compose pull
-            sudo docker-compose up -d
+            sudo docker-compose pull springboot
+            sudo docker-compose up -d springboot
             sudo docker image prune -a -f
