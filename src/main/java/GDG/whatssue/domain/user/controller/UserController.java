@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class  UserController {
 
-    private final UserServiceFacade userServiceFacade;
-    private final CustomOauth2Service customOauth2Service;
     private final UserService userService;
 
     @GetMapping("/getInfo")

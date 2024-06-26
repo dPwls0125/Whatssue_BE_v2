@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,20 +57,15 @@ public class AttendanceService {
     }
 
     //현재 진행중인 일정 리스트
-    public List<ScheduleDto> currentAttendanceList(Long clubId) {
+    public List<ScheduleDto> currentAttendanceList(Long clubId,Long scheduleId) {
 
-        List<ScheduleDto> scheduleDtoList = new ArrayList<>();
-        List<Schedule> scheduleList =  scheduleFacade.getSchedule(clubId);
-        for(Schedule schedule : scheduleList){
-            if(schedule.getAttendanceStatus() == AttendanceStatus.ONGOING){
-                if (attendanceNumMap.get(clubId).containsKey(schedule.getId())){
-                    scheduleDtoList.add(ScheduleDto.of(schedule));
-                }else{
-                    throw new CommonException(AttendanceErrorCode.EX5204);
-                }
-            }
-        }
-            return scheduleDtoList;
+        List<Schedule> scheduleList =  scheduleFacade.getSchedule(clubId, AttendanceStatus.ONGOING);
+
+        return scheduleList.stream()
+                .filter(schedule -> schedule.getAttendanceStatus() == AttendanceStatus.ONGOING)
+                .filter(schedule -> isScheduleInMap(clubId, schedule.getId()))
+                .map(ScheduleDto::of)
+                .collect(Collectors.toList());
     }
 
     /*Delete 시에 결석자 명단을 업로드해야할까?*/
@@ -94,7 +90,7 @@ public class AttendanceService {
         AttendanceStatus scheduleStatus = schedule.getAttendanceStatus();
 
         if(scheduleStatus == AttendanceStatus.ONGOING) {
-            checkMapNull(clubId, scheduleId);
+            isScheduleInMap(clubId, scheduleId);
             attendanceNumMap.get(clubId).remove(scheduleId);
         }
 
@@ -159,12 +155,15 @@ public class AttendanceService {
 
     private int putAttendanceNumInMapAndReturn(Long clubId, Long scheduleId){
 
-        AttendanceService.attendanceNumMap.put(clubId, new HashMap<>());
+        if(!attendanceNumMap.containsKey(clubId)){
+            attendanceNumMap.put(clubId, new HashMap<>());
+        }
 
         int randomInt = AttendanceService.random.nextInt(1, 1000);
 
         Map<Long, Integer> innerMap = attendanceNumMap.get(clubId);
         innerMap.put(scheduleId, randomInt);
+
         randomInt = attendanceNumMap.get(clubId).get(scheduleId);
 
         return randomInt;
@@ -175,14 +174,16 @@ public class AttendanceService {
     }
 
     private int storedNum(Long clubId, Long scheduleId) {
-        checkMapNull(clubId, scheduleId);
+        isScheduleInMap(clubId, scheduleId);
         return attendanceNumMap.get(clubId).get(scheduleId);
     }
 
-    private void checkMapNull(Long clubId, Long scheduleId) {
-        if (!attendanceNumMap.containsKey(clubId) || !attendanceNumMap.get(clubId).containsKey(scheduleId)) {
+    private boolean isScheduleInMap(Long clubId, Long scheduleId) {
+        System.out.println(attendanceNumMap);
+        if (!attendanceNumMap.get(clubId).containsKey(scheduleId)) {
             throw new CommonException(AttendanceErrorCode.EX5203);
         }
+        return true;
     }
 
 }

@@ -52,10 +52,10 @@ public class ClubMemberController {
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-    @GetMapping("/member/{memberId}/")
+    @GetMapping("/member")
     @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
-    public ResponseEntity getProfile(@PathVariable Long memberId, @LoginUser Long userId){
-        MemberProfileDto dto = clubMemberSerivce.getMemberProfile(memberId,userId);
+    public ResponseEntity getProfile(@PathVariable Long clubId, @LoginUser Long userId){
+        MemberProfileDto dto = clubMemberSerivce.getMemberProfile(clubId,userId);
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
