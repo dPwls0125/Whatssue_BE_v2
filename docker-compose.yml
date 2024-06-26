@@ -2,6 +2,8 @@ version: '3'
 services:
   redis:
     image: redis:latest
+    container_name: redis
+    hostname: redis
     ports:
       - "6379:6379"
     networks:
@@ -10,6 +12,7 @@ services:
 
   springboot:
     image: ghcr.io/onion-city/whatssue_be_v2/whatssue:latest
+    container_name: whatssue-be
     depends_on:
       - redis
     environment:
@@ -18,7 +21,6 @@ services:
       - "8080:8080"
     networks:
       - my-network
-    restart: unless-stopped
 
 networks:
   my-network:
