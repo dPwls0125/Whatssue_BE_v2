@@ -16,13 +16,12 @@ import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-import GDG.whatssue.domain.attendance.service.repository.ScheduleAttendanceResultRepository;
+import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultRepository;
 import GDG.whatssue.domain.schedule.service.ScheduleFacade;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 @Service
@@ -55,6 +54,7 @@ public class AttendanceService {
         return responseDto;
 
     }
+
     //현재 진행중인 일정 리스트
     public List<ScheduleDto> currentAttendanceList(Long clubId) {
 
@@ -88,19 +88,33 @@ public class AttendanceService {
 
     }
 
+    @Transactional
+    public void initAttendance(Long clubId, Long scheduleId) {
+        Schedule schedule = scheduleFacade.getSchedule(clubId, scheduleId);
+        AttendanceStatus scheduleStatus = schedule.getAttendanceStatus();
+
+        if(scheduleStatus == AttendanceStatus.ONGOING) {
+            checkMapNull(clubId, scheduleId);
+            attendanceNumMap.get(clubId).remove(scheduleId);
+        }
+
+        scheduleAttendanceResultRepository.deleteByScheduleId(scheduleId);
+        schedule.initAttendance();
+
+    }
+
     public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId) {
         List<ScheduleAttendanceResult> attendanceList = attendanceFacade.getAttendanceResultbySchedule(scheduleId, AttendanceType.ATTENDANCE);
         return ScheduleAttendanceMemberDto.of(attendanceList);
     }
 
     @Transactional
-    public void doAttendance(Long clubId, Long schduleId, Long userId, AttendanceNumRequestDto requestDto) {
+    public void doAttendance(Long clubId, Long scheduleId, Long userId, AttendanceNumRequestDto requestDto) {
 
-        int attendanceNum = attendanceNumMap.get(clubId).get(schduleId);
         int inputValue = requestDto.getAttendanceNum();
 
-        if (attendanceNum == inputValue) {
-            ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(schduleId, getClubMemberId(clubId, userId));
+        if (storedNum(clubId,scheduleId) == inputValue) {
+            ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(scheduleId, getClubMemberId(clubId, userId));
             if(scheduleAttendanceResult.getAttendanceType() == AttendanceType.ATTENDANCE){
                 throw new CommonException(AttendanceErrorCode.EX5205);
             }
@@ -160,6 +174,15 @@ public class AttendanceService {
         return clubMemberService.getClubMemberId(clubId, userId);
     }
 
+    private int storedNum(Long clubId, Long scheduleId) {
+        checkMapNull(clubId, scheduleId);
+        return attendanceNumMap.get(clubId).get(scheduleId);
+    }
 
+    private void checkMapNull(Long clubId, Long scheduleId) {
+        if (!attendanceNumMap.containsKey(clubId) || !attendanceNumMap.get(clubId).containsKey(scheduleId)) {
+            throw new CommonException(AttendanceErrorCode.EX5203);
+        }
+    }
 
 }

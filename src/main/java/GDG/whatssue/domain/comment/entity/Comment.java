@@ -4,6 +4,7 @@ import GDG.whatssue.domain.comment.dto.CommentAddDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.global.common.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
@@ -28,6 +29,7 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private Comment parentComment; // 부모 댓글
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
