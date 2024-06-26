@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.schedule.repository;
 
+import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import javax.swing.text.html.Option;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
     Optional<List<Schedule>>findByClub_Id(Long clubId);
     boolean existsByIdAndClub_Id(Long scheduleId, Long clubId);
     Optional<Schedule> findByIdAndClub_Id(Long scheduleId, Long clubId);
+    Optional<List<Schedule>> findByClub_IdAndAttendanceStatus(Long clubId, AttendanceStatus attendanceStatus);
 }

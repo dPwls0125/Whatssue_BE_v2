@@ -59,9 +59,9 @@ public class AttendanceController {
     }
 
     @Operation(summary = "현재 출석 진행 중인 스케줄")
-    @GetMapping("/attendance-list")
-    public ResponseEntity currentAttendanceList(@PathVariable Long clubId) {
-        List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId);
+    @GetMapping("/schedules/{scheduleId}/attendance-ongoing")
+    public ResponseEntity currentAttendanceList(@PathVariable Long clubId, @PathVariable Long scheduleId) {
+        List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId,scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
