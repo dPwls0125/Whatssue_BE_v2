@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum UserErrorCode implements ErrorCode {
 
-    EX1000("1100", HttpStatus.FORBIDDEN, "본인의 유저 정보만 수정할 수 있습니다."),
+    EX1000("1000", HttpStatus.FORBIDDEN, "본인의 유저 정보만 수정할 수 있습니다."),
 
     EX1100("1100", HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다.");
 

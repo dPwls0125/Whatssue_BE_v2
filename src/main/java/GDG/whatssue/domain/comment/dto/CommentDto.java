@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class CommentDto {
 
     private Long commentId;
-    private Long memberId;
+    private Long writerId;
     private Long postId;
     private Long parentId;
     private String content;
@@ -23,7 +23,7 @@ public class CommentDto {
 
         return CommentDto.builder()
                 .commentId(comment.getId())
-                .memberId(comment.getClubMember().getId())
+                .writerId(comment.getClubMember().getId())
                 .postId(comment.getPost().getId())
                 .parentId(comment.getParentComment() == null ? null : comment.getParentComment().getId())
                 .content(comment.getContent())

@@ -6,6 +6,7 @@ import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
+import GDG.whatssue.domain.user.Error.UserErrorCode;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.util.S3Utils;
@@ -38,7 +39,7 @@ public class ClubMemberService {
         ClubMember clubMember = getClubMember(clubId, userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->new RuntimeException("User Not Found"));
+                .orElseThrow(() ->new CommonException(UserErrorCode.EX1100));
 
         String storeFileName = clubMember.getProfileImage().getStoreFileName();
         String memberProfileImage = S3Utils.getFullPath(storeFileName);
