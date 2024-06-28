@@ -20,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,8 +85,17 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     public Page<CommentDto> getCommentList(Long postId, int size, int page) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createAt"));
-        Page<Comment> comments = commentRepository.findAllByPostIdAndDeleteAtIsNull(postId, pageable);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
+        Page<Comment> commentsPage = commentRepository.findAllByPostIdAndParentCommentIsNullAndDeleteAtIsNull(postId, pageable);
+
+        // 모든 댓글을 CommentDto로 변환하여 반환
+        return commentsPage.map(CommentDto::of);
+    }
+
+    public Page<CommentDto> getChildCommentList(Long parentId, int size, int page){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
+        Page<Comment> comments = commentRepository.findByParentComment_Id(parentId, pageable);
         return comments.map(CommentDto::of);
     }
 
