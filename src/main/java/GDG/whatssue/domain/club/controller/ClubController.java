@@ -68,12 +68,11 @@ public class ClubController {
     }
 
     @Operation(summary = "모임가입 코드로 모임 정보 조회")
-    @GetMapping("/{privateCode}")
+    @GetMapping
     public ResponseEntity<GetClubInfoByPrivateCodeResponse> findClubByPrivateCode(
         @NotBlank(message = "가입코드는 필수 입력값입니다.")
         @Size(min = 6, max = 6, message = "클럽 가입코드는 6자리입니다")
-        @PathVariable(name = "privateCode") String privateCode) {
-
+        @RequestParam(name = "privateCode") String privateCode) {
         return ResponseEntity.status(HttpStatus.OK).body(clubService.findClubByPrivateCode(privateCode));
     }
 
