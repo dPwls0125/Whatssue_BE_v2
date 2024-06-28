@@ -142,7 +142,6 @@ public class PostController {
             @PathVariable Long postId){
         postService.deletePostLike(clubId, userId, postId);
         return ResponseEntity.status(200).body("게시물 좋아요 취소 성공");
-
     }
     @GetMapping(value="/my_posts")
     @Operation(summary="내가 쓴 글", description = "sort : [\"createAt,desc\"] or [\"createAt,asc\"] 올바르지 않은 값 500에러")
