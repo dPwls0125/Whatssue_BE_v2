@@ -13,17 +13,23 @@ public class CommentDto {
 
     private Long commentId;
     private Long writerId;
+    private String writerName;
     private Long postId;
     private Long parentId;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
+    private String profileImage;
 
-    public static CommentDto of(Comment comment) {
+    public static CommentDto of(Comment comment, String profileImage) {
+
+
 
         return CommentDto.builder()
                 .commentId(comment.getId())
                 .writerId(comment.getClubMember().getId())
+                .writerName(comment.getClubMember().getMemberName())
+                .profileImage(profileImage)
                 .postId(comment.getPost().getId())
                 .parentId(comment.getParentComment() == null ? null : comment.getParentComment().getId())
                 .content(comment.getContent())

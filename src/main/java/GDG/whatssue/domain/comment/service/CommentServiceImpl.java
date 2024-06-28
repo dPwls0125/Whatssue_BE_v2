@@ -8,11 +8,13 @@ import GDG.whatssue.domain.comment.dto.CommentUpdateDto;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.comment.exception.CommentErrorCode;
 import GDG.whatssue.domain.comment.repository.CommentRepository;
+import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.error.CommonException;
+import GDG.whatssue.global.util.S3Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class CommentServiceImpl implements CommentService{
     private final CommentRepository commentRepository;
     private final ClubMemberService clubMemberService;
     private final PostService postService;
+    private final FileUploadService fileUploadService;
 
     @Override
     public void createComment(CommentAddDto dto, Long userId, Long clubId) {
@@ -90,13 +93,24 @@ public class CommentServiceImpl implements CommentService{
         Page<Comment> commentsPage = commentRepository.findAllByPostIdAndParentCommentIsNullAndDeleteAtIsNull(postId, pageable);
 
         // 모든 댓글을 CommentDto로 변환하여 반환
-        return commentsPage.map(CommentDto::of);
+        return commentsPage.map(comment -> {
+            String storeFileName = comment.getClubMember().getProfileImage().getStoreFileName();
+            String memberProfileImage = S3Utils.getFullPath(storeFileName);
+            return CommentDto.of(comment, memberProfileImage);
+        });
+
     }
 
     public Page<CommentDto> getChildCommentList(Long parentId, int size, int page){
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
-        Page<Comment> comments = commentRepository.findByParentComment_Id(parentId, pageable);
-        return comments.map(CommentDto::of);
+        Page<Comment> commentsPage = commentRepository.findByParentComment_Id(parentId, pageable);
+
+        return commentsPage.map(comment -> {
+            String storeFileName = comment.getClubMember().getProfileImage().getStoreFileName();
+            String memberProfileImage = S3Utils.getFullPath(storeFileName);
+            return CommentDto.of(comment, memberProfileImage);
+        });
     }
 
     @Override

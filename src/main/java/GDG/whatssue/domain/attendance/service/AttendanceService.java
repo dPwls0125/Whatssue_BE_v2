@@ -140,6 +140,7 @@ public class AttendanceService {
     private void initializeMemberAttendance(Long clubId, Long scheduleId) throws RuntimeException {
 
         List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.EX3100));
+
         for(ClubMember clubMember : clubMembers){
             if(scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId, clubMember.getId()).isPresent()){
                 break;
