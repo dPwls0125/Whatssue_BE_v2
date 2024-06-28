@@ -4,14 +4,12 @@ import GDG.whatssue.domain.comment.dto.ChildCommentAddDto;
 import GDG.whatssue.domain.comment.dto.CommentAddDto;
 import GDG.whatssue.domain.comment.dto.CommentUpdateDto;
 import GDG.whatssue.domain.comment.service.CommentService;
-import GDG.whatssue.domain.comment.service.CommentServiceImpl;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -52,7 +50,13 @@ public class CommentController {
 
     @Operation(summary = "댓글 리스트 조회")
     @GetMapping("/{postId}")
-    public ResponseEntity getCommentList(@PathVariable Long postId, @PathVariable(name = "clubId") Long clubId, @RequestParam int size, @RequestParam int page) {
+    public ResponseEntity getParentCommentList(@PathVariable Long postId, @PathVariable(name = "clubId") Long clubId, @RequestParam int size, @RequestParam int page) {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentList(postId, size, page));
+    }
+
+    @Operation(summary = "대댓글 리스트 조회")
+    @GetMapping("/child/{parentId}")
+    public ResponseEntity getChildCommentList(@PathVariable Long parentId, @PathVariable(name = "clubId") Long clubId, @RequestParam int size, @RequestParam int page) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getChildCommentList(parentId, size, page));
     }
 }

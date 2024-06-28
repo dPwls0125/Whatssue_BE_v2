@@ -21,6 +21,8 @@ public interface CommentService {
 
     Page<CommentDto> getCommentList(Long postId, int size, int page);
 
+    Page<CommentDto> getChildCommentList(Long parentId, int size, int page);
+
     void getMyCommentList(Long userId, Long clubId);
 
 
