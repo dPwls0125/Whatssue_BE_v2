@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.member.controller;
 
+import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
@@ -45,6 +46,14 @@ public class ClubMemberController {
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
+    @GetMapping("/member/info")
+    @Operation(summary = "유저의 클럽 내 멤버 아이디 및 역할 조회")
+    public ResponseEntity getMemberInfo(@PathVariable Long clubId, @LoginUser Long userId) {
+        ClubMemberDto dto = clubMemberSerivce.getMemberIdAndRole(clubId, userId);
+        return new ResponseEntity(dto, HttpStatus.OK);
+    }
+
+
     @PatchMapping("/member/{memberId}")
     @Operation(summary = "멤버 정보 수정")
     public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberInfoDto dto) {
@@ -52,7 +61,7 @@ public class ClubMemberController {
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-    @GetMapping("/member")
+    @GetMapping("/member/profile")
     @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
     public ResponseEntity getProfile(@PathVariable Long clubId, @LoginUser Long userId){
         MemberProfileDto dto = clubMemberSerivce.getMemberProfile(clubId,userId);
