@@ -1,7 +1,7 @@
 package GDG.whatssue.domain.club.controller;
 
-import GDG.whatssue.domain.club.dto.ClubCreateRequest;
-import GDG.whatssue.domain.club.dto.ClubCreateResponse;
+import GDG.whatssue.domain.club.dto.CreateClubRequest;
+import GDG.whatssue.domain.club.dto.CreateClubResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.dto.UpdateClubPrivateRequest;
@@ -57,12 +57,12 @@ public class ClubController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createClub(
         @LoginUser Long userId,
-        @Valid @RequestPart("request") ClubCreateRequest request,
+        @Valid @RequestPart("request") CreateClubRequest request,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
         //Validation 및 예외처리 TODO
 
-        ClubCreateResponse responseDto = clubService.createClub(userId, request, profileImage);
+        CreateClubResponse responseDto = clubService.createClub(userId, request, profileImage);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

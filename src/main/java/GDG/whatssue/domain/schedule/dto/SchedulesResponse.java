@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class SchedulesResponse {
 
     private Long scheduleId;
@@ -20,9 +22,7 @@ public class SchedulesResponse {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime scheduleTime;
 
-    @Builder
-    public SchedulesResponse(
-        Long scheduleId, String scheduleName, AttendanceStatus attendanceStatus, LocalDateTime scheduleDate) {
+    public SchedulesResponse(Long scheduleId, String scheduleName, AttendanceStatus attendanceStatus, LocalDateTime scheduleDate) {
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
         this.attendanceStatus = attendanceStatus;

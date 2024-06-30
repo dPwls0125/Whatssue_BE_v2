@@ -57,7 +57,10 @@ public class ScheduleService {
     }
 
     public ScheduleDetailResponse getScheduleDetail(Long clubId, Long scheduleId) {
-        return scheduleToGetScheduleDetailResponse(findSchedule(scheduleId, clubId));
+        Schedule schedule = findSchedule(scheduleId, clubId);
+        ClubMember register = schedule.getRegister();
+
+        return new ScheduleDetailResponse(schedule, register);
     }
 
     public Page<SchedulesResponse> findAllSchedule(Long clubId, String keyword, LocalDate sDate, LocalDate eDate, Pageable pageable) {
@@ -66,24 +69,6 @@ public class ScheduleService {
 
     public boolean isClubSchedule(Long clubId, Long scheduleId) {
         return scheduleRepository.existsByIdAndClub_Id(scheduleId, clubId);
-    }
-
-    private ScheduleDetailResponse scheduleToGetScheduleDetailResponse(Schedule schedule) {
-        ClubMember register = schedule.getRegister();
-
-        String storeFileName = register.getProfileImage().getStoreFileName();
-        String registerProfileImage = S3Utils.getFullPath(storeFileName);
-
-        return ScheduleDetailResponse.builder()
-            .scheduleId(schedule.getId())
-            .scheduleName(schedule.getScheduleName())
-            .scheduleContent(schedule.getScheduleContent())
-            .scheduleDate(schedule.getScheduleDate())
-            .schedulePlace(schedule.getSchedulePlace())
-            .registerName(register.getMemberName())
-            .registerProfileImage(registerProfileImage)
-            .registerTime(schedule.getCreateAt())
-            .attendanceStatus(schedule.getAttendanceStatus()).build();
     }
 
     private Club findClub(Long clubId) {
