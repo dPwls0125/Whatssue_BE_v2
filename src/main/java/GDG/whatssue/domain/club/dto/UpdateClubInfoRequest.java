@@ -15,4 +15,6 @@ public class UpdateClubInfoRequest {
 
     @NotNull(message = "대표 연락수단은 필수 입력값입니다.")
     String contactMeans;
+
+    String link;
 }

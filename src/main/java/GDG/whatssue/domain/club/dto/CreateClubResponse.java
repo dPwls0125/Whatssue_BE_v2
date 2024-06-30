@@ -3,16 +3,15 @@ package GDG.whatssue.domain.club.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
-public class ClubCreateResponse {
+public class CreateClubResponse {
 
     Long clubId;
 
     @Builder
-    public ClubCreateResponse(Long clubId) {
+    public CreateClubResponse(Long clubId) {
         this.clubId = clubId;
     }
 }

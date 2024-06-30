@@ -8,8 +8,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
-public class ClubCreateRequest {
+public class CreateClubRequest {
 
     @Size(min = 2, max = 15, message = "모임 이름은 최소 2자, 최대 15자까지입니다.")
     private String clubName; //클럽 이름(필수)
@@ -26,7 +25,9 @@ public class ClubCreateRequest {
     @NotNull(message = "모임 이름정책은 필수 선택 사항입니다.")
     private NamePolicy namePolicy;
 
+    private String link;
+
     public Club toEntity() {
-        return Club.createClub(clubName, clubIntro, isPrivate, contactMeans, namePolicy);
+        return Club.createClub(clubName, clubIntro, isPrivate, contactMeans, link, namePolicy);
     }
 }

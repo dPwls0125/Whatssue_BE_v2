@@ -2,8 +2,8 @@ package GDG.whatssue.domain.club.service;
 
 import static GDG.whatssue.domain.file.FileConst.*;
 
-import GDG.whatssue.domain.club.dto.ClubCreateRequest;
-import GDG.whatssue.domain.club.dto.ClubCreateResponse;
+import GDG.whatssue.domain.club.dto.CreateClubRequest;
+import GDG.whatssue.domain.club.dto.CreateClubResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoByPrivateCodeResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
@@ -49,7 +49,7 @@ public class ClubService {
     }
 
     @Transactional
-    public ClubCreateResponse createClub(Long userId, ClubCreateRequest requestDto, MultipartFile profileImage) throws IOException {
+    public CreateClubResponse createClub(Long userId, CreateClubRequest requestDto, MultipartFile profileImage) throws IOException {
         User user = userRepository.findById(userId).get();
 
         //클럽 생성
@@ -66,7 +66,7 @@ public class ClubService {
         newMember.switchToManager();
         clubMemberRepository.save(newMember);
 
-        return ClubCreateResponse.builder().clubId(club.getId()).build();
+        return CreateClubResponse.builder().clubId(club.getId()).build();
     }
 
     @Transactional
@@ -99,16 +99,7 @@ public class ClubService {
         String storeFileName = club.getProfileImage().getStoreFileName();
         String clubProfileImage = S3Utils.getFullPath(storeFileName);
 
-        return GetClubInfoResponse.builder()
-            .clubName(club.getClubName())
-            .clubIntro(club.getClubIntro())
-            .contactMeans(club.getContactMeans())
-            .namePolicy(club.getNamePolicy())
-            .privateCode(club.getPrivateCode())
-            .clubProfileImage(clubProfileImage)
-            .memberCount(memberCount)
-            .isPrivate(club.isPrivate())
-            .createdAt(club.getCreateAt()).build();
+        return new GetClubInfoResponse(club, clubProfileImage, memberCount);
     }
 
     @Transactional

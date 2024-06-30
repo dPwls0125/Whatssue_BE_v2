@@ -1,14 +1,19 @@
 package GDG.whatssue.domain.schedule.dto;
 
+import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
+import GDG.whatssue.domain.schedule.entity.Schedule;
+import GDG.whatssue.global.util.S3Utils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class ScheduleDetailResponse {
 
     private Long scheduleId;
@@ -29,20 +34,16 @@ public class ScheduleDetailResponse {
     private LocalDateTime registrationDate;
     private AttendanceStatus attendanceStatus;
 
-    @Builder
-    public ScheduleDetailResponse(
-        Long scheduleId, String scheduleName, String scheduleContent,
-        LocalDateTime scheduleDate, String schedulePlace,
-        String registerName, String registerProfileImage, LocalDateTime registerTime, AttendanceStatus attendanceStatus) {
-        this.scheduleId = scheduleId;
-        this.scheduleName = scheduleName;
-        this.scheduleContent = scheduleContent;
-        this.scheduleDate = scheduleDate.toLocalDate();
-        this.scheduleTime = scheduleDate.toLocalTime();
-        this.schedulePlace = schedulePlace;
-        this.registerName = registerName;
-        this.registerProfileImage = registerProfileImage;
-        this.registrationDate = registerTime;
-        this.attendanceStatus = attendanceStatus;
+    public ScheduleDetailResponse(Schedule schedule, ClubMember register) {
+        this.scheduleId = schedule.getId();
+        this.scheduleName = schedule.getScheduleName();
+        this.scheduleContent = schedule.getScheduleContent();
+        this.scheduleDate = schedule.getScheduleDate().toLocalDate();
+        this.scheduleTime = schedule.getScheduleDate().toLocalTime();
+        this.schedulePlace = schedule.getSchedulePlace();
+        this.registerName = schedule.getRegister().getMemberName();
+        this.registerProfileImage = S3Utils.getFullPath(register.getProfileImage().getStoreFileName());
+        this.registrationDate = schedule.getCreateAt();
+        this.attendanceStatus = schedule.getAttendanceStatus();
     }
 }
