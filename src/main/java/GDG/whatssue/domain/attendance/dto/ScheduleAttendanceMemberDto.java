@@ -22,12 +22,15 @@ public class ScheduleAttendanceMemberDto {
 
     private Long clubMemberId;
 
+    private String clubMemberName;
+
     private AttendanceType attendanceType;
 
     public static ScheduleAttendanceMemberDto of(ScheduleAttendanceResult entity){
         return ScheduleAttendanceMemberDto.builder()
                 .scheduleId(entity.getSchedule().getId())
                 .clubId(entity.getSchedule().getClub().getId())
+                .clubMemberName(entity.getClubMember().getMemberName())
                 .attendanceType(entity.getAttendanceType())
                 .clubMemberId(entity.getClubMember().getId())
                 .build();
