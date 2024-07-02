@@ -33,6 +33,9 @@ public class Club extends BaseEntity {
     @Column
     private String contactMeans;
 
+    @Column
+    private String link;
+
     @Column(nullable = false)
     private String privateCode;
 
@@ -58,18 +61,19 @@ public class Club extends BaseEntity {
     }
 
     //==생성메서드==//
-    private Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
+    private Club(String clubName, String clubInfo, boolean isPrivate, String contactMeans, String link, NamePolicy namePolicy) {
         this.clubName = clubName;
         this.clubIntro = clubInfo;
         this.isPrivate = isPrivate;
         this.contactMeans = contactMeans;
+        this.link = link;
         this.namePolicy = namePolicy;
 
         this.updatePrivateCode();
     }
 
-    public static Club createClub(String clubName, String clubInfo, boolean isPrivate, String contactMeans, NamePolicy namePolicy) {
-        return new Club(clubName, clubInfo, isPrivate, contactMeans, namePolicy);
+    public static Club createClub(String clubName, String clubInfo, boolean isPrivate, String contactMeans, String link, NamePolicy namePolicy) {
+        return new Club(clubName, clubInfo, isPrivate, contactMeans, link, namePolicy);
     }
 
     //==비즈니스 로직==//
@@ -80,6 +84,7 @@ public class Club extends BaseEntity {
         this.clubName = requestDto.getClubName();
         this.clubIntro = requestDto.getClubIntro();
         this.contactMeans = requestDto.getContactMeans();
+        this.link = requestDto.getLink();
     }
 
     /**

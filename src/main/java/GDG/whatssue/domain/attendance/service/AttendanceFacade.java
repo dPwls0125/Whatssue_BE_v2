@@ -23,9 +23,8 @@ public class AttendanceFacade {
                 .orElseThrow(() -> new CommonException(AttendanceErrorCode.EX5100));
     }
 
-    public List<ScheduleAttendanceResult> getAttendanceResult(Long memberId){
-        // 찾은 객체가 없을 경우에는 빈 배열 반환
-        return scheduleAttendanceResultRepository.findByClubMemberId(memberId);
+    public List<ScheduleAttendanceResult> getAttendanceResultbySchedule(Long scheduleId){
+        return scheduleAttendanceResultRepository.findByScheduleId(scheduleId);
     }
 
     public List<ScheduleAttendanceResult> getAttendanceResultbySchedule(Long scheduleId, AttendanceType attendenceType){

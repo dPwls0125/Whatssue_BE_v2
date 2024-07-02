@@ -90,15 +90,11 @@ public class CommentServiceImpl implements CommentService{
     public Page<CommentDto> getParentCommentList(Long postId, int size, int page) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
-        Page<Comment> commentsPage = commentRepository.findAllByPostIdAndParentCommentIsNull(postId, pageable);
+        Page<Comment> commentsPage = commentRepository.findFilteredParentComments(postId, pageable);
 
-        List<Comment> filteredComments = commentsPage.getContent().stream()
-                .filter(comment -> comment.getDeleteAt() != null && getChildCommentCount(comment.getId()) > 0)
+        List<CommentDto> commentDtos = commentsPage.stream()
+                .map(comment -> CommentDto.of(comment))
                 .map(this::nullifyDeletedCommentFields)
-                .collect(Collectors.toList());
-
-        List<CommentDto> commentDtos = filteredComments.stream()
-                .map(comment -> CommentDto.of(comment,getProfileImage(comment)))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(commentDtos, pageable, commentsPage.getTotalElements());
@@ -110,9 +106,7 @@ public class CommentServiceImpl implements CommentService{
         Page<Comment> commentsPage = commentRepository.findByParentComment_Id(parentId, pageable);
 
         return commentsPage.map(comment -> {
-            String storeFileName = comment.getClubMember().getProfileImage().getStoreFileName();
-            String memberProfileImage = S3Utils.getFullPath(storeFileName);
-            return CommentDto.of(comment, memberProfileImage);
+            return CommentDto.of(comment);
         });
     }
 
@@ -145,14 +139,16 @@ public class CommentServiceImpl implements CommentService{
     public long getChildCommentCount(Long parentId) {
         return commentRepository.countByParentCommentId(parentId);
     }
-    private Comment nullifyDeletedCommentFields(Comment comment){
-
-        if(comment.getDeleteAt() != null){
-            comment.setContent(null);
-            comment.setClubMember(null);
-            comment.setPost(null);
+    private CommentDto nullifyDeletedCommentFields(CommentDto commentDto){
+        if(commentDto.getDeleteAt() != null){
+            commentDto.setWriterId(null);
+            commentDto.setWriterName(null);
+            commentDto.setProfileImage(null);
+            commentDto.setContent(null);
+            commentDto.setCreatedAt(null);
+            commentDto.setUpdateAt(null);
         }
-        return comment;
+        return commentDto;
     }
 
     private String getProfileImage(Comment comment) {
@@ -160,3 +156,4 @@ public class CommentServiceImpl implements CommentService{
         return S3Utils.getFullPath(storeFileName);
     }
 }
+

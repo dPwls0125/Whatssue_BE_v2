@@ -1,7 +1,7 @@
 package GDG.whatssue.domain.club.controller;
 
-import GDG.whatssue.domain.club.dto.ClubCreateRequest;
-import GDG.whatssue.domain.club.dto.ClubCreateResponse;
+import GDG.whatssue.domain.club.dto.CreateClubRequest;
+import GDG.whatssue.domain.club.dto.CreateClubResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoResponse;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.dto.UpdateClubPrivateRequest;
@@ -57,23 +57,22 @@ public class ClubController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createClub(
         @LoginUser Long userId,
-        @Valid @RequestPart("request") ClubCreateRequest request,
+        @Valid @RequestPart("request") CreateClubRequest request,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
         //Validation 및 예외처리 TODO
 
-        ClubCreateResponse responseDto = clubService.createClub(userId, request, profileImage);
+        CreateClubResponse responseDto = clubService.createClub(userId, request, profileImage);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @Operation(summary = "모임가입 코드로 모임 정보 조회")
-    @GetMapping("/{privateCode}")
+    @GetMapping
     public ResponseEntity<GetClubInfoByPrivateCodeResponse> findClubByPrivateCode(
         @NotBlank(message = "가입코드는 필수 입력값입니다.")
         @Size(min = 6, max = 6, message = "클럽 가입코드는 6자리입니다")
-        @PathVariable(name = "privateCode") String privateCode) {
-
+        @RequestParam(name = "privateCode") String privateCode) {
         return ResponseEntity.status(HttpStatus.OK).body(clubService.findClubByPrivateCode(privateCode));
     }
 

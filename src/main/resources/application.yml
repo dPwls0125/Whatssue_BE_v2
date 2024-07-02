@@ -10,7 +10,7 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     url: jdbc:mysql://localhost:3306/whatssuev2?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect

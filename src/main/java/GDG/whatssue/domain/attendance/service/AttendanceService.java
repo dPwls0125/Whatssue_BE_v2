@@ -5,6 +5,8 @@ import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
 import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
 import GDG.whatssue.domain.attendance.dto.ScheduleDto;
+import GDG.whatssue.domain.attendance.entity.AttendanceNum;
+import GDG.whatssue.domain.attendance.repository.AttendanceNumRepository;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.service.ClubMemberService;
@@ -29,12 +31,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class AttendanceService {
-    private static Map<Long, Map<Long, Integer>> attendanceNumMap = new HashMap<>();
+
 
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleFacade scheduleFacade;
     private final AttendanceFacade attendanceFacade;
+    private final AttendanceNumRepository attendanceNumRepository;
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
     private final ClubMemberService clubMemberService;
     public final static Random random = new Random();
@@ -78,9 +81,7 @@ public class AttendanceService {
         schedule.finishAttendance();
 
         // Map에서 출석 번호 삭제
-        if(attendanceNumMap.containsKey(clubId) && attendanceNumMap.get(clubId).containsKey(scheduleId))
-            attendanceNumMap.get(clubId).remove(scheduleId);
-        else throw new CommonException(AttendanceErrorCode.EX5203);
+        attendanceNumRepository.deleteById(getId(clubId,scheduleId));
 
     }
 
@@ -91,7 +92,7 @@ public class AttendanceService {
 
         if(scheduleStatus == AttendanceStatus.ONGOING) {
             isScheduleInMap(clubId, scheduleId);
-            attendanceNumMap.get(clubId).remove(scheduleId);
+            attendanceNumRepository.deleteById(getId(clubId,scheduleId));
         }
 
         scheduleAttendanceResultRepository.deleteByScheduleId(scheduleId);
@@ -99,8 +100,8 @@ public class AttendanceService {
 
     }
 
-    public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId, Long clubId) {
-        List<ScheduleAttendanceResult> attendanceList = attendanceFacade.getAttendanceResultbySchedule(scheduleId, AttendanceType.ATTENDANCE);
+    public List<ScheduleAttendanceMemberDto> getAttendanceList(Long scheduleId) {
+        List<ScheduleAttendanceResult> attendanceList = attendanceFacade.getAttendanceResultbySchedule(scheduleId);
         return ScheduleAttendanceMemberDto.of(attendanceList);
     }
 
@@ -109,7 +110,7 @@ public class AttendanceService {
 
         int inputValue = requestDto.getAttendanceNum();
 
-        if (storedNum(clubId,scheduleId) == inputValue) {
+        if (getStoredNum(clubId,scheduleId) == inputValue) {
             ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(scheduleId, getClubMemberId(clubId, userId));
             if(scheduleAttendanceResult.getAttendanceType() == AttendanceType.ATTENDANCE){
                 throw new CommonException(AttendanceErrorCode.EX5205);
@@ -156,35 +157,44 @@ public class AttendanceService {
 
     private int putAttendanceNumInMapAndReturn(Long clubId, Long scheduleId){
 
-        if(!attendanceNumMap.containsKey(clubId)){
-            attendanceNumMap.put(clubId, new HashMap<>());
-        }
-
         int randomInt = AttendanceService.random.nextInt(1, 1000);
 
-        Map<Long, Integer> innerMap = attendanceNumMap.get(clubId);
-        innerMap.put(scheduleId, randomInt);
+        String id = "attendanceNum" + clubId.toString() +":" + scheduleId.toString();
 
-        randomInt = attendanceNumMap.get(clubId).get(scheduleId);
+        attendanceNumRepository.save(
+                AttendanceNum.builder()
+                .id(id)
+                .certificationNum(randomInt)
+                .build());
 
-        return randomInt;
+        AttendanceNum attendanceNum  = attendanceNumRepository.findById(id).orElseThrow( () -> new CommonException(AttendanceErrorCode.EX5206) );
+
+        return attendanceNum.getCertificationNum();
     }
 
     private Long getClubMemberId(Long clubId, Long userId) {
         return clubMemberService.getClubMemberId(clubId, userId);
     }
 
-    private int storedNum(Long clubId, Long scheduleId) {
+    private int getStoredNum(Long clubId, Long scheduleId) {
+
         isScheduleInMap(clubId, scheduleId);
-        return attendanceNumMap.get(clubId).get(scheduleId);
+        String mapId = "attendanceNum" + clubId.toString() +":" + scheduleId.toString();
+        return attendanceNumRepository.findById(mapId)
+                .orElseThrow( () -> new CommonException(AttendanceErrorCode.EX5206) )
+                .getCertificationNum();
     }
 
     private boolean isScheduleInMap(Long clubId, Long scheduleId) {
-        System.out.println(attendanceNumMap);
-        if (!attendanceNumMap.get(clubId).containsKey(scheduleId)) {
+
+        if (!attendanceNumRepository.findById(getId(clubId,scheduleId)).isPresent()) {
             throw new CommonException(AttendanceErrorCode.EX5203);
         }
         return true;
+    }
+
+    private String getId(Long clubId, Long scheduleId) {
+        return "attendanceNum" + clubId.toString() +":" + scheduleId.toString();
     }
 
 }
