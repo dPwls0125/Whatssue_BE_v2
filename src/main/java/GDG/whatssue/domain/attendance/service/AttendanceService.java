@@ -85,6 +85,11 @@ public class AttendanceService {
 
     }
 
+//    public getMemberAttendanceList(Long clubId, Long scheduleId, Long memberId) {
+//
+//    }
+
+
     @Transactional
     public void initAttendance(Long clubId, Long scheduleId) {
         Schedule schedule = scheduleFacade.getSchedule(clubId, scheduleId);
