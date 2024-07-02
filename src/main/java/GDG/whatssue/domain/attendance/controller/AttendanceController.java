@@ -47,7 +47,9 @@ public class AttendanceController {
     @GetMapping("/{scheduleId}/attendance-list")
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
-        return ResponseEntity.status(HttpStatus.OK).body(list);
+        Map<String,Object> response = new HashMap<>();
+        response.put("data",list);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "출석하기 _ user")
