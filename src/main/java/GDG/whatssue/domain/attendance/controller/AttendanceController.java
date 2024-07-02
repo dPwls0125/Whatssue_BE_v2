@@ -42,13 +42,14 @@ public class AttendanceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
-
     @ClubManager
     @Operation(summary = "일정별 출석한 멤버 리스트 조회")
     @GetMapping("/{scheduleId}/attendance-list")
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) {
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
-        return ResponseEntity.status(HttpStatus.OK).body(list);
+        Map<String,Object> response = new HashMap<>();
+        response.put("data",list);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "출석하기 _ user")
@@ -62,7 +63,10 @@ public class AttendanceController {
     @GetMapping("/attendance-ongoing")
     public ResponseEntity currentAttendanceList(@PathVariable Long clubId) {
         List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId);
-        return ResponseEntity.status(HttpStatus.OK).body(list);
+        System.out.println(list);
+        Map<String,Object> response = new HashMap<>();
+        response.put("data",list);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "출석 초기화")
