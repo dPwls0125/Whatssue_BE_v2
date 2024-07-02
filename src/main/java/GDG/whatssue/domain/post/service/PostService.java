@@ -140,11 +140,13 @@ public class PostService {
 
     @Transactional
     public void deletePostImages(Post post) throws IOException {
-
         List<UploadFile> deleteImages = post.getPostImageFiles();
         if(deleteImages != null){
             for(UploadFile deleteImage : deleteImages){
+                // S3에서 파일 삭제
                 fileUploadService.deleteFile(deleteImage.getStoreFileName());
+                // DB에서 파일 삭제
+                fileRepository.delete(deleteImage);
             }
             post.clearPostImageFiles();
         }
@@ -158,34 +160,43 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
 
-        if (post.getPostCategory() == PostCategory.NOTICE && !clubMember.checkManagerRole()) {
-                throw new CommonException(PostErrorCode.EX7202);//공지 삭제 권한 X
+        // 공지사항인 경우, 관리자만 삭제 가능
+        if (post.getPostCategory() == PostCategory.NOTICE) {
+            if (!clubMember.checkManagerRole()) {
+                throw new CommonException(PostErrorCode.EX7202); // 공지 삭제 권한 없음
             }
-        if (post.getWriter().getId() != clubMember.getId() && !clubMember.checkManagerRole()) {
-            throw new CommonException(PostErrorCode.EX7204);//작성자만 삭제 가능
+        } else {
+            // 공지가 아닌 경우, 작성자 본인이나 관리자만 삭제 가능
+            if (!post.getWriter().getId().equals(clubMember.getId()) && !clubMember.checkManagerRole()) {
+                throw new CommonException(PostErrorCode.EX7204); // 작성자 본인이나 매니저가 아닌 경우 삭제 권한 없음
+            }
         }
-            //이미지 삭제 = CasCadeType.REMOVE
-            //이미지 삭제 S3 체크 방법 TODO
-            postRepository.delete(post);
+        //이미지 삭제
+        deletePostImages(post);
+        //post 삭제
+        postRepository.delete(post);
     }
-
+    @Transactional
     public void updatePost(Long clubId, Long userId, Long postId, UpdatePostRequest request, List<MultipartFile> postImages) throws IOException {
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
-        if (post.getPostCategory() == PostCategory.NOTICE && !clubMember.checkManagerRole()) {
-            throw new CommonException(PostErrorCode.EX7201);//공지 수정 권한 X
-        }
-        if (post.getWriter().getId() != clubMember.getId() && !clubMember.checkManagerRole()) {
-            throw new CommonException(PostErrorCode.EX7203);//작성자만 수정 가능
+        // 공지사항인 경우, 관리자만 수정 가능
+        if (post.getPostCategory() == PostCategory.NOTICE) {
+            if (!clubMember.checkManagerRole()) {
+                throw new CommonException(PostErrorCode.EX7201); // 공지 수정 권한 없음
+            }
+        } else {
+            // 공지가 아닌 경우, 작성자 본인이나 관리자만 수정 가능
+            if (!post.getWriter().getId().equals(clubMember.getId()) && !clubMember.checkManagerRole()) {
+                throw new CommonException(PostErrorCode.EX7203); // 작성자 본인이나 매니저가 아닌 경우 수정 권한 없음
+            }
         }
 
-        post.updatePost(request.getPostTitle(), request.getPostContent(), request.getPostCategory(), clubMember);
-
+        post.updatePost(request.getPostTitle(), request.getPostContent());
         //기존 이미지 삭제
         deletePostImages(post);
-
         //새로운 이미지 s3 업로드, db 저장
         uploadPostImages(postImages, post);
         postRepository.save(post);
@@ -262,15 +273,13 @@ public class PostService {
         postLikeRepository.delete(postLike);
     }
 
-    public Page<GetPostResponse> getMyPosts(Long clubId, Long userId, PostCategory postCategory, Pageable pageable) {
+    public Page<GetPostResponse> getMyPosts(Long clubId, Long userId, Pageable pageable) {
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100)); // 존재하지 않는 멤버
 
         Club club = clubMember.getClub();
 
-
-        Page<Post> posts = postRepository.findByClubAndWriterAndPostCategory(club, clubMember, postCategory, pageable);
-
+        Page<Post> posts = postRepository.findByClubAndWriter(club, clubMember, pageable);
 
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
@@ -313,14 +322,12 @@ public class PostService {
         }
         return new PageImpl<>(getPostResponses, pageable, posts.getTotalElements());
     }
-    public Page<GetPostResponse> getLikedPosts(Long userId, Long clubId, PostCategory postCategory, Pageable pageable) {
+    public Page<GetPostResponse> getLikedPosts(Long clubId, Long userId, Pageable pageable) {
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100)); // 존재하지 않는 멤버
         Club club = clubMember.getClub();
 
-        Page<Post> posts = postRepository.findByPostLikeList_ClubMemberAndClubAndPostCategory(clubMember, club, postCategory, pageable);
-
-
+        Page<Post> posts = postRepository.findByPostLikeList_ClubMemberAndClub(clubMember, club, pageable);
 
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
