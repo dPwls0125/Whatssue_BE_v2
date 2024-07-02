@@ -89,7 +89,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public Page<CommentDto> getParentCommentList(Long postId, int size, int page) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").ascending());
         Page<Comment> commentsPage = commentRepository.findFilteredParentComments(postId, pageable);
 
         List<CommentDto> commentDtos = commentsPage.stream()
@@ -102,11 +102,12 @@ public class CommentServiceImpl implements CommentService{
 
     public Page<CommentDto> getChildCommentList(Long parentId, int size, int page){
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
-        Page<Comment> commentsPage = commentRepository.findByParentComment_Id(parentId, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").ascending());
+        Page<Comment> commentsPage = commentRepository.findByParentComment_IdAndDeleteAtIsNull(parentId, pageable);
 
         return commentsPage.map(comment -> {
-            return CommentDto.of(comment);
+            CommentDto commentDto = CommentDto.of(comment);
+            return commentDto;
         });
     }
 
