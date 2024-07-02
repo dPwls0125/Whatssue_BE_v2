@@ -8,11 +8,13 @@ import GDG.whatssue.domain.comment.dto.CommentUpdateDto;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.comment.exception.CommentErrorCode;
 import GDG.whatssue.domain.comment.repository.CommentRepository;
+import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.error.CommonException;
+import GDG.whatssue.global.util.S3Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class CommentServiceImpl implements CommentService{
     private final CommentRepository commentRepository;
     private final ClubMemberService clubMemberService;
     private final PostService postService;
+    private final FileUploadService fileUploadService;
 
     @Override
     public void createComment(CommentAddDto dto, Long userId, Long clubId) {
@@ -84,19 +87,28 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public Page<CommentDto> getCommentList(Long postId, int size, int page) {
+    public Page<CommentDto> getParentCommentList(Long postId, int size, int page) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
-        Page<Comment> commentsPage = commentRepository.findAllByPostIdAndParentCommentIsNullAndDeleteAtIsNull(postId, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").ascending());
+        Page<Comment> commentsPage = commentRepository.findFilteredParentComments(postId, pageable);
 
-        // 모든 댓글을 CommentDto로 변환하여 반환
-        return commentsPage.map(CommentDto::of);
+        List<CommentDto> commentDtos = commentsPage.stream()
+                .map(comment -> CommentDto.of(comment))
+                .map(this::nullifyDeletedCommentFields)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(commentDtos, pageable, commentsPage.getTotalElements());
     }
 
     public Page<CommentDto> getChildCommentList(Long parentId, int size, int page){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
-        Page<Comment> comments = commentRepository.findByParentComment_Id(parentId, pageable);
-        return comments.map(CommentDto::of);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").ascending());
+        Page<Comment> commentsPage = commentRepository.findByParentComment_IdAndDeleteAtIsNull(parentId, pageable);
+
+        return commentsPage.map(comment -> {
+            CommentDto commentDto = CommentDto.of(comment);
+            return commentDto;
+        });
     }
 
     @Override
@@ -125,5 +137,24 @@ public class CommentServiceImpl implements CommentService{
             throw new CommonException(CommentErrorCode.EX8101);
 
     }
+    public long getChildCommentCount(Long parentId) {
+        return commentRepository.countByParentCommentId(parentId);
+    }
+    private CommentDto nullifyDeletedCommentFields(CommentDto commentDto){
+        if(commentDto.getDeleteAt() != null){
+            commentDto.setWriterId(null);
+            commentDto.setWriterName(null);
+            commentDto.setProfileImage(null);
+            commentDto.setContent(null);
+            commentDto.setCreatedAt(null);
+            commentDto.setUpdateAt(null);
+        }
+        return commentDto;
+    }
 
+    private String getProfileImage(Comment comment) {
+        String storeFileName = comment.getClubMember().getProfileImage().getStoreFileName();
+        return S3Utils.getFullPath(storeFileName);
+    }
 }
+

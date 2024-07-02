@@ -19,7 +19,7 @@ public interface CommentService {
 
     void createChildComment(ChildCommentAddDto childCommentAddDto, Long userId, Long clubId);
 
-    Page<CommentDto> getCommentList(Long postId, int size, int page);
+    Page<CommentDto> getParentCommentList(Long postId, int size, int page);
 
     Page<CommentDto> getChildCommentList(Long parentId, int size, int page);
 
