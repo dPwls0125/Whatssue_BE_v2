@@ -15,7 +15,8 @@ public enum AttendanceErrorCode  implements  ErrorCode {
     EX5202("5202",HttpStatus.BAD_REQUEST,"The Attendance is Not Ongoing"),
     EX5203("5203",HttpStatus.BAD_REQUEST, "There are no attendance numbers, Map is Null"),
     EX5204("5204",HttpStatus.BAD_REQUEST, "Attendance Number is not valid"),
-    EX5205("5205",HttpStatus.BAD_REQUEST, "해당 스케줄에 대해 이미 출석한 멤버입니다.");
+    EX5205("5205",HttpStatus.BAD_REQUEST, "해당 스케줄에 대해 이미 출석한 멤버입니다."),
+    EX5206("5206",HttpStatus.INTERNAL_SERVER_ERROR, "출석번호 저장에 실패했습니다.");
 
     private final String code;
     private final HttpStatus httpStatus;
