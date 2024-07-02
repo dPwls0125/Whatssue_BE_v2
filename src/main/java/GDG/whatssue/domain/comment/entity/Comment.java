@@ -32,8 +32,8 @@ public class Comment extends BaseEntity {
     @JsonIgnore
     private Comment parentComment; // 부모 댓글
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
-    private List<Comment> childComments; // 자식 댓글 리스트
+//    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
+//    private List<Comment> childComments; // 자식 댓글 리스트
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)

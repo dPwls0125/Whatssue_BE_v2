@@ -87,18 +87,21 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public Page<CommentDto> getCommentList(Long postId, int size, int page) {
+    public Page<CommentDto> getParentCommentList(Long postId, int size, int page) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").descending());
-        Page<Comment> commentsPage = commentRepository.findAllByPostIdAndParentCommentIsNullAndDeleteAtIsNull(postId, pageable);
+        Page<Comment> commentsPage = commentRepository.findAllByPostIdAndParentCommentIsNull(postId, pageable);
 
-        // 모든 댓글을 CommentDto로 변환하여 반환
-        return commentsPage.map(comment -> {
-            String storeFileName = comment.getClubMember().getProfileImage().getStoreFileName();
-            String memberProfileImage = S3Utils.getFullPath(storeFileName);
-            return CommentDto.of(comment, memberProfileImage);
-        });
+        List<Comment> filteredComments = commentsPage.getContent().stream()
+                .filter(comment -> comment.getDeleteAt() != null && getChildCommentCount(comment.getId()) > 0)
+                .map(this::nullifyDeletedCommentFields)
+                .collect(Collectors.toList());
 
+        List<CommentDto> commentDtos = filteredComments.stream()
+                .map(comment -> CommentDto.of(comment,getProfileImage(comment)))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(commentDtos, pageable, commentsPage.getTotalElements());
     }
 
     public Page<CommentDto> getChildCommentList(Long parentId, int size, int page){
@@ -139,5 +142,21 @@ public class CommentServiceImpl implements CommentService{
             throw new CommonException(CommentErrorCode.EX8101);
 
     }
+    public long getChildCommentCount(Long parentId) {
+        return commentRepository.countByParentCommentId(parentId);
+    }
+    private Comment nullifyDeletedCommentFields(Comment comment){
 
+        if(comment.getDeleteAt() != null){
+            comment.setContent(null);
+            comment.setClubMember(null);
+            comment.setPost(null);
+        }
+        return comment;
+    }
+
+    private String getProfileImage(Comment comment) {
+        String storeFileName = comment.getClubMember().getProfileImage().getStoreFileName();
+        return S3Utils.getFullPath(storeFileName);
+    }
 }

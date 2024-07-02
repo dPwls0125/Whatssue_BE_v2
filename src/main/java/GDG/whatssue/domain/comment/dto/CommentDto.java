@@ -23,8 +23,6 @@ public class CommentDto {
 
     public static CommentDto of(Comment comment, String profileImage) {
 
-
-
         return CommentDto.builder()
                 .commentId(comment.getId())
                 .writerId(comment.getClubMember().getId())
