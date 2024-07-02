@@ -35,25 +35,22 @@ public class AttendanceController {
     @Operation(summary = "출석 종료")
     @PostMapping("/{scheduleId}/attendance-end")
     public ResponseEntity offAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
-        try{
-            attendanceService.finishAttendanceOngoing(clubId, scheduleId);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(e);
-        }
+        attendanceService.finishAttendanceOngoing(clubId, scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
+
     @ClubManager
-    @Operation(summary = "일정별 출석한 멤버 리스트 조회")
+    @Operation(summary = "멤버들의 출석 진행 현황 리스트 조회")
     @GetMapping("/{scheduleId}/attendance-list")
     public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) {
-        List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId, clubId);
+        List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId);
         Map<String,Object> response = new HashMap<>();
         response.put("data",list);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "출석하기 _ user")
-    @PostMapping("/{scheduleId}/attendance/")
+    @PostMapping("/{scheduleId}/attendance")
     public ResponseEntity doAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @LoginUser Long userId , @RequestBody AttendanceNumRequestDto requestDto) {
         attendanceService.doAttendance(clubId, scheduleId, userId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("출석이 완료되었습니다.");
@@ -62,29 +59,29 @@ public class AttendanceController {
     @Operation(summary = "현재 출석 진행 중인 스케줄")
     @GetMapping("/attendance-ongoing")
     public ResponseEntity currentAttendanceList(@PathVariable Long clubId) {
+
         List<ScheduleDto> list = attendanceService.currentAttendanceList(clubId);
         System.out.println(list);
         Map<String,Object> response = new HashMap<>();
         response.put("data",list);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+
     }
 
     @Operation(summary = "출석 초기화")
     @GetMapping("/{scheduleId}/attendance-reset")
     public ResponseEntity resetAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
+
         attendanceService.initAttendance(clubId, scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body("출석이 초기화되었습니다.");
+
     }
 
     @ClubManager
     @Operation(summary = "출석 정정")
     @PutMapping("/{scheduleId}/attendance/{memberId}/{attendanceType}")
-    public ResponseEntity modifyMemberAttendance(@PathVariable Long scheduleId, @PathVariable Long memberId, @PathVariable String attendanceType){
-        try {
-             attendanceService.modifyMemberAttendance(scheduleId, memberId, attendanceType);
-         }catch (Exception e){
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
-         }
+    public ResponseEntity modifyMemberAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @PathVariable Long memberId, @PathVariable String attendanceType){
+        attendanceService.modifyMemberAttendance(scheduleId, memberId, attendanceType);
          return ResponseEntity.status(HttpStatus.OK).body("출석이 정정되었습니다.");
     }
 

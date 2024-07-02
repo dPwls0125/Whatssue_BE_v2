@@ -26,6 +26,7 @@ public class ScheduleAttendanceMemberDto {
 
     private AttendanceType attendanceType;
 
+
     public static ScheduleAttendanceMemberDto of(ScheduleAttendanceResult entity){
         return ScheduleAttendanceMemberDto.builder()
                 .scheduleId(entity.getSchedule().getId())
