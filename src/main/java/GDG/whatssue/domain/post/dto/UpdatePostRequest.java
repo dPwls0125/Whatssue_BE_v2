@@ -10,6 +10,4 @@ import lombok.Getter;
 public class UpdatePostRequest {
     private String postTitle;
     private String postContent;
-    private String writerName;
-    private PostCategory postCategory;
 }

@@ -92,13 +92,12 @@ public class Post extends BaseEntity {
 
     }
     //업데이트 메소드
-    public void updatePost(String postTitle, String postContent, PostCategory postCategory, ClubMember updater) {
+    public void updatePost(String postTitle, String postContent) {
 
         if (this.postCategory == PostCategory.NOTICE && !writer.checkManagerRole()) {
             throw new CommonException(PostErrorCode.EX7203);//관리자만 업데이트 가능
         }
         this.postTitle = postTitle;
         this.postContent = postContent;
-        this.postCategory = postCategory;
     }
 }
