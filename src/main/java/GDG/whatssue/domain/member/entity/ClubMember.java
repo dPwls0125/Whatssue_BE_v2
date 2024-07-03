@@ -1,16 +1,13 @@
 package GDG.whatssue.domain.member.entity;
 
-import GDG.whatssue.domain.attendance.entity.MemberAttendanceResult;
+import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.EX2200;
+
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.file.entity.UploadFile;
-import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
-import GDG.whatssue.domain.post.entity.Post;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
+import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import lombok.*;
 
@@ -103,5 +100,11 @@ public class ClubMember extends BaseEntity {
 
     public boolean checkManagerRole() {
         return role == Role.MANAGER;
+    }
+
+    public void validateFirstVisit() {
+        if (this.isFirstVisit == true) {
+            throw new CommonException(EX2200);
+        }
     }
 }

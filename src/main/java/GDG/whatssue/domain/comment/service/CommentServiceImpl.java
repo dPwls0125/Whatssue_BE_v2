@@ -20,10 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -109,8 +105,9 @@ public class CommentServiceImpl implements CommentService{
     }
 
     private ClubMember getClubMember(Long clubId, Long userId) {
-        return clubMemberService.getClubMember(clubId, userId);
+        return clubMemberService.findClubMemberByClubAndUser(clubId, userId).get();
     }
+
     private Post getPost(Long postId) {
         return postService.getPost(postId);
     }
