@@ -28,4 +28,13 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
             " order by m.createAt"
     )
     Page<GetJoinClubResponse> getJoinClubList(@Param("userId") Long userId, Pageable pageable);
+
+    @Query(
+        "select m From ClubMember m" +
+        " join fetch m.club c" +
+        " join fetch c.profileImage ci" +
+        " join fetch m.profileImage mi" +
+        " where m.club.id = :clubId and m.user.userId = :userId"
+    )
+    ClubMember findMemberWithClub(@Param("clubId") Long clubId, @Param("userId") Long userId);
 }

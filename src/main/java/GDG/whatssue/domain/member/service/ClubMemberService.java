@@ -2,6 +2,7 @@ package GDG.whatssue.domain.member.service;
 
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
+import GDG.whatssue.domain.member.dto.MemberAuthInfoResponse;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
@@ -61,6 +62,10 @@ public class ClubMemberService {
         return profile;
     }
 
+    public MemberAuthInfoResponse getMemberAuthInfo(Long clubId, Long userId) {
+        ClubMember member = clubMemberRepository.findMemberWithClub(clubId, userId);
+        return new MemberAuthInfoResponse(member);
+    }
 
     public ClubMemberDto getMemberIdAndRole(Long clubId, Long userId) {
         ClubMember clubMember = findClubMemberByClubAndUser(clubId, userId).get();

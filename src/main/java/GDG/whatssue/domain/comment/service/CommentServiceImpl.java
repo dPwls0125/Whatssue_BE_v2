@@ -17,6 +17,8 @@ import GDG.whatssue.domain.post.repository.PostRepository;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.error.CommonException;
 import GDG.whatssue.global.util.S3Utils;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
