@@ -35,8 +35,6 @@ public class CommentServiceImpl implements CommentService{
     private final PostRepository postRepository;
     private final ClubMemberService clubMemberService;
 
-    private final FileUploadService fileUploadService;
-
     @Override
     public void createComment(CommentAddDto dto, Long userId, Long clubId) {
 

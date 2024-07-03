@@ -16,10 +16,9 @@ import java.util.Optional;
 
 @Entity
 @AllArgsConstructor
-@Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@NoArgsConstructor
 @Builder
-@Transactional
 public class Comment extends BaseEntity {
 
     @Id
@@ -31,9 +30,6 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_id")
     @JsonIgnore
     private Comment parentComment; // 부모 댓글
-
-//    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
-//    private List<Comment> childComments; // 자식 댓글 리스트
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
@@ -50,4 +46,11 @@ public class Comment extends BaseEntity {
     private LocalDateTime deleteAt;
 
 
+    public void setDeleteAt(LocalDateTime deleteAt) {
+        this.deleteAt = deleteAt;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
