@@ -6,5 +6,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ScheduleRepositoryCustom {
-    Page<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, LocalDate sDate, LocalDate eDate, Pageable pageable);
+    Page<SchedulesResponse> findAllScheduleDto(Long clubId, String searchQuery, LocalDate sDate, LocalDate eDate, Pageable pageable);
 }

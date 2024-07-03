@@ -1,11 +1,10 @@
 package GDG.whatssue.domain.club.dto;
 
+import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.entity.NamePolicy;
 import GDG.whatssue.global.util.S3Utils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,14 +21,14 @@ public class GetClubInfoByPrivateCodeResponse {
     private LocalDateTime createdAt;
     private String clubIntro;
 
-    public GetClubInfoByPrivateCodeResponse(Long clubId, String storeFileName, String clubName,
-        NamePolicy namePolicy, LocalDateTime createdAt, String clubIntro, long clubMemberCount) {
-        this.clubId = clubId;
-        this.clubProfileImage = S3Utils.getFullPath(storeFileName);
-        this.clubName = clubName;
+    public GetClubInfoByPrivateCodeResponse(Club club, long clubMemberCount) {
+        this.clubId = club.getId();
+        this.clubProfileImage = S3Utils.getFullPath(club.getProfileImage().getStoreFileName());
+        this.clubName = club.getClubName();
+        this.namePolicy = club.getNamePolicy();
+        this.createdAt = club.getCreateAt();
+        this.clubIntro = club.getClubIntro();
+
         this.clubMemberCount = clubMemberCount;
-        this.namePolicy = namePolicy;
-        this.createdAt = createdAt;
-        this.clubIntro = clubIntro;
     }
 }
