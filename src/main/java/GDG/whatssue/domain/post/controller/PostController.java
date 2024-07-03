@@ -55,7 +55,6 @@ public class PostController {
         @RequestPart("request") AddPostRequest request,
         @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages)
         throws IOException {
-
         postService.addPost(clubId, userId, request, postImages);
         return ResponseEntity.status(200).body("게시글 작성 완료");
     }
@@ -71,7 +70,7 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @DeleteMapping("/{postId}/delete")
+    @DeleteMapping("/{postId}")
     @Operation(summary="게시글 삭제")
     public ResponseEntity deletePost(
         @PathVariable(name = "clubId") Long clubId,
@@ -85,7 +84,7 @@ public class PostController {
         return ResponseEntity.status(200).body("게시글 삭제 완료");
     }
 
-    @PatchMapping(value = "/{postId}/modify", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary="게시글 수정")
     public ResponseEntity updatePost(
             @PathVariable(name = "clubId") Long clubId,
@@ -143,24 +142,22 @@ public class PostController {
         postService.deletePostLike(clubId, userId, postId);
         return ResponseEntity.status(200).body("게시물 좋아요 취소 성공");
     }
-    @GetMapping(value="/my_posts")
-    @Operation(summary="내가 쓴 글", description = "sort : [\"createAt,desc\"] or [\"createAt,asc\"] 올바르지 않은 값 500에러")
+    @GetMapping(value="/my-posts")
+    @Operation(summary="내가 쓴 글")
     public ResponseEntity getMyPosts(
             @PathVariable Long clubId,
             @LoginUser Long userId,
-            @RequestParam PostCategory postCategory,
             Pageable pageable) {
-        Page<GetPostResponse> posts = postService.getMyPosts(clubId, userId, postCategory, pageable);
+        Page<GetPostResponse> posts = postService.getMyPosts(clubId, userId, pageable);
         return ResponseEntity.ok(posts);
     }
-    @GetMapping(value="/my_like_posts")
-    @Operation(summary="내가 좋아요한 글", description = "sort : [\"createAt,desc\"] or [\"createAt,asc\"] 올바르지 않은 값 500에러")
+    @GetMapping(value="/my-like-posts")
+    @Operation(summary="내가 좋아요한 글")
     public ResponseEntity getMyLikePosts(
             @PathVariable Long clubId,
             @LoginUser Long userId,
-            @RequestParam PostCategory postCategory,
             Pageable pageable) {
-        Page<GetPostResponse> posts = postService.getLikedPosts(clubId, userId, postCategory, pageable);
+        Page<GetPostResponse> posts = postService.getLikedPosts(clubId, userId, pageable);
         return ResponseEntity.ok(posts);
     }
 }
