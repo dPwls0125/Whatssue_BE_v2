@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.clubjoinrequest.dto;
 
+import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
 import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequestStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
@@ -18,12 +19,11 @@ public class GetJoinRequestsResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime updatedAt;
 
-    public GetJoinRequestsResponse(Long clubJoinRequestId, Long clubId, String clubName,
-        ClubJoinRequestStatus status, LocalDateTime updatedAt) {
-        this.clubJoinRequestId = clubJoinRequestId;
-        this.clubId = clubId;
-        this.clubName = clubName;
-        this.status = status;
-        this.updatedAt = updatedAt;
+    public GetJoinRequestsResponse(ClubJoinRequest request) {
+        this.clubJoinRequestId = request.getId();
+        this.clubId = request.getClub().getId();
+        this.clubName = request.getClub().getClubName();
+        this.status = request.getStatus();
+        this.updatedAt = request.getUpdateAt();
     }
 }

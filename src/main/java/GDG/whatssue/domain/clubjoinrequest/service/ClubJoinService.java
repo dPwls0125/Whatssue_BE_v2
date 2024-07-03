@@ -43,7 +43,8 @@ public class ClubJoinService {
     }
 
     public Page<GetJoinRequestsResponse> getJoinRequests(Long userId, Pageable pageable) {
-        return clubJoinRequestRepository.findAllJoinRequest(userId, pageable);
+        Page<ClubJoinRequest> result = clubJoinRequestRepository.findAllWithClub(userId, pageable);
+        return result.map(GetJoinRequestsResponse::new);
     }
 
     public GetRejectionReasonResponse getJoinRequestRejectionReason(Long userId, Long joinRequestId) {
