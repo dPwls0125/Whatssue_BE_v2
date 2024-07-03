@@ -12,6 +12,8 @@ import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.post.entity.Post;
+import GDG.whatssue.domain.post.exception.PostErrorCode;
+import GDG.whatssue.domain.post.repository.PostRepository;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.error.CommonException;
 import GDG.whatssue.global.util.S3Utils;
@@ -32,8 +34,9 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService{
 
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
     private final ClubMemberService clubMemberService;
-    private final PostService postService;
+
     private final FileUploadService fileUploadService;
 
     @Override
@@ -124,7 +127,8 @@ public class CommentServiceImpl implements CommentService{
         return clubMemberService.getClubMember(clubId, userId);
     }
     private Post getPost(Long postId) {
-        return postService.getPost(postId);
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
     }
 
     private Comment getComment(Long commentId) {
