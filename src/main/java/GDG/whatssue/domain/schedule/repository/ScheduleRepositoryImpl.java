@@ -28,7 +28,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<SchedulesResponse> findAllSchedule(Long clubId, String searchQuery, LocalDate sDate, LocalDate eDate, Pageable pageable) {
+    public Page<SchedulesResponse> findAllScheduleDto(Long clubId, String searchQuery, LocalDate sDate, LocalDate eDate, Pageable pageable) {
 
         JPAQuery<SchedulesResponse> query = queryFactory
                 .select(Projections.constructor(

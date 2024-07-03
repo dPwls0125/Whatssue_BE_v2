@@ -2,6 +2,7 @@ package GDG.whatssue.domain.member.controller;
 
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
+import GDG.whatssue.domain.member.dto.MemberAuthInfoResponse;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
@@ -13,14 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-/**
- * 멤버 권한 수정 : [PATCH] - /api/clubs/{clubId}/members/{memberId}/manager
- * 멤버 추방 : [DELETE] - /api/clubs/{clubId}/members/{memberId}/manager
- * 멤버 상세조회(일반멤버) : [GET] - /api/clubs/{clubId}/members/{memberId}
- * 멤버 상세조회(관리자) : [GET] - /api/clubs/{clubId}/members/{memberId}/manager
- * 멤버 목록 조회 : [GET] - /api/clubs/{clubId}/members
- */
 
 @Slf4j
 @RestController
@@ -68,4 +61,9 @@ public class ClubMemberController {
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
+    @GetMapping("/member/auth")
+    public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfo(@PathVariable Long clubId, @LoginUser Long userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(clubMemberSerivce.getMemberAuthInfo(clubId, userId));
+    }
 }

@@ -17,6 +17,8 @@ import GDG.whatssue.domain.post.repository.PostRepository;
 import GDG.whatssue.domain.post.service.PostService;
 import GDG.whatssue.global.error.CommonException;
 import GDG.whatssue.global.util.S3Utils;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -124,8 +122,9 @@ public class CommentServiceImpl implements CommentService{
     }
 
     private ClubMember getClubMember(Long clubId, Long userId) {
-        return clubMemberService.getClubMember(clubId, userId);
+        return clubMemberService.findClubMemberByClubAndUser(clubId, userId).get();
     }
+
     private Post getPost(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글

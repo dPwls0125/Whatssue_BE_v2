@@ -38,14 +38,17 @@ public class ClubService {
     private final FileUploadService fileUploadService;
     private final ClubMemberRepository clubMemberRepository;
 
-
     public Page<GetJoinClubResponse> getJoinClubList(Long userId, Pageable pageable) {
         return clubMemberRepository.getJoinClubList(userId, pageable);
     }
 
     public GetClubInfoByPrivateCodeResponse findClubByPrivateCode(String privateCode) {
-        return clubRepository.findByPrivateCode(privateCode)
+        Club findClub = clubRepository.findByPrivateCode(privateCode)
             .orElseThrow(() -> new CommonException(ClubErrorCode.EX3101));
+
+        long memberCount = clubMemberRepository.countClubMember(findClub.getId());
+
+        return new GetClubInfoByPrivateCodeResponse(findClub, memberCount);
     }
 
     @Transactional
@@ -94,7 +97,7 @@ public class ClubService {
     public GetClubInfoResponse getClubInfo(Long clubId) {
         Club club = findClub(clubId);
 
-        long memberCount = clubMemberRepository.getClubMemberCount(club.getId());
+        long memberCount = clubMemberRepository.countClubMember(club.getId());
 
         String storeFileName = club.getProfileImage().getStoreFileName();
         String clubProfileImage = S3Utils.getFullPath(storeFileName);

@@ -2,6 +2,7 @@ package GDG.whatssue.domain.member.service;
 
 import GDG.whatssue.domain.member.dto.ClubMemberDto;
 import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
+import GDG.whatssue.domain.member.dto.MemberAuthInfoResponse;
 import GDG.whatssue.domain.member.dto.MemberProfileDto;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
@@ -11,6 +12,7 @@ import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +38,7 @@ public class ClubMemberService {
     @Transactional
     public MemberProfileDto getMemberProfile(Long clubId, Long userId) {
 
-        ClubMember clubMember = getClubMember(clubId, userId);
+        ClubMember clubMember = findClubMemberByClubAndUser(clubId, userId).get();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->new CommonException(UserErrorCode.EX1100));
@@ -60,33 +62,24 @@ public class ClubMemberService {
         return profile;
     }
 
+    public MemberAuthInfoResponse getMemberAuthInfo(Long clubId, Long userId) {
+        ClubMember member = clubMemberRepository.findMemberWithClub(clubId, userId);
+        return new MemberAuthInfoResponse(member);
+    }
 
     public ClubMemberDto getMemberIdAndRole(Long clubId, Long userId) {
-        ClubMember clubMember = getClubMember(clubId, userId);
+        ClubMember clubMember = findClubMemberByClubAndUser(clubId, userId).get();
         return ClubMemberDto.builder()
                 .memberId(clubMember.getId())
                 .role(clubMember.getRole())
                 .build();
     }
 
-    public boolean isClubMember(Long clubId, Long userId) {
-        return getClubMember(clubId, userId) != null;
-    }
-
-    public boolean isClubManager(Long clubId, Long userId) {
-        return getClubMember(clubId, userId).checkManagerRole();
-    }
-    public boolean isFirstVisit(Long clubId, Long userId) {
-        return getClubMember(clubId, userId).isFirstVisit();
-    }
-
     public Long getClubMemberId(Long clubId, Long userId) {
-        return getClubMember(clubId, userId).getId();
+        return findClubMemberByClubAndUser(clubId, userId).get().getId();
     }
 
-    public ClubMember getClubMember(Long clubId, Long userId) {
-        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId).orElse(null);
+    public Optional<ClubMember> findClubMemberByClubAndUser(Long clubId, Long userId) {
+        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId);
     }
-
-
 }

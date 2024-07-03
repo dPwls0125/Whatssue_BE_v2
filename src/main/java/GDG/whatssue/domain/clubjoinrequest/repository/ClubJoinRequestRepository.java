@@ -1,6 +1,5 @@
 package GDG.whatssue.domain.clubjoinrequest.repository;
 
-import GDG.whatssue.domain.clubjoinrequest.dto.GetJoinRequestsResponse;
 import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -17,14 +16,11 @@ public interface ClubJoinRequestRepository extends JpaRepository<ClubJoinRequest
     Boolean existsByClub_IdAndUser_UserId(Long clubId, Long userId);
     List<ClubJoinRequest> findByClub_Id(Long clubId);
 
-    @Query("select new GDG.whatssue.domain.clubjoinrequest.dto.GetJoinRequestsResponse(" +
-                                            "r.id, c.id, c.clubName, r.status, r.updateAt" +
-            ") " +
-            "from ClubJoinRequest r " +
-                "join r.user u " +
-                "join r.club c " +
-            "where u.userId = :userId " +
-            "order by r.createAt asc"
+    @Query("select r from ClubJoinRequest r" +
+            " join fetch r.club c" +
+            " join fetch c.profileImage" +
+            " where r.user.userId = :userId" +
+            " order by r.createAt asc"
     )
-    Page<GetJoinRequestsResponse> findAllJoinRequest(@Param("userId") Long userId, Pageable pageable);
+    Page<ClubJoinRequest> findAllWithClub(@Param("userId") Long userId, Pageable pageable);
 }
