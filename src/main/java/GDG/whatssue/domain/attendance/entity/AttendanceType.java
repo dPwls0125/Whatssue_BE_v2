@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.attendance.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AttendanceType {
@@ -17,5 +18,6 @@ public enum AttendanceType {
     public String getValue() {
         return value;
     }
+
 
 }

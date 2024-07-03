@@ -1,10 +1,7 @@
 package GDG.whatssue.domain.attendance.service;
 
 import GDG.whatssue.domain.attendance.Error.AttendanceErrorCode;
-import GDG.whatssue.domain.attendance.dto.AttendanceNumRequestDto;
-import GDG.whatssue.domain.attendance.dto.AttendanceNumResponseDto;
-import GDG.whatssue.domain.attendance.dto.ScheduleAttendanceMemberDto;
-import GDG.whatssue.domain.attendance.dto.ScheduleDto;
+import GDG.whatssue.domain.attendance.dto.*;
 import GDG.whatssue.domain.attendance.entity.AttendanceNum;
 import GDG.whatssue.domain.attendance.repository.AttendanceNumRepository;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
@@ -24,6 +21,10 @@ import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,30 @@ public class AttendanceService {
 
         return responseDto;
 
+    }
+
+    public List<ScheduleAttendanceResultDto> getFilteredMemberAttendance(Long userId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType) {
+
+        Long memberId = getClubMemberId(clubId, userId);
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        attendanceType = attendanceType.toUpperCase();
+        System.out.println(attendanceType);
+
+        if(attendanceType.equals("TOTAL") ){
+            List<ScheduleAttendanceResult> entityList = scheduleAttendanceResultRepository.findAllByScheduleDateBetween(startDateTime, endDateTime, memberId);
+            return entityList.stream()
+                    .map(ScheduleAttendanceResultDto::of)
+                    .collect(Collectors.toList());
+        } else if (attendanceType.equals("ATTENDANCE") || attendanceType.equals("ABSENCE") || attendanceType.equals("OFFICIAL_ABSENCE")) {
+            List<ScheduleAttendanceResult> entityList = scheduleAttendanceResultRepository.findAllByScheduleDateBetweenAndAttendanceType(startDateTime, endDateTime, AttendanceType.valueOf(attendanceType), memberId);
+            return entityList.stream()
+                    .map(ScheduleAttendanceResultDto::of)
+                    .collect(Collectors.toList());
+        }else{
+            throw new CommonException(AttendanceErrorCode.EX5207);
+        }
     }
 
     //현재 진행중인 일정 리스트
@@ -142,6 +167,8 @@ public class AttendanceService {
         attendanceResult.setAttendanceType(type);
         scheduleAttendanceResultRepository.save(attendanceResult);
     }
+
+
 
     private void initializeMemberAttendance(Long clubId, Long scheduleId) throws RuntimeException {
 
