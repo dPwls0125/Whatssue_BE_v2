@@ -5,6 +5,9 @@ import static GDG.whatssue.domain.file.FileConst.POST_IMAGE_DIRNAME;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubRepository;
+import GDG.whatssue.domain.comment.entity.Comment;
+import GDG.whatssue.domain.comment.repository.CommentRepository;
+import GDG.whatssue.domain.comment.service.CommentService;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
@@ -48,6 +51,7 @@ public class PostService {
     private final FileRepository fileRepository;
     private final PostQueryRepository postQueryRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public void addPost(Long clubId, Long userId, AddPostRequest request, List<MultipartFile> postImages)
@@ -61,6 +65,7 @@ public class PostService {
         if (request.getPostCategory() == PostCategory.NOTICE && clubMember.getRole() != Role.MANAGER) {
             throw new CommonException(PostErrorCode.EX7200);//공지 게시글 작성 권한이 없습니다.
         }
+
         //게시글 db 저장
         Post post = request.toEntity(club, writer);
         postRepository.save(post);
@@ -90,7 +95,8 @@ public class PostService {
         Long postLikeCount = Long.valueOf(post.getPostLikeList().size());
 
         // 댓글 수 가져오기
-        Long commentCount = Long.valueOf(post.getCommentList().size());
+        Long commentCount = commentCount(postId);
+
 
         // 좋아요 여부 체크
         Boolean postLikeCheck = isLikedCheck(userId, postId, clubId);
@@ -108,6 +114,16 @@ public class PostService {
                 .isLiked(postLikeCheck)
                 .createdAt(post.getCreateAt())
                 .build();
+    }
+    public Long commentCount(Long postId){
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("createAt").ascending());
+
+        Page<Comment> commentsPage = commentRepository.findFilteredParentComments(postId, pageable);
+        Long commentCount = commentsPage.getTotalElements();
+        for(Comment comment : commentsPage){
+            commentCount+=commentRepository.findByParentComment_IdAndDeleteAtIsNull(comment.getId(),pageable).getTotalElements();
+        }
+        return commentCount;
     }
 
     public Boolean isLikedCheck(Long userId, Long postId, Long clubId){
@@ -221,7 +237,7 @@ public class PostService {
             Long postLikeCount = (long) post.getPostLikeList().size();
 
             // 댓글 수 가져오기
-            Long commentCount = Long.valueOf(post.getCommentList().size());
+            Long commentCount = commentCount(post.getId());
 
             // 좋아요 여부 체크
             Boolean postLikeCheck = isLikedCheck(userId, post.getId(), clubId);
@@ -299,7 +315,7 @@ public class PostService {
             Long postLikeCount = (long) post.getPostLikeList().size();
 
             // 댓글 수 가져오기
-            Long commentCount = Long.valueOf(post.getCommentList().size());
+            Long commentCount = commentCount(post.getId());
 
             // 좋아요 여부 체크
             Boolean postLikeCheck = isLikedCheck(userId, post.getId(), clubId);
@@ -347,7 +363,7 @@ public class PostService {
             Long postLikeCount = (long) post.getPostLikeList().size();
 
             // 댓글 수 가져오기
-            Long commentCount = Long.valueOf(post.getCommentList().size());
+            Long commentCount = commentCount(post.getId());
 
             // 좋아요 여부 체크
             Boolean postLikeCheck = isLikedCheck(userId, post.getId(), clubId);
