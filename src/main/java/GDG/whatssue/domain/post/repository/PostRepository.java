@@ -15,6 +15,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findById(Long id);
 
-    Page<Post> findByClubAndWriterAndPostCategory(Club club, ClubMember clubMember, PostCategory postCategory, Pageable pageable);
-    Page<Post> findByPostLikeList_ClubMemberAndClubAndPostCategory(ClubMember clubMember, Club club, PostCategory postCategory, Pageable pageable);
+    Page<Post> findByClubAndWriter(Club club, ClubMember clubMember, Pageable pageable);
+    Page<Post> findByPostLikeList_ClubMemberAndClub(ClubMember clubMember, Club club, Pageable pageable);
 }

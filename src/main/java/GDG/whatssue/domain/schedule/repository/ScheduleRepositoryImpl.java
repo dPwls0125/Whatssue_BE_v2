@@ -31,31 +31,31 @@ public class ScheduleRepositoryImpl implements ScheduleRepositoryCustom{
     public Page<SchedulesResponse> findAllScheduleDto(Long clubId, String searchQuery, LocalDate sDate, LocalDate eDate, Pageable pageable) {
 
         JPAQuery<SchedulesResponse> query = queryFactory
-            .select(Projections.constructor(
-                SchedulesResponse.class,
-                schedule.id,
-                schedule.scheduleName,
-                schedule.attendanceStatus,
-                schedule.scheduleDate))
-            .from(schedule)
-            .where(
-                filterClub(clubId),
-                filterQuery(searchQuery),
-                filterDate(sDate, eDate))
-            .orderBy(schedule.scheduleDate.asc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize());
+                .select(Projections.constructor(
+                        SchedulesResponse.class,
+                        schedule.id,
+                        schedule.scheduleName,
+                        schedule.attendanceStatus,
+                        schedule.scheduleDate))
+                .from(schedule)
+                .where(
+                        filterClub(clubId),
+                        filterQuery(searchQuery),
+                        filterDate(sDate, eDate))
+                .orderBy(schedule.scheduleDate.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
 
         List<SchedulesResponse> results = query.fetch();
 
         long total = query.select(schedule)
-            .from(schedule)
-            .where(
-                filterClub(clubId),
-                filterQuery(searchQuery),
-                filterDate(sDate, eDate))
-            .stream()
-            .count();
+                .from(schedule)
+                .where(
+                        filterClub(clubId),
+                        filterQuery(searchQuery),
+                        filterDate(sDate, eDate))
+                .stream()
+                .count();
 
         return new PageImpl<>(results, pageable, total);
     }
