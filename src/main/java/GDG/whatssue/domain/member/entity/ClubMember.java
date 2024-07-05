@@ -85,6 +85,7 @@ public class ClubMember extends BaseEntity {
         this.isPhonePublic = isPhonePublic;
     }
 
+
     public void setFirstVisitFalse(){
         this.isFirstVisit = false;
     }
