@@ -36,15 +36,23 @@ public class ClubMemberService {
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
 
-    public void modifyClubMember(Long memberId, ClubMemberInfoDto requestDto) {
-        ClubMember clubMember = clubMemberRepository.findById(memberId)
-                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
 
-        clubMember.updateProfile(requestDto.getMemberName(),
+    @Transactional
+    public void modifyClubMember(Long clubId, Long userId, ClubMemberInfoDto requestDto) {
+
+        ClubMember clubMember = findClubMemberByClubAndUser(clubId, userId).get();
+        Club club = clubRepository.findById(clubId).get();
+
+        String memberName;
+
+        if (club.getNamePolicy() == REAL_NAME) memberName = clubMember.getUser().getUserName();
+        else memberName = requestDto.getMemberName();
+
+        clubMember.updateProfile(memberName,
                 requestDto.getMemberIntro(),
                 requestDto.isEmailPublic(),
                 requestDto.isPhonePublic());
-        clubMemberRepository.save(clubMember);
+
     }
 
     @Transactional
@@ -56,19 +64,20 @@ public class ClubMemberService {
 
         ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
 
-        if(clubMember.isFirstVisit() == false) throw new CommonException(ClubMemberErrorCode.EX2201);
+        if(!clubMember.isFirstVisit()) throw new CommonException(ClubMemberErrorCode.EX2201);
 
         // 멤버 프로필 이미지 저장
         MultipartFile profileImage = request.getProfileImage();
         UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, MEMBER_PROFILE_IMAGE_DIRNAME);
 
         // 멤버 프로필 정보  업데이트
-        if(namePolicy == REAL_NAME){
-            String realName = clubMember.getUser().getUserName();
-            clubMember.updateProfile(request.getMemberIntro(), realName, request.getIsEmailPublic(), request.getIsPhonePublic());
-        }else {
-            clubMember.updateProfile(request.getMemberIntro(), request.getMemberName(), request.getIsEmailPublic(), request.getIsPhonePublic());
-        }
+        String memberName;
+        if(namePolicy == REAL_NAME)
+            memberName = clubMember.getUser().getUserName();
+        else
+            memberName = request.getMemberName();
+
+        clubMember.updateProfile(request.getMemberIntro(), memberName, request.getIsEmailPublic(), request.getIsPhonePublic());
         clubMember.setProfileImage(clubProfileImage);
         clubMember.setFirstVisitFalse();
     }

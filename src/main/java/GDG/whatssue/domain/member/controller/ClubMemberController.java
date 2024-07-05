@@ -50,10 +50,10 @@ public class ClubMemberController {
     }
 
 
-    @PatchMapping("/member/{memberId}")
+    @PutMapping("/member/profile/modify")
     @Operation(summary = "멤버 정보 수정")
-    public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberInfoDto dto) {
-        clubMemberService.modifyClubMember(memberId,dto);
+    public ResponseEntity modifyMemberInfo(@PathVariable Long clubId, @LoginUser Long userId, ClubMemberInfoDto dto) {
+        clubMemberService.modifyClubMember(clubId,userId,dto);
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
