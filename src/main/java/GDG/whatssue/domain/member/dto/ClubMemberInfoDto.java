@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClubMemberInfoDto {
+
     private String memberIntro;
     private String memberName;
     private boolean isEmailPublic;

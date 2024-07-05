@@ -26,10 +26,16 @@ public class CertificationController {
     }
     @GetMapping("/check-random-number")
     @Operation(summary = "인증 번호 확인")
-    public ResponseEntity checkRandomNumber(@RequestParam("toNumber") String toNumber, @RequestParam("certificationNum") int certificationNum, @AuthenticationPrincipal KakaoDetails kakaoDetails) {
+    public ResponseEntity<Void> checkRandomNumber(@RequestParam("toNumber") String toNumber, @RequestParam("certificationNum") int certificationNum, @AuthenticationPrincipal KakaoDetails kakaoDetails) {
         Long userId = kakaoDetails.getUser().getUserId();
+<<<<<<< Updated upstream
         Boolean result = myMessageService.checkCertNum(toNumber, certificationNum, userId);
         return ResponseEntity.status(200).body(result);
+=======
+         myMessageService.checkCertNum(toNumber, certificationNum, userId);
+
+        return ResponseEntity.status(200).build();
+>>>>>>> Stashed changes
     }
 }
 
