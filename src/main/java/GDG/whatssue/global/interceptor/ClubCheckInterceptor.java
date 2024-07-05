@@ -1,13 +1,14 @@
 package GDG.whatssue.global.interceptor;
 
-import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.*;
 import static GDG.whatssue.global.error.CommonErrorCode.*;
 
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.service.ClubService;
+import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.global.common.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.SkipFirstVisitCheck;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,35 +49,27 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         clubService.isClubExist(clubId);
 
         // 클럽 멤버여부 체크
-        if (!clubMemberService.isClubMember(clubId, userId)) {
-            throw new CommonException(FORBIDDEN_ACCESS_ERROR);
-        }
+        ClubMember member = clubMemberService.findClubMemberByClubAndUser(clubId, userId)
+            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3000));
 
         // 클럽 관리자 체크
         ClubManager clubManager = hm.getMethodAnnotation(ClubManager.class);
 
-        if (clubManager != null && !clubMemberService.isClubManager(clubId, userId)) {
-            throw new CommonException(FORBIDDEN_ACCESS_ERROR);
+        if (clubManager != null && !member.checkManagerRole()) {
+            throw new CommonException(ClubErrorCode.EX3003);
         }
         
         //첫 로그인 여부 체크
-        if (clubMemberService.isFirstVisit(clubId, userId)) {
-            throw new CommonException(PROFILE_SETUP_REQUIRED_ERROR);
+        SkipFirstVisitCheck skipFirstVisitCheck = hm.getMethodAnnotation(SkipFirstVisitCheck.class);
+        if (skipFirstVisitCheck == null) {
+            member.validateFirstVisit();
         }
-
-
         //인터셉터 통과
         return true;
     }
 
     private Long getClubId(HttpServletRequest request) {
-        String clubId = extractPathVariableFromRequest(request, "clubId");
-
-        try {
-            return Long.parseLong(clubId);
-        } catch (Exception e) {
-            throw new CommonException(BAD_REQUEST);
-        }
+        return Long.parseLong(extractPathVariableFromRequest(request, "clubId"));
     }
 
     private Long getUserId() {
@@ -85,7 +78,7 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         try {
             return kaKaoDetails.getUser().getUserId();
         } catch (Exception e) {
-            throw new CommonException(BAD_REQUEST);
+            throw new CommonException(EX0400);
         }
     }
 
@@ -99,7 +92,7 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !(auth.getPrincipal() instanceof OAuth2User)) {
-            throw new CommonException(OAUTH_ERROR);
+            throw new CommonException(EX0400);
         }
 
         return (KakaoDetails) auth.getPrincipal();

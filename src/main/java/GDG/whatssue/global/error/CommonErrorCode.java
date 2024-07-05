@@ -8,11 +8,20 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum CommonErrorCode implements ErrorCode{
 
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "Invalid Input Value"),
-    OAUTH_ERROR(HttpStatus.BAD_REQUEST, "OAuth Error"),
-    FORBIDDEN_ACCESS_ERROR(HttpStatus.FORBIDDEN, "You do not have access to this resource"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+    EX0000("0000", HttpStatus.FORBIDDEN, "로그인이 필요한 작업입니다"),
+    EX0002("0002", HttpStatus.FORBIDDEN, "해당 리소스에 대한 접근 권한이 없습니다"),
 
+    EX0100("0100", HttpStatus.NOT_FOUND, "잘못된 요청 경로입니다."),
+
+    EX0300("0300", HttpStatus.BAD_REQUEST, "잘못된 요청 메서드입니다."),
+    EX0301("0301", HttpStatus.BAD_REQUEST, "요청 데이터가 조건에 맞지 않습니다"),
+    EX0302("0302", HttpStatus.BAD_REQUEST, "요청 파라미터의 데이터가 조건에 맞지 않습니다"),
+    EX0303("0303", HttpStatus.BAD_REQUEST, "요청 파라미터는 필수입니다."),
+    EX0304("0304", HttpStatus.BAD_REQUEST, "날짜 또는 시간의 형식이 잘못되었습니다."),
+
+    EX0400("0400", HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다.");
+
+    private final String code;
     private final HttpStatus httpStatus;
     private final String Message;
 }

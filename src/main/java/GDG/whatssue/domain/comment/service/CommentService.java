@@ -1,32 +1,29 @@
 package GDG.whatssue.domain.comment.service;
 
-import GDG.whatssue.domain.comment.repository.CommentRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import GDG.whatssue.domain.comment.dto.ChildCommentAddDto;
+import GDG.whatssue.domain.comment.dto.CommentAddDto;
+import GDG.whatssue.domain.comment.dto.CommentDto;
+import GDG.whatssue.domain.comment.dto.CommentUpdateDto;
+import GDG.whatssue.domain.comment.entity.Comment;
+import org.springframework.data.domain.Page;
 
-@Service
-@RequiredArgsConstructor
-public class CommentService {
-    private final CommentRepository commentRepository;
+import java.util.List;
 
-    public void createComment() {
-        // 댓글 작성
-    }
+public interface CommentService {
 
-    public void updateComment() {
-        // 댓글 수정
-    }
+    void createComment(CommentAddDto commentAddDto, Long userId, Long clubId);
 
-    public void deleteComment() {
-        // 댓글 삭제
-    }
+    void deleteComment( Long commentId, Long userId, Long clubId);
 
-    public void getComment() {
-        // 댓글 조회
-    }
+    void updateComment(CommentUpdateDto commentUpdateDto, Long userId, Long clubId);
 
-    public void getCommentList() {
-        // 댓글 목록 조회
-    }
+    void createChildComment(ChildCommentAddDto childCommentAddDto, Long userId, Long clubId);
+
+    Page<CommentDto> getParentCommentList(Long postId, int size, int page);
+
+    Page<CommentDto> getChildCommentList(Long parentId, int size, int page);
+
+    void getMyCommentList(Long userId, Long clubId);
+
 
 }

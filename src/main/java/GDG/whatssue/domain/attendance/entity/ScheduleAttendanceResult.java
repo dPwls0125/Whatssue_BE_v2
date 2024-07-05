@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.attendance.entity;
 
+import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.global.common.BaseEntity;
@@ -7,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,11 +30,11 @@ public class ScheduleAttendanceResult extends BaseEntity {
     @Column(name = "schedule_attendance_result_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "club_member_id", nullable = false)
     private ClubMember clubMember;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
 

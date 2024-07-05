@@ -1,3 +1,45 @@
+package GDG.whatssue.domain.user.service;
+
+import GDG.whatssue.domain.user.Error.UserErrorCode;
+import GDG.whatssue.domain.user.dto.SignUpRequestDto;
+import GDG.whatssue.domain.user.dto.UserDto;
+import GDG.whatssue.domain.user.dto.UserModifiyRequestDto;
+import GDG.whatssue.domain.user.entity.User;
+import GDG.whatssue.global.error.CommonException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class UserService {
+
+    private final UserServiceFacade userServiceFacade;
+
+    public UserDto getUserInfo(Long userId) {
+        User user = userServiceFacade.getUserById(userId);
+        // user정보를 Repository에서 가져와야 signup 이후의 정보(phone, name)를 가져올 수 있음.
+        return user.entityToUserDto();
+    }
+
+    @Transactional
+    public UserDto signUp(Long userId, SignUpRequestDto requestDto) {
+        User user = userServiceFacade.getUserById(userId);
+        user.setSignUpUserInfo(requestDto);
+        return user.entityToUserDto();
+    }
+
+    @Transactional
+    public UserDto modifyUserInfo(Long userId, UserModifiyRequestDto request) {
+        User user = userServiceFacade.getUserById(userId);
+        user.setModifyUserInfo(request);
+
+        UserDto dto = user.entityToUserDto();
+        return dto;
+    }
+}
+
 //package GDG.whatssue.domain.user.service;
 //import GDG.whatssue.domain.user.dto.UserDto;
 //import GDG.whatssue.domain.user.entity.PrincipalDetails;
@@ -61,17 +103,6 @@
 ////                .build();
 ////    }
 //
-//    public UserDto getUserInfo(Long userId)  {
-//        User user = userRepository.findById(userId).orElseThrow(
-//                () -> new IllegalArgumentException("해당 유저가 없습니다.")
-//        );
-//        return UserDto.builder()
-//                .userId(String.valueOf(user.getUserId()))
-//                .userName(user.getUserName())
-//                .role(user.getRole())
-//                .oauth2Id(user.getOauth2Id())
-//                .build();
-//    }
 //
 //
 //}

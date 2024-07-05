@@ -8,12 +8,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ClubMemberErrorCode implements ErrorCode {
-    CLUB_MEMBER_NOT_FOUND_ERROR(HttpStatus.BAD_REQUEST, "Club Member Not Found"),
+    EX2100("2100", HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
 
-    CLUB_MEMBER_COULD_NOT_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"Club Member Cannot be Not Deleted" ),
-    PROFILE_SETUP_REQUIRED_ERROR(HttpStatus.PRECONDITION_REQUIRED, "Initial profile settings required"),
-    CLUB_MEMBER_COULD_NOT_MODIFY_ERROR(HttpStatus.NOT_MODIFIED, "Club Member's Role Was Not Modified");
+    EX2200("2200", HttpStatus.PRECONDITION_REQUIRED, "멤버 프로필 초기 설정이 필요합니다."),
 
+    EX2201("2201", HttpStatus.BAD_REQUEST, "멤버 프로필 설정은 최초에만 가능합니다.");
+
+    private final String code;
     private final HttpStatus httpStatus;
     private final String message;
 }

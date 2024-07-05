@@ -1,32 +1,29 @@
 package GDG.whatssue.domain.member.controller;
 
-import GDG.whatssue.domain.member.dto.ClubMemberDto;
-import GDG.whatssue.domain.member.dto.MemberProfileDto;
+import GDG.whatssue.domain.member.dto.*;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
-import GDG.whatssue.domain.member.service.ClubMemberSerivce;
+import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
+import GDG.whatssue.global.common.annotation.SkipFirstVisitCheck;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- * 멤버 권한 수정 : [PATCH] - /api/clubs/{clubId}/members/{memberId}/manager
- * 멤버 추방 : [DELETE] - /api/clubs/{clubId}/members/{memberId}/manager
- * 멤버 상세조회(일반멤버) : [GET] - /api/clubs/{clubId}/members/{memberId}
- * 멤버 상세조회(관리자) : [GET] - /api/clubs/{clubId}/members/{memberId}/manager
- * 멤버 목록 조회 : [GET] - /api/clubs/{clubId}/members
- */
+import java.io.IOException;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}")
 public class ClubMemberController {
-    private final ClubMemberSerivce clubMemberSerivce;
+    private final ClubMemberService clubMemberService;
     private final ClubMemberManagingService clubMemberManagingService;
 
     @ClubManager
@@ -45,18 +42,42 @@ public class ClubMemberController {
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-    @PatchMapping("/member/{memberId}")
-    @Operation(summary = "멤버 정보 수정")
-    public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberDto dto) {
-        clubMemberSerivce.modifyClubMember(memberId,dto);
-        return new ResponseEntity("ok", HttpStatus.OK);
-    }
-
-    @GetMapping("/member/{memberId}/")
-    @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
-    public ResponseEntity getProfile(@PathVariable Long memberId, @LoginUser Long userId){
-        MemberProfileDto dto = clubMemberSerivce.getMemberProfile(memberId,userId);
+    @GetMapping("/member/info")
+    @Operation(summary = "유저의 클럽 내 멤버 아이디 및 역할 조회")
+    public ResponseEntity getMemberInfo(@PathVariable Long clubId, @LoginUser Long userId) {
+        ClubMemberDto dto = clubMemberService.getMemberIdAndRole(clubId, userId);
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
+
+    @PatchMapping("/member/{memberId}")
+    @Operation(summary = "멤버 정보 수정")
+    public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberInfoDto dto) {
+        clubMemberService.modifyClubMember(memberId,dto);
+        return new ResponseEntity("ok", HttpStatus.OK);
+    }
+
+    @SkipFirstVisitCheck
+    @PostMapping(value = "/member/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary ="멤버 프로필 등록")
+    public ResponseEntity<Void> setProfile(
+            @LoginUser Long userId,
+            @PathVariable Long clubId,
+            @Valid @ModelAttribute CreateMemberProfileRequest request) throws IOException {
+        clubMemberService.setMemberProfile(clubId, userId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/member/profile")
+    @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
+    public ResponseEntity getProfile(@PathVariable Long clubId, @LoginUser Long userId){
+        MemberProfileDto response = clubMemberService.getMemberProfile(clubId,userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/member/auth")
+    public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfo(@PathVariable Long clubId, @LoginUser Long userId) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(clubMemberService.getMemberAuthInfo(clubId, userId));
+    }
 }

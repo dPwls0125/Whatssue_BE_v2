@@ -1,25 +1,28 @@
 package GDG.whatssue.domain.schedule.controller;
 
+import static org.springframework.http.HttpStatus.*;
+
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
-import GDG.whatssue.domain.schedule.dto.GetScheduleDetailResponse;
-import GDG.whatssue.domain.schedule.dto.GetScheduleListResponse;
+import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
+import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
-import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
-import GDG.whatssue.domain.schedule.service.impl.ScheduleServiceImpl;
+import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
+import GDG.whatssue.domain.schedule.service.ScheduleService;
 import GDG.whatssue.global.common.annotation.ClubManager;
-import GDG.whatssue.global.common.annotation.LoginMember;
-import GDG.whatssue.global.error.CommonException;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 
-import java.util.regex.Pattern;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,92 +33,90 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Interceptor
- *  - ClubCheckInterceptor : 클럽 유효성 체크, 멤버 여부 체크, 관리자 여부 체크
- *  - ScheduleCheckInterceptor : 스케줄 유효성 체크, 스케줄-클럽 권한 체크
- */
 @Tag(name = "ScheduleController", description = "모임의 일정에 관련된 api")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}/schedules")
+@CrossOrigin
 public class ScheduleController {
 
-    private final ScheduleServiceImpl scheduleService;
+    private final ScheduleService scheduleService;
 
+    /**
+     * 일정 추가 api
+     */
     @ClubManager
-    @Operation(summary = "일정 추가", description = "날짜 패턴 yyyy-MM-dd HH:ss")
+    @Operation(summary = "일정 추가", description = "날짜= yyyy-MM-dd, 시간= HH:mm")
     @PostMapping
-    public ResponseEntity addSchedule (
+    public ResponseEntity<AddScheduleResponse> addSchedule (
         @PathVariable(name = "clubId") Long clubId,
-        @LoginMember Long memberId,
+        @LoginUser Long userId,
         @Valid @RequestBody AddScheduleRequest requestDto) {
-        scheduleService.saveSchedule(clubId, memberId, requestDto);
 
-        return ResponseEntity.status(200).body("ok");
+        return ResponseEntity
+            .status(OK)
+            .body(scheduleService.saveSchedule(clubId, userId, requestDto));
     }
 
+    /**
+     * 일정 수정 api
+     */
     @ClubManager
     @Operation(summary = "일정 수정", description = "날짜 패턴 yyyy-MM-dd HH:ss")
     @PatchMapping("/{scheduleId}")
-    public ResponseEntity modifySchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId,
+    public ResponseEntity<String> modifySchedule(
+        @PathVariable(name = "clubId") Long clubId,
+        @PathVariable(name = "scheduleId") Long scheduleId,
         @Valid @RequestBody ModifyScheduleRequest requestDto) {
+        scheduleService.updateSchedule(clubId, scheduleId, requestDto);
 
-        scheduleService.updateSchedule(scheduleId, requestDto);
-
-        return ResponseEntity.status(HttpStatus.OK).body("ok");
+        return ResponseEntity
+            .status(OK)
+            .body("ok");
     }
 
+    /**
+     * 일정 삭제 api
+     */
     @ClubManager
     @Operation(summary = "일정 삭제")
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        scheduleService.deleteSchedule(scheduleId);
+    public ResponseEntity<String> deleteSchedule(@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
+        scheduleService.deleteSchedule(clubId, scheduleId);
 
-        return ResponseEntity.status(HttpStatus.OK).body("ok");
+        return ResponseEntity
+            .status(OK)
+            .body("ok");
     }
     
     @Operation(summary = "일정 상세조회")
     @GetMapping("/{scheduleId}")
-    public ResponseEntity getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
-        GetScheduleDetailResponse scheduleDto = scheduleService.findSchedule(scheduleId);
+    public ResponseEntity<ScheduleDetailResponse> getSchedule (@PathVariable(name = "clubId") Long clubId, @PathVariable(name = "scheduleId") Long scheduleId) {
+        ScheduleDetailResponse scheduleDto = scheduleService.getScheduleDetail(clubId, scheduleId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
+        return ResponseEntity
+            .status(OK)
+            .body(scheduleDto);
     }
 
-    @Operation(summary = "일정 조회(전체/일별/월별)")
+    @Operation(summary = "일정 조회(검색 : 검색어, 기간)")
     @GetMapping
-    @Parameter(name = "date", description = "날짜 미입력 시 전체 일정 조회 (날짜 패턴 : yyyy-MM-dd or yyyy-MM)", required = false, in = ParameterIn.QUERY)
-    public ResponseEntity getScheduleAll( @PathVariable(name = "clubId") Long clubId, @RequestParam(name = "date", required = false) String date) {
-        List<GetScheduleListResponse> responseDtoList = getScheduleResponses(clubId, date);
+    @Parameter(name = "keyword", description = "검색어. 일정명으로 검색", in = ParameterIn.QUERY)
+    @Parameter(name = "startDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", in = ParameterIn.QUERY)
+    @Parameter(name = "endDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
+    public ResponseEntity<Page<SchedulesResponse>> findSchedules(
+        @PathVariable(name = "clubId") Long clubId,
+        @RequestParam(name = "keyword", required = false, defaultValue = "") String query,
+        @RequestParam(name = "startDate", defaultValue = "1900-01-01") String startDate,
+        @RequestParam(name = "endDate", required = false, defaultValue = "2199-12-31") String endDate,
+        Pageable pageable) {
 
-        return new ResponseEntity(responseDtoList, HttpStatus.OK);
-    }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate sDate = LocalDate.parse(startDate, formatter);
+        LocalDate eDate = LocalDate.parse(endDate, formatter);
 
-    private List<GetScheduleListResponse> getScheduleResponses(Long clubId, String date) {
-        List<GetScheduleListResponse> responseDtoList;
-        if (date == null) { //전체 조회
-            responseDtoList = scheduleService.findScheduleAll(clubId);
-        } else {
-            boolean day_check = Pattern.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}", date);
-            boolean month_check = Pattern.matches("[0-9]{4}-[0-9]{2}", date);
-
-            responseDtoList = getScheduleResponsesByFilter(clubId, date, day_check, month_check);
-        }
-
-        return responseDtoList;
-    }
-
-    private List<GetScheduleListResponse> getScheduleResponsesByFilter(Long clubId, String date, boolean day_check, boolean month_check) {
-        List<GetScheduleListResponse> responseDtoList;
-        if (day_check) { //일자별 조회
-            responseDtoList = scheduleService.findScheduleByDay(clubId, date);
-        } else if (month_check) { //월별 조회
-            responseDtoList = scheduleService.findScheduleByMonth(clubId, date);
-        } else { //지정 패턴과 맞지 않음
-            throw new CommonException(ScheduleErrorCode.INVALID_SCHEDULE_DATE_PATTERN_ERROR);
-        }
-
-        return responseDtoList;
+        return ResponseEntity
+            .status(OK)
+            .body(scheduleService.findAllSchedule(clubId, query, sDate, eDate, pageable));
     }
 }

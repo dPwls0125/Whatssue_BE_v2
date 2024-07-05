@@ -1,13 +1,14 @@
 package GDG.whatssue.domain.member.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import GDG.whatssue.domain.member.entity.Role;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
+
+@Data
+@Builder
 public class ClubMemberDto {
-    private String memberIntro;
-    private String memberName;
-    private boolean isEmailPublic;
-    private boolean isPhonePublic;
+
+    private Long memberId;
+    private Role role;
 }
