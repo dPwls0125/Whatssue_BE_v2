@@ -21,6 +21,8 @@ public interface OfficialAbsenceRequestRepository extends JpaRepository<Official
 
     boolean existsByScheduleAndClubMember(Schedule schedule, ClubMember clubMember);
 
+    Optional<OfficialAbsenceRequest> findByScheduleIdAndClubMemberId(Long scheduleId, Long clubMemberId);
+
     Page<OfficialAbsenceRequest> findByClubMember(ClubMember clubMember, Pageable pageable);
     Page<OfficialAbsenceRequest> findByClubMember_Club_Id(Long clubId, Pageable pageable);
 

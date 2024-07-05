@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class AttendanceService {
 
-
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleFacade scheduleFacade;
@@ -175,15 +174,28 @@ public class AttendanceService {
         List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.EX3100));
 
         for(ClubMember clubMember : clubMembers){
+
             if(scheduleAttendanceResultRepository.findByScheduleIdAndClubMemberId(scheduleId, clubMember.getId()).isPresent()){
                 break;
             }
-            ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
-                    .clubMember(clubMember)
-                    .schedule(scheduleFacade.getSchedule(clubId, scheduleId))
-                    .attendanceType(AttendanceType.ABSENCE)
-                    .build();
-            scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
+
+            if(isOfficial_Accepted(clubMember.getId(), scheduleId)){
+
+                ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
+                        .clubMember(clubMember)
+                        .schedule(scheduleFacade.getSchedule(clubId, scheduleId))
+                        .attendanceType(AttendanceType.OFFICIAL_ABSENCE)
+                        .build();
+                scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
+
+            }else{
+                ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
+                        .clubMember(clubMember)
+                        .schedule(scheduleFacade.getSchedule(clubId, scheduleId))
+                        .attendanceType(AttendanceType.ABSENCE)
+                        .build();
+                scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
+            }
         }
     }
 
@@ -229,4 +241,12 @@ public class AttendanceService {
         return "attendanceNum" + clubId.toString() +":" + scheduleId.toString();
     }
 
+
+    private boolean isOfficial_Accepted(Long clubMemberId, Long scheduleId){
+        return officialAbsenceRequestRepository.findByScheduleIdAndClubMemberId(scheduleId, clubMemberId)
+                .map(officialAbsenceRequest -> officialAbsenceRequest.getOfficialAbsenceRequestType() == OfficialAbsenceRequestType.ACCEPTED)
+                .orElse(false);
+    }
+
 }
+
