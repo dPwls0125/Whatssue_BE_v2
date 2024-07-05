@@ -12,6 +12,7 @@ import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.Error.UserErrorCode;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
+import GDG.whatssue.global.common.annotation.SkipFirstVisitCheck;
 import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
 
@@ -46,18 +47,18 @@ public class ClubMemberService {
     }
 
     @Transactional
-    public void setMemberProfile(Long clubId, Long userId, CreateMemberProfileRequest request, MultipartFile profileImage) throws IOException {
-
+    public void setMemberProfile(Long clubId, Long userId, CreateMemberProfileRequest request) throws IOException {
         // 멤버 생성 및 역할 일반 멤버로 설정
-        Club club = clubRepository.findById(clubId).get();
-        NamePolicy namePolicy = club.getNamePolicy();
         ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
 
+        if(clubMember.isFirstVisit() == false) throw new CommonException(ClubMemberErrorCode.EX2201);
+
         // 멤버 프로필 이미지 저장
+        MultipartFile profileImage = request.getProfileImage();
         UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, MEMBER_PROFILE_IMAGE_DIRNAME);
 
         // 멤버 프로필 정보  업데이트
-        clubMember.updateProfile(request.getMemberIntro(),request.getMemberName(), request.getIsEmailPublic(), request.getIsPhonePublic());
+        clubMember.updateProfile(request.getMemberIntro(), request.getMemberName(), request.getIsEmailPublic(), request.getIsPhonePublic());
         clubMember.setProfileImage(clubProfileImage);
         clubMember.setFirstVisitFalse();
     }
