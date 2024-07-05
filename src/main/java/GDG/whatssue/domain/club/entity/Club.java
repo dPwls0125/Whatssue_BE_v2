@@ -4,8 +4,6 @@ package GDG.whatssue.domain.club.entity;
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.file.entity.ClubProfileImage;
-import GDG.whatssue.domain.file.entity.PostImage;
-import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.*;
@@ -45,7 +43,7 @@ public class Club extends BaseEntity {
     @Column(nullable = false)
     private NamePolicy namePolicy;
 
-    @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) //지연 로딩
+    @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) //지연 로딩
     private ClubProfileImage profileImage;
 
     //==연관관계 메서드==//
@@ -54,8 +52,12 @@ public class Club extends BaseEntity {
      * 모임 프로필이미지 업데이트
      */
     public void updateProfileImage(ClubProfileImage profileImage) {
-        profileImage.setClub(this); //연관관계 편의 메서드
+        if (this.profileImage != null) {
+            this.profileImage.setClub(null);
+        }
+
         this.profileImage = profileImage;
+        profileImage.setClub(this);
     }
 
     //==생성메서드==//

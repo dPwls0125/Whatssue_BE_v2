@@ -35,7 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class ClubService {
     private final ClubRepository clubRepository;
-    private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
     private final ClubMemberRepository clubMemberRepository;
@@ -67,8 +66,6 @@ public class ClubService {
 
         ClubProfileImage profileImage = ClubProfileImage.of(originalFileName, storeFileName);
         club.updateProfileImage(profileImage);
-        fileRepository.save(profileImage);
-
 
         //로그인 유저 관리자로 추가
         ClubMember newMember = ClubMember.newMember(club, user);
@@ -90,14 +87,12 @@ public class ClubService {
 
         //기존 프로필 사진 버킷 및 DB 삭제
         fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
-        fileRepository.delete(club.getProfileImage());//레포에서 삭제
 
         //새로운 프로필 사진 저장
         String storeFileName = fileUploadService.uploadFile(multipartFile, CLUB_PROFILE_IMAGE_DIRNAME);
         String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
         ClubProfileImage profileImage = ClubProfileImage.of(originalFileName, storeFileName);
         club.updateProfileImage(profileImage);
-        fileRepository.save(profileImage);
     }
 
     @Transactional
