@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import static GDG.whatssue.domain.club.entity.NamePolicy.REAL_NAME;
 import static GDG.whatssue.domain.file.FileConst.MEMBER_PROFILE_IMAGE_DIRNAME;
 
 @Service
@@ -49,6 +50,10 @@ public class ClubMemberService {
     @Transactional
     public void setMemberProfile(Long clubId, Long userId, CreateMemberProfileRequest request) throws IOException {
         // 멤버 생성 및 역할 일반 멤버로 설정
+        Club club = clubRepository.findById(clubId).get();
+        NamePolicy namePolicy = club.getNamePolicy();
+
+
         ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
 
         if(clubMember.isFirstVisit() == false) throw new CommonException(ClubMemberErrorCode.EX2201);
@@ -58,7 +63,12 @@ public class ClubMemberService {
         UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, MEMBER_PROFILE_IMAGE_DIRNAME);
 
         // 멤버 프로필 정보  업데이트
-        clubMember.updateProfile(request.getMemberIntro(), request.getMemberName(), request.getIsEmailPublic(), request.getIsPhonePublic());
+        if(namePolicy == REAL_NAME){
+            String realName = clubMember.getUser().getUserName();
+            clubMember.updateProfile(request.getMemberIntro(), realName, request.getIsEmailPublic(), request.getIsPhonePublic());
+        }else {
+            clubMember.updateProfile(request.getMemberIntro(), request.getMemberName(), request.getIsEmailPublic(), request.getIsPhonePublic());
+        }
         clubMember.setProfileImage(clubProfileImage);
         clubMember.setFirstVisitFalse();
     }
