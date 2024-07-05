@@ -8,6 +8,7 @@ import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.user.entity.KakaoDetails;
 import GDG.whatssue.global.common.annotation.ClubManager;
+import GDG.whatssue.global.common.annotation.SkipFirstVisitCheck;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,8 +60,10 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         }
         
         //첫 로그인 여부 체크
-        member.validateFirstVisit();
-
+        SkipFirstVisitCheck skipFirstVisitCheck = hm.getMethodAnnotation(SkipFirstVisitCheck.class);
+        if (skipFirstVisitCheck == null) {
+            member.validateFirstVisit();
+        }
         //인터셉터 통과
         return true;
     }

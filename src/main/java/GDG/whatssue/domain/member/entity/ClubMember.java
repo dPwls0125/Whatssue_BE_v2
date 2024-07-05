@@ -4,7 +4,6 @@ import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.EX2200;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.file.entity.MemberProfileImage;
-import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
@@ -53,7 +52,7 @@ public class ClubMember extends BaseEntity {
     private MemberProfileImage profileImage;
 
     //==연관관계 메서드==//
-    public void setProfileImage(MemberProfileImage profileImage) {
+    public void changeProfileImage(MemberProfileImage profileImage) {
         profileImage.setClubMember(this);
         this.profileImage = profileImage;
     }
@@ -83,6 +82,10 @@ public class ClubMember extends BaseEntity {
         this.memberName = memberName;
         this.isEmailPublic = isEmailPublic;
         this.isPhonePublic = isPhonePublic;
+    }
+
+    public void setFirstVisitFalse(){
+        this.isFirstVisit = false;
     }
 
     /**

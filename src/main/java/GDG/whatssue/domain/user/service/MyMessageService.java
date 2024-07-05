@@ -47,7 +47,7 @@ public class MyMessageService {
         int randomNum = randomNumber();
         message.setFrom(fromNumber);
         message.setTo(toNumber);
-        message.setText("[WHATSSUE] 인증번호:" + randomNum + "입니다. \n 인증 번호를 정확히 입력해주세요.");
+        message.setText("[왓슈]\n 인증번호: " + randomNum + "\n 인증 번호를 정확히 입력해주세요.");
 
         phoneCertNum = PhoneCertNum.builder()
                 .Id(toNumber +":"+ userId)
@@ -67,12 +67,11 @@ public class MyMessageService {
             return response;
         }
 
-        public Boolean checkCertNum(String toNumber, int certNum,Long userId) {
+        public void checkCertNum(String toNumber, int certNum,Long userId) {
             PhoneCertNum phoneCertNum = phoneCertNumRepository.findById(toNumber + ":" + userId).orElseThrow(() -> new RuntimeException("인증번호가 존재하지 않습니다."));
             if (phoneCertNum.getCertificationNum() != certNum) {
                 throw new RuntimeException("인증번호가 일치하지 않습니다.");
             }
-            return true;
         }
 
         private int randomNumber() {
