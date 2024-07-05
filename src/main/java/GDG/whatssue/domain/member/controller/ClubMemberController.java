@@ -5,6 +5,7 @@ import GDG.whatssue.domain.member.service.ClubMemberManagingService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
+import GDG.whatssue.global.common.annotation.SkipFirstVisitCheck;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}")
 public class ClubMemberController {
-    private final ClubMemberService clubMemberSerivce;
+    private final ClubMemberService clubMemberService;
     private final ClubMemberManagingService clubMemberManagingService;
 
     @ClubManager
@@ -44,7 +45,7 @@ public class ClubMemberController {
     @GetMapping("/member/info")
     @Operation(summary = "유저의 클럽 내 멤버 아이디 및 역할 조회")
     public ResponseEntity getMemberInfo(@PathVariable Long clubId, @LoginUser Long userId) {
-        ClubMemberDto dto = clubMemberSerivce.getMemberIdAndRole(clubId, userId);
+        ClubMemberDto dto = clubMemberService.getMemberIdAndRole(clubId, userId);
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
@@ -52,33 +53,31 @@ public class ClubMemberController {
     @PatchMapping("/member/{memberId}")
     @Operation(summary = "멤버 정보 수정")
     public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberInfoDto dto) {
-        clubMemberSerivce.modifyClubMember(memberId,dto);
+        clubMemberService.modifyClubMember(memberId,dto);
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-
-    @PostMapping(value = "/member/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @SkipFirstVisitCheck
+    @PostMapping(value = "/member/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary ="멤버 프로필 등록")
-    public ResponseEntity setProfile(
+    public ResponseEntity<Void> setProfile(
             @LoginUser Long userId,
             @PathVariable Long clubId,
-            @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
-            @Valid @RequestPart CreateMemberProfileRequest request) throws IOException {
-        clubMemberSerivce.setMemberProfile(clubId, userId, request, profileImage);
-        return ResponseEntity.status(HttpStatus.OK).body("ok");
+            @Valid @ModelAttribute CreateMemberProfileRequest request) throws IOException {
+        clubMemberService.setMemberProfile(clubId, userId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 
     @GetMapping("/member/profile")
     @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
     public ResponseEntity getProfile(@PathVariable Long clubId, @LoginUser Long userId){
-        MemberProfileDto response = clubMemberSerivce.getMemberProfile(clubId,userId);
+        MemberProfileDto response = clubMemberService.getMemberProfile(clubId,userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/member/auth")
     public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfo(@PathVariable Long clubId, @LoginUser Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(clubMemberSerivce.getMemberAuthInfo(clubId, userId));
+            .body(clubMemberService.getMemberAuthInfo(clubId, userId));
     }
 }

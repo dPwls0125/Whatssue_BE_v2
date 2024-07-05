@@ -11,6 +11,10 @@ spring:
     url: jdbc:mysql://localhost:3306/whatssuev2?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     password: ${SPRING_DATASOURCE_PASSWORD}
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -40,6 +44,7 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token #토큰 받기 항목
             user-info-uri: https://kapi.kakao.com/v2/user/me #유저 정보 받기 항목
             user-name-attribute: id #식별자 카카오의 경우 "id" 이용
+
 logging:
   level:
     org:

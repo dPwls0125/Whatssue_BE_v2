@@ -48,7 +48,7 @@ public class ClubMember extends BaseEntity {
     @Column(nullable = false)
     private boolean isFirstVisit;
 
-    @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
+    @OneToOne(mappedBy = "clubMember", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY) //지연 로딩 설정
     private UploadFile profileImage;
 
     //==연관관계 메서드==//
@@ -109,6 +109,7 @@ public class ClubMember extends BaseEntity {
     }
 
     public void validateFirstVisit() {
+
         if (this.isFirstVisit == true) {
             throw new CommonException(EX2200);
         }
