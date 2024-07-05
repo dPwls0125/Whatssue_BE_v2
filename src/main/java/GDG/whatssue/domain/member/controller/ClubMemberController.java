@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/clubs/{clubId}")
+@RequestMapping("/api/clubs/{clubId}/members")
 public class ClubMemberController {
     private final ClubMemberService clubMemberSerivce;
     private final ClubMemberManagingService clubMemberManagingService;
 
     @ClubManager
-    @DeleteMapping("/member/{memberId}/manager")
+    @DeleteMapping("/{memberId}/manager")
     @Operation(summary = "멤버 추방", description = "멤버를 클럽에서 추방합니다.(매니저만 이용 가능한 기능)")
     public ResponseEntity deleteMember(@PathVariable Long clubId, @PathVariable Long memberId) {
         clubMemberManagingService.deleteClubMember(memberId);
@@ -32,36 +32,28 @@ public class ClubMemberController {
     }
 
     @ClubManager
-    @PatchMapping ("/member/{memberId}/manager")
+    @PatchMapping ("/{memberId}/manager")
     @Operation(summary = "멤버 권한 수정", description = "멤버의 권한을 수정합니다. role 은 string 형태로 'member' or 'manager'와 같이 입력해야 합니다.(대소문자 구분 x)")
     public ResponseEntity modifyMemberRole(@PathVariable Long clubId, @PathVariable Long memberId, @RequestParam("role") String role) {
         clubMemberManagingService.modifyClubMemberRole(memberId, role);
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-    @GetMapping("/member/info")
-    @Operation(summary = "유저의 클럽 내 멤버 아이디 및 역할 조회")
-    public ResponseEntity getMemberInfo(@PathVariable Long clubId, @LoginUser Long userId) {
-        ClubMemberDto dto = clubMemberSerivce.getMemberIdAndRole(clubId, userId);
-        return new ResponseEntity(dto, HttpStatus.OK);
-    }
-
-
-    @PatchMapping("/member/{memberId}")
+    @PatchMapping("/{memberId}")
     @Operation(summary = "멤버 정보 수정")
     public ResponseEntity modifyMemberInfo(@PathVariable Long memberId, ClubMemberInfoDto dto) {
         clubMemberSerivce.modifyClubMember(memberId,dto);
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-    @GetMapping("/member/profile")
+    @GetMapping("/profile")
     @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
     public ResponseEntity getProfile(@PathVariable Long clubId, @LoginUser Long userId){
         MemberProfileDto dto = clubMemberSerivce.getMemberProfile(clubId,userId);
         return new ResponseEntity(dto, HttpStatus.OK);
     }
 
-    @GetMapping("/member/auth")
+    @GetMapping("/my/auth")
     public ResponseEntity<MemberAuthInfoResponse> getMemberAuthInfo(@PathVariable Long clubId, @LoginUser Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(clubMemberSerivce.getMemberAuthInfo(clubId, userId));
