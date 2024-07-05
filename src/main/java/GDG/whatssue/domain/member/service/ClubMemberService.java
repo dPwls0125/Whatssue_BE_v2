@@ -3,7 +3,7 @@ package GDG.whatssue.domain.member.service;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.entity.NamePolicy;
 import GDG.whatssue.domain.club.repository.ClubRepository;
-import GDG.whatssue.domain.file.entity.UploadFile;
+import GDG.whatssue.domain.file.entity.MemberProfileImage;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.dto.*;
 import GDG.whatssue.domain.member.entity.ClubMember;
@@ -12,7 +12,6 @@ import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.user.Error.UserErrorCode;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.global.common.annotation.SkipFirstVisitCheck;
 import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
 
@@ -67,8 +66,10 @@ public class ClubMemberService {
         if(!clubMember.isFirstVisit()) throw new CommonException(ClubMemberErrorCode.EX2201);
 
         // 멤버 프로필 이미지 저장
-        MultipartFile profileImage = request.getProfileImage();
-        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, MEMBER_PROFILE_IMAGE_DIRNAME);
+        MultipartFile multipartFile = request.getProfileImage();
+        String storeFileName = fileUploadService.uploadFile(multipartFile, MEMBER_PROFILE_IMAGE_DIRNAME);
+        String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
+        MemberProfileImage memberProfileImage = MemberProfileImage.of(originalFileName, storeFileName);
 
         // 멤버 프로필 정보  업데이트
         String memberName;
@@ -78,7 +79,7 @@ public class ClubMemberService {
             memberName = request.getMemberName();
 
         clubMember.updateProfile(request.getMemberIntro(), memberName, request.getIsEmailPublic(), request.getIsPhonePublic());
-        clubMember.setProfileImage(clubProfileImage);
+        clubMember.changeProfileImage(memberProfileImage);
         clubMember.setFirstVisitFalse();
     }
 
