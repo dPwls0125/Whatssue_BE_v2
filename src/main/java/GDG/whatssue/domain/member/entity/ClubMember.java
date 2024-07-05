@@ -3,6 +3,7 @@ package GDG.whatssue.domain.member.entity;
 import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.EX2200;
 
 import GDG.whatssue.domain.club.entity.Club;
+import GDG.whatssue.domain.file.entity.MemberProfileImage;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
@@ -49,12 +50,12 @@ public class ClubMember extends BaseEntity {
     private boolean isFirstVisit;
 
     @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
-    private UploadFile profileImage;
+    private MemberProfileImage profileImage;
 
     //==연관관계 메서드==//
-    public void setProfileImage(UploadFile profileImage) {
-        this.profileImage = profileImage;
+    public void setProfileImage(MemberProfileImage profileImage) {
         profileImage.setClubMember(this);
+        this.profileImage = profileImage;
     }
 
     //==생성메서드==//
