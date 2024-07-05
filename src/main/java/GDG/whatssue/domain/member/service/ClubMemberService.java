@@ -1,9 +1,11 @@
 package GDG.whatssue.domain.member.service;
 
-import GDG.whatssue.domain.member.dto.ClubMemberDto;
-import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
-import GDG.whatssue.domain.member.dto.MemberAuthInfoResponse;
-import GDG.whatssue.domain.member.dto.MemberProfileDto;
+import GDG.whatssue.domain.club.entity.Club;
+import GDG.whatssue.domain.club.entity.NamePolicy;
+import GDG.whatssue.domain.club.repository.ClubRepository;
+import GDG.whatssue.domain.file.entity.UploadFile;
+import GDG.whatssue.domain.file.service.FileUploadService;
+import GDG.whatssue.domain.member.dto.*;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
@@ -12,16 +14,25 @@ import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
+
+import java.io.IOException;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import static GDG.whatssue.domain.file.FileConst.MEMBER_PROFILE_IMAGE_DIRNAME;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ClubMemberService {
+    private final ClubRepository clubRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final UserRepository userRepository;
+    private final FileUploadService fileUploadService;
 
     public void modifyClubMember(Long memberId, ClubMemberInfoDto requestDto) {
         ClubMember clubMember = clubMemberRepository.findById(memberId)
@@ -32,6 +43,23 @@ public class ClubMemberService {
                 requestDto.isEmailPublic(),
                 requestDto.isPhonePublic());
         clubMemberRepository.save(clubMember);
+    }
+
+    @Transactional
+    public void setMemberProfile(Long clubId, Long userId, CreateMemberProfileRequest request, MultipartFile profileImage) throws IOException {
+
+        // 멤버 생성 및 역할 일반 멤버로 설정
+        Club club = clubRepository.findById(clubId).get();
+        NamePolicy namePolicy = club.getNamePolicy();
+        ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
+
+        // 멤버 프로필 이미지 저장
+        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, MEMBER_PROFILE_IMAGE_DIRNAME);
+
+        // 멤버 프로필 정보  업데이트
+        clubMember.updateProfile(request.getMemberIntro(),request.getMemberName(), request.getIsEmailPublic(), request.getIsPhonePublic());
+        clubMember.setProfileImage(clubProfileImage);
+        clubMember.setFirstVisitFalse();
     }
 
     // TDDO
@@ -82,4 +110,5 @@ public class ClubMemberService {
     public Optional<ClubMember> findClubMemberByClubAndUser(Long clubId, Long userId) {
         return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId);
     }
+
 }

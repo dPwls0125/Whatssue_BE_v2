@@ -1,19 +1,21 @@
 package GDG.whatssue.domain.member.controller;
 
-import GDG.whatssue.domain.member.dto.ClubMemberDto;
-import GDG.whatssue.domain.member.dto.ClubMemberInfoDto;
-import GDG.whatssue.domain.member.dto.MemberAuthInfoResponse;
-import GDG.whatssue.domain.member.dto.MemberProfileDto;
+import GDG.whatssue.domain.member.dto.*;
 import GDG.whatssue.domain.member.service.ClubMemberManagingService;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -54,11 +56,24 @@ public class ClubMemberController {
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
+
+    @PostMapping(value = "/member/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary ="멤버 프로필 등록")
+    public ResponseEntity setProfile(
+            @LoginUser Long userId,
+            @PathVariable Long clubId,
+            @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
+            @Valid @RequestPart CreateMemberProfileRequest request) throws IOException {
+        clubMemberSerivce.setMemberProfile(clubId, userId, request, profileImage);
+        return ResponseEntity.status(HttpStatus.OK).body("ok");
+    }
+
+
     @GetMapping("/member/profile")
     @Operation(summary = "프로필 조회 ( 멤버 + 유저 )")
     public ResponseEntity getProfile(@PathVariable Long clubId, @LoginUser Long userId){
-        MemberProfileDto dto = clubMemberSerivce.getMemberProfile(clubId,userId);
-        return new ResponseEntity(dto, HttpStatus.OK);
+        MemberProfileDto response = clubMemberSerivce.getMemberProfile(clubId,userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/member/auth")

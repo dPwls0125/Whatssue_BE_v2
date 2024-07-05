@@ -72,6 +72,7 @@ public class ClubMember extends BaseEntity {
         return new ClubMember(club, user);
     }
 
+
     //==비즈니스 로직==//
 
     /**
@@ -83,6 +84,11 @@ public class ClubMember extends BaseEntity {
         this.isEmailPublic = isEmailPublic;
         this.isPhonePublic = isPhonePublic;
     }
+
+    public void setFirstVisitFalse(){
+        this.isFirstVisit = false;
+    }
+
 
     /**
      * 관리자 권한 부여
