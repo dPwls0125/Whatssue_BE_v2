@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/clubs/{clubId}/members")
+@RequestMapping("/api/clubs/{clubId}/member")
 public class ClubMemberController {
     private final ClubMemberService clubMemberService;
     private final ClubMemberManagingService clubMemberManagingService;
@@ -37,29 +37,36 @@ public class ClubMemberController {
     }
 
     @ClubManager
-    @PatchMapping ("/{memberId}/manager")
+    @PatchMapping ("/role")
     @Operation(summary = "멤버 권한 수정", description = "멤버의 권한을 수정합니다. role 은 string 형태로 'member' or 'manager'와 같이 입력해야 합니다.(대소문자 구분 x)")
     public ResponseEntity modifyMemberRole(@PathVariable Long clubId, @PathVariable Long memberId, @RequestParam("role") String role) {
         clubMemberManagingService.modifyClubMemberRole(memberId, role);
         return new ResponseEntity("ok", HttpStatus.OK);
     }
 
-    @PatchMapping("/{memberId}")
-    @Operation(summary = "멤버 정보 수정")
-    public ResponseEntity modifyMemberInfo(@PathVariable Long clubId, @LoginUser Long userId, ClubMemberInfoDto dto) {
-        clubMemberService.modifyClubMember(clubId,userId,dto);
-        return new ResponseEntity("ok", HttpStatus.OK);
+    @PostMapping(value = "/profile/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "멤버 프로필 수정")
+    public ResponseEntity<Void> modifyProfile(
+            @LoginUser Long userId,
+            @PathVariable Long clubId,
+            @Valid @ModelAttribute CreateMemberProfileRequest request) throws IOException {
+
+        clubMemberService.modifyClubMember(clubId,userId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+
     }
 
     @SkipFirstVisitCheck
-    @PostMapping(value = "/member/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary ="멤버 프로필 등록")
     public ResponseEntity<Void> setProfile(
             @LoginUser Long userId,
             @PathVariable Long clubId,
             @Valid @ModelAttribute CreateMemberProfileRequest request) throws IOException {
+
         clubMemberService.setMemberProfile(clubId, userId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
+
     }
 
     @GetMapping("/member/profile")

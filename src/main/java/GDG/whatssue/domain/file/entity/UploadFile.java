@@ -37,4 +37,9 @@ public class UploadFile extends BaseEntity{
         this.uploadFileName = uploadFileName;
         this.storeFileName = storeFileName;
     }
+
+    protected void  updateUploadFile(String uploadFileName, String storeFileName) {
+        this.uploadFileName = uploadFileName;
+        this.storeFileName = storeFileName;
+    }
 }

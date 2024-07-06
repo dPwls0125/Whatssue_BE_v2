@@ -27,4 +27,8 @@ public class MemberProfileImage extends UploadFile{
     public static MemberProfileImage of(String uploadFileName, String storeFileName) {
         return new MemberProfileImage(uploadFileName, storeFileName);
     }
+
+    public void update(String uploadFileName, String storeFileName) {
+        updateUploadFile(uploadFileName, storeFileName);
+    }
 }

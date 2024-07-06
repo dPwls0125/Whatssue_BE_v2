@@ -48,7 +48,7 @@ public class ClubMember extends BaseEntity {
     @Column(nullable = false)
     private boolean isFirstVisit;
 
-    @OneToOne(mappedBy = "clubMember", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //지연 로딩 설정
+    @OneToOne(mappedBy = "clubMember", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.LAZY) //지연 로딩 설정
     private MemberProfileImage profileImage;
 
     //==연관관계 메서드==//

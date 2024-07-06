@@ -4,6 +4,7 @@ import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.entity.NamePolicy;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.file.entity.MemberProfileImage;
+import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.dto.*;
 import GDG.whatssue.domain.member.entity.ClubMember;
@@ -30,36 +31,55 @@ import static GDG.whatssue.domain.file.FileConst.MEMBER_PROFILE_IMAGE_DIRNAME;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ClubMemberService {
+
     private final ClubRepository clubRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
 
-
     @Transactional
-    public void modifyClubMember(Long clubId, Long userId, ClubMemberInfoDto requestDto) {
+    public void modifyClubMember(Long clubId, Long userId, CreateMemberProfileRequest request) throws IOException {
 
-        ClubMember clubMember = findClubMemberByClubAndUser(clubId, userId).get();
         Club club = clubRepository.findById(clubId).get();
+        NamePolicy namePolicy = club.getNamePolicy();
 
+        ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
+
+        // 멤버 프로필 이미지 저장
+        MultipartFile multipartFile = request.getProfileImage();
+
+        String storeFileName = fileUploadService.uploadFile(multipartFile, MEMBER_PROFILE_IMAGE_DIRNAME);
+        String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
+
+        if(clubMember.getProfileImage() != null) {
+
+            MemberProfileImage memberProfileImage = clubMember.getProfileImage();
+            // 버킷에서 기존 사진 삭제
+            fileUploadService.deleteFile(memberProfileImage.getStoreFileName());
+            // DB 새로운 사진으로 업데이트
+            memberProfileImage.update(originalFileName, storeFileName);
+
+        }else{
+            MemberProfileImage memberProfileImage = MemberProfileImage.of(originalFileName, storeFileName);
+            clubMember.changeProfileImage(memberProfileImage);
+        }
+
+        // 멤버 프로필 정보 업데이트
         String memberName;
+        if(namePolicy == REAL_NAME)
+            memberName = clubMember.getUser().getUserName();
+        else
+            memberName = request.getMemberName();
 
-        if (club.getNamePolicy() == REAL_NAME) memberName = clubMember.getUser().getUserName();
-        else memberName = requestDto.getMemberName();
-
-        clubMember.updateProfile(memberName,
-                requestDto.getMemberIntro(),
-                requestDto.isEmailPublic(),
-                requestDto.isPhonePublic());
+        clubMember.updateProfile(request.getMemberIntro(), memberName, request.getIsEmailPublic(), request.getIsPhonePublic());
 
     }
 
     @Transactional
     public void setMemberProfile(Long clubId, Long userId, CreateMemberProfileRequest request) throws IOException {
-        // 멤버 생성 및 역할 일반 멤버로 설정
+
         Club club = clubRepository.findById(clubId).get();
         NamePolicy namePolicy = club.getNamePolicy();
-
 
         ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
 
@@ -89,8 +109,7 @@ public class ClubMemberService {
 
         ClubMember clubMember = findClubMemberByClubAndUser(clubId, userId).get();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() ->new CommonException(UserErrorCode.EX1100));
+        User user = userRepository.findById(userId).get();
 
         String storeFileName = clubMember.getProfileImage().getStoreFileName();
         String memberProfileImage = S3Utils.getFullPath(storeFileName);
@@ -114,14 +133,6 @@ public class ClubMemberService {
     public MemberAuthInfoResponse getMemberAuthInfo(Long clubId, Long userId) {
         ClubMember member = clubMemberRepository.findMemberWithClub(clubId, userId);
         return new MemberAuthInfoResponse(member);
-    }
-
-    public ClubMemberDto getMemberIdAndRole(Long clubId, Long userId) {
-        ClubMember clubMember = findClubMemberByClubAndUser(clubId, userId).get();
-        return ClubMemberDto.builder()
-                .memberId(clubMember.getId())
-                .role(clubMember.getRole())
-                .build();
     }
 
     public Long getClubMemberId(Long clubId, Long userId) {
