@@ -1,7 +1,6 @@
 package GDG.whatssue.domain.member.dto;
 
-import GDG.whatssue.domain.member.entity.ClubMember;
-import jakarta.validation.constraints.NotBlank;
+import GDG.whatssue.domain.member.entity.ImgModifyStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
-public class CreateMemberProfileRequest {
+public class ModifyMemberProfileRequest {
 
     @Size(min = 1, max = 15, message = "멤버 이름은 최소 1자, 최대 15자까지 입니다.")
     private String memberName;
@@ -25,4 +24,6 @@ public class CreateMemberProfileRequest {
     private Boolean isPhonePublic;
 
     private MultipartFile profileImage;
+
+    private ImgModifyStatus ImageModifyStatus;
 }
