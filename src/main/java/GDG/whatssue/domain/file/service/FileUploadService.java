@@ -8,7 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public interface FileUploadService {
 
-    public UploadFile uploadFile(MultipartFile multipartFile, String dirName) throws IOException;
+    public String uploadFile(MultipartFile multipartFile, String dirName) throws IOException;
     public String downloadFile(String uploadFileName);
     public void deleteFile(String uploadFileName);
+
+    String getOriginalFileName(MultipartFile multipartFile);
 }

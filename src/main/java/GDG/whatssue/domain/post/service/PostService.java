@@ -8,6 +8,7 @@ import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.comment.repository.CommentRepository;
 import GDG.whatssue.domain.comment.service.CommentService;
+import GDG.whatssue.domain.file.entity.PostImage;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
@@ -81,7 +82,7 @@ public class PostService {
 
         //게시글 이미지 Path List
         List <String> postImages = new ArrayList<>();
-        List <UploadFile> storeFileNames = post.getPostImageFiles();
+        List <PostImage> storeFileNames = post.getPostImageFiles();
         if (storeFileNames != null) {
             for (UploadFile storeFileName : storeFileNames){
                 postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
@@ -144,19 +145,21 @@ public class PostService {
     }
 
     @Transactional
-    public void uploadPostImages(List<MultipartFile> postImages, Post post) throws IOException {
-        if (postImages != null) {
-            for (MultipartFile postImage : postImages) {
-                UploadFile imageFile = fileUploadService.uploadFile(postImage, POST_IMAGE_DIRNAME);
-                post.addPostImageFile(imageFile);
-                fileRepository.save(imageFile);
+    public void uploadPostImages(List<MultipartFile> files, Post post) throws IOException {
+        if (files != null) {
+            for (MultipartFile file : files) {
+                String storeFileName = fileUploadService.uploadFile(file, POST_IMAGE_DIRNAME);
+                String originalFileName = fileUploadService.getOriginalFileName(file);
+                PostImage postImage = PostImage.of(storeFileName, originalFileName, 1);
+                post.addPostImageFile(postImage);
+                fileRepository.save(postImage);
             }
         }
     }
 
     @Transactional
     public void deletePostImages(Post post) throws IOException {
-        List<UploadFile> deleteImages = post.getPostImageFiles();
+        List<PostImage> deleteImages = post.getPostImageFiles();
         if(deleteImages != null){
             for(UploadFile deleteImage : deleteImages){
                 // S3에서 파일 삭제
@@ -224,7 +227,7 @@ public class PostService {
         for (Post post : posts) {
             // 게시글 이미지 Path List
             List<String> postImages = new ArrayList<>();
-            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            List<PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
                 for (UploadFile storeFileName : storeFileNames) {
                     postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
@@ -302,7 +305,7 @@ public class PostService {
         for (Post post : posts) {
             // 게시글 이미지 Path List
             List<String> postImages = new ArrayList<>();
-            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            List<PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
                 for (UploadFile storeFileName : storeFileNames) {
                     postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
@@ -350,7 +353,7 @@ public class PostService {
         for (Post post : posts) {
             // 게시글 이미지 Path List
             List<String> postImages = new ArrayList<>();
-            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            List<PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
                 for (UploadFile storeFileName : storeFileNames) {
                     postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
