@@ -12,7 +12,9 @@ public enum ClubMemberErrorCode implements ErrorCode {
 
     EX2200("2200", HttpStatus.PRECONDITION_REQUIRED, "멤버 프로필 초기 설정이 필요합니다."),
 
-    EX2201("2201", HttpStatus.BAD_REQUEST, "멤버 프로필 설정은 최초에만 가능합니다.");
+    EX2201("2201", HttpStatus.BAD_REQUEST, "멤버 프로필 설정은 최초에만 가능합니다."),
+
+    EX2202("2202", HttpStatus.BAD_REQUEST, "이미지가 null 입니다. 이미지를 업로드해주세요.");
 
     private final String code;
     private final HttpStatus httpStatus;
