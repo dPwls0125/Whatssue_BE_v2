@@ -73,6 +73,10 @@ public class Post extends BaseEntity {
             this.postImageFiles.clear();
         }
     }
+    public void removePostImageFile(PostImage postImage) {
+        postImageFiles.remove(postImage);
+        postImage.setPost(null);
+    }
 
     //==생성 메서드==//
     private Post(Club club, ClubMember writer, String postTitle, String postContent, PostCategory postCategory) {

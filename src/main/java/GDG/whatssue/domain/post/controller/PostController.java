@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/clubs/{clubId}/posts")
 public class PostController {
-
+    private static final int MAX_IMAGE_LIST_SIZE = 10;
     private final PostService postService;
     private final ClubMemberRepository clubMemberRepository;
 
@@ -90,10 +91,11 @@ public class PostController {
             @PathVariable(name = "clubId") Long clubId,
             @PathVariable(name = "postId") Long postId,
             @LoginUser Long userId,
-            @RequestPart("request") UpdatePostRequest request,
-            @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages) throws IOException {
+            @RequestPart(name = "postRequest") UpdatePostRequest postRequest,
+            @RequestPart(value = "postImages", required = false) List<MultipartFile> newImages) throws IOException {
 
-        postService.updatePost(clubId, userId, postId, request, postImages);
+
+        postService.updatePost(clubId, userId, postId, postRequest, newImages);
         return ResponseEntity.status(HttpStatus.OK).body("게시글 수정 완료");
     }
     @Operation(summary = "게시물 검색", description = "검색 : 키워드, 기간(형식 :'yyyy-MM-dd', 기본 1900~2199년), 정렬(default : 최신순(or 'Like' 입력), 카테고리(NOTICE or FREE)")
