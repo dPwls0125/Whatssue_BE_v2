@@ -1,6 +1,7 @@
 package GDG.whatssue.domain.member.dto;
 
 import GDG.whatssue.domain.member.entity.ClubMember;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class CreateMemberProfileRequest {
     @Size(min = 1, max = 15, message = "멤버 이름은 최소 1자, 최대 15자까지 입니다.")
     private String memberName;
 
-    @Size(min = 1, max = 30, message = "")
+    @Size(min = 1, max = 30, message = "멤버 소개는 최소 1자, 최대 30자까지 입니다.")
     private String memberIntro;
 
     @NotNull(message = "이메일 공개 여부는 필수 선택 사항입니다.")

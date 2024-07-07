@@ -35,7 +35,7 @@ public class S3UploadService implements FileUploadService {
 
         //저장 사진이 없으면 기본 경로 반환
         if (multipartFile == null) {
-            storeFileName = dirName + FileConst.DEFAULT_IMAGE_NAME;
+            return storeFileName = dirName + FileConst.DEFAULT_IMAGE_NAME;
         }
 
         storeFileName = getFileName(dirName, multipartFile.getOriginalFilename());
