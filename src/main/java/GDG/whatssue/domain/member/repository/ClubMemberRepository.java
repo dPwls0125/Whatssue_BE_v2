@@ -15,6 +15,9 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
     Boolean existsByClub_IdAndUser_UserId(Long clubId, Long userId);
     Optional<List<ClubMember>> findByClubId(Long clubId);
 
+    @Query("SELECT cm FROM ClubMember cm WHERE cm.club.id = :clubId ORDER BY CASE WHEN cm.role = 'MANAGER' THEN 0 ELSE 1 END, cm.id")
+    Page<ClubMember> findByClubIdOrderByRole(@Param("clubId") Long clubId, Pageable pageable);
+
     @Query("select count(m) from ClubMember m where m.club.id = :clubId")
     long countClubMember(@Param("clubId") Long clubId);
 
