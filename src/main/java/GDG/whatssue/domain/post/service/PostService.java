@@ -29,6 +29,7 @@ import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -85,11 +86,11 @@ public class PostService {
             .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
 
         //게시글 이미지 Path List
-        List <String> postImages = new ArrayList<>();
+        Map<Integer, String> postImages = new HashMap<>();
         List <PostImage> storeFileNames = post.getPostImageFiles();
         if (storeFileNames != null) {
-            for (UploadFile storeFileName : storeFileNames){
-                postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+            for (PostImage storeFileName : storeFileNames){
+                postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
             }
         }
 
@@ -151,12 +152,14 @@ public class PostService {
     @Transactional
     public void uploadPostImages(List<MultipartFile> files, Post post) throws IOException {
         if (files != null) {
+            int orderNum = 1;
             for (MultipartFile file : files) {
                 String storeFileName = fileUploadService.uploadFile(file, POST_IMAGE_DIRNAME);
                 String originalFileName = fileUploadService.getOriginalFileName(file);
-                PostImage postImage = PostImage.of(originalFileName,storeFileName,1);
+                PostImage postImage = PostImage.of(originalFileName,storeFileName,orderNum);
                 post.addPostImageFile(postImage);
                 fileRepository.save(postImage);
+                orderNum++;
             }
         }
     }
@@ -313,12 +316,12 @@ public class PostService {
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
         for (Post post : posts) {
-            // 게시글 이미지 Path List
-            List<String> postImages = new ArrayList<>();
-            List<PostImage> storeFileNames = post.getPostImageFiles();
+            //게시글 이미지 Path List
+            Map<Integer, String> postImages = new HashMap<>();
+            List <PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
-                for (UploadFile storeFileName : storeFileNames) {
-                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                for (PostImage storeFileName : storeFileNames){
+                    postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
                 }
             }
             // 작성자 프로필 이미지 Path
@@ -391,12 +394,12 @@ public class PostService {
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
         for (Post post : posts) {
-            // 게시글 이미지 Path List
-            List<String> postImages = new ArrayList<>();
-            List<PostImage> storeFileNames = post.getPostImageFiles();
+            //게시글 이미지 Path List
+            Map<Integer, String> postImages = new HashMap<>();
+            List <PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
-                for (UploadFile storeFileName : storeFileNames) {
-                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                for (PostImage storeFileName : storeFileNames){
+                    postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
                 }
             }
             // 작성자 프로필 이미지 Path
@@ -439,12 +442,12 @@ public class PostService {
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
         for (Post post : posts) {
-            // 게시글 이미지 Path List
-            List<String> postImages = new ArrayList<>();
-            List<PostImage> storeFileNames = post.getPostImageFiles();
+            //게시글 이미지 Path List
+            Map<Integer, String> postImages = new HashMap<>();
+            List <PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
-                for (UploadFile storeFileName : storeFileNames) {
-                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                for (PostImage storeFileName : storeFileNames){
+                    postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
                 }
             }
             // 작성자 프로필 이미지 Path
