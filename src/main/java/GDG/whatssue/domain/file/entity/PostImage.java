@@ -27,6 +27,8 @@ public class PostImage extends UploadFile{
         this.orderNum = orderNum;
     }
 
+    public int getOrderNum() {return orderNum;}
+
     //==생성 메서드==//
     private PostImage(String uploadFileName, String storeFileName, int orderNum) {
         super(uploadFileName, storeFileName);
