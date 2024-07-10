@@ -59,7 +59,7 @@ public class ClubJoinController {
             .body(clubJoinService.getJoinRequestRejectionReason(userId, joinRequestId));
     }
 
-    @Operation(summary = "모임가입 신청 삭제")
+    @Operation(summary = "모임가입 신청 내역 삭제")
     @DeleteMapping("/{joinRequestId}")
     public ResponseEntity<String> deleteJoinRequest(@LoginUser Long userId, @PathVariable(name = "joinRequestId") Long joinRequestId) {
         clubJoinService.deleteJoinRequest(userId, joinRequestId);
