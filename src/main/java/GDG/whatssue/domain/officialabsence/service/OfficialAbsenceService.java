@@ -38,7 +38,7 @@ public class OfficialAbsenceService {
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
-    private static final Logger logger = LoggerFactory.getLogger(OfficialAbsenceService.class);
+
 
     @Transactional
     public void createOfficialAbsenceRequest(Long userId, Long clubId, Long scheduleId, String officialAbsenceContent) {
@@ -75,9 +75,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -114,9 +117,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -136,9 +142,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -158,9 +167,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -178,8 +190,12 @@ public class OfficialAbsenceService {
                 .id(officialAbsenceRequest.getId())
                 .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                 .scheduleId(officialAbsenceRequest.getSchedule().getId())
-                .officialAbsenceContent(officialAbsenceRequest.getOfficialAbsenceContent())
+                .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
+                .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                 .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
+                .createdAt((officialAbsenceRequest.getCreateAt()))
+                .updatedAt((officialAbsenceRequest.getUpdateAt()))
                 .build();
 
         return officialAbsenceGetRequestDto;
