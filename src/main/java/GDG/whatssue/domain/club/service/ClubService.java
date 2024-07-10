@@ -85,14 +85,16 @@ public class ClubService {
         //정보 update
         club.updateClubInfo(requestDto);
 
-        //기존 프로필 사진 버킷 및 DB 삭제
-        fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
+        //기본 사진 또는 사진 변경
+        if (requestDto.getImageIsChanged()) {
+            fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
 
-        //새로운 프로필 사진 저장
-        String storeFileName = fileUploadService.uploadFile(multipartFile, CLUB_PROFILE_IMAGE_DIRNAME);
-        String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
-        ClubProfileImage profileImage = ClubProfileImage.of(originalFileName, storeFileName);
-        club.updateProfileImage(profileImage);
+            //새로운 프로필 사진 저장
+            String storeFileName = fileUploadService.uploadFile(multipartFile, CLUB_PROFILE_IMAGE_DIRNAME);
+            String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
+            ClubProfileImage profileImage = ClubProfileImage.of(originalFileName, storeFileName);
+            club.updateProfileImage(profileImage);
+        }
     }
 
     @Transactional

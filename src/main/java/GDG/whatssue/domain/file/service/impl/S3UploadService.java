@@ -34,7 +34,7 @@ public class S3UploadService implements FileUploadService {
         String storeFileName;
 
         //저장 사진이 없으면 기본 경로 반환
-        if (multipartFile == null) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
             return storeFileName = dirName + FileConst.DEFAULT_IMAGE_NAME;
         }
 
@@ -70,7 +70,7 @@ public class S3UploadService implements FileUploadService {
     public String getOriginalFileName(MultipartFile multipartFile) {
         String originalFileName;
 
-        if (multipartFile == null) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
             originalFileName = "default";
         } else {
             originalFileName = multipartFile.getOriginalFilename();
