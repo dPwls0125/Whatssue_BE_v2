@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -109,7 +110,8 @@ public class ScheduleController {
         @RequestParam(name = "keyword", required = false, defaultValue = "") String query,
         @RequestParam(name = "startDate", defaultValue = "1900-01-01") String startDate,
         @RequestParam(name = "endDate", required = false, defaultValue = "2199-12-31") String endDate,
-        Pageable pageable) {
+        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+        @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate sDate = LocalDate.parse(startDate, formatter);
@@ -117,6 +119,6 @@ public class ScheduleController {
 
         return ResponseEntity
             .status(OK)
-            .body(scheduleService.findAllSchedule(clubId, query, sDate, eDate, pageable));
+            .body(scheduleService.findAllSchedule(clubId, query, sDate, eDate, PageRequest.of(page, size)));
     }
 }
