@@ -25,8 +25,8 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
                         "c.id, c.clubName, i.storeFileName, m.createAt, m.role, " +
                             "(select count(subM) from ClubMember subM where subM.club = c))" +
             " from ClubMember m" +
-                " join m.club c" +
-                " join c.profileImage i" +
+                " left join m.club c" +
+                " left join c.profileImage i" +
             " where m.user.userId = :userId" +
             " order by c.clubName asc"
     , countQuery = "select count(m) from ClubMember m where m.user.userId = :userId"
