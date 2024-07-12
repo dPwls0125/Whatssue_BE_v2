@@ -6,7 +6,6 @@ import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
-import GDG.whatssue.domain.schedule.dto.GetDateByScheduleExistResponse;
 import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.club.entity.Club;

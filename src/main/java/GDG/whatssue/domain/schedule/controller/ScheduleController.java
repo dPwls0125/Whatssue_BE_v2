@@ -4,7 +4,6 @@ import static org.springframework.http.HttpStatus.*;
 
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
-import GDG.whatssue.domain.schedule.dto.GetDateByScheduleExistResponse;
 import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
