@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberProfileImage extends UploadFile{
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "club_member_id")
+    @JoinColumn(name = "club_member_id", nullable = false)
     private ClubMember clubMember;
 
     public void setClubMember(ClubMember clubMember) {
