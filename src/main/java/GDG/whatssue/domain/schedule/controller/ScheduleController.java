@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
+import GDG.whatssue.domain.schedule.dto.GetDateByScheduleExistResponse;
 import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
@@ -100,12 +101,12 @@ public class ScheduleController {
             .body(scheduleDto);
     }
 
-    @Operation(summary = "일정 조회(검색 : 검색어, 기간)")
+    @Operation(summary = "일정 목록조회(검색 : 검색어, 기간)")
     @GetMapping
     @Parameter(name = "keyword", description = "검색어. 일정명으로 검색", in = ParameterIn.QUERY)
     @Parameter(name = "startDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", in = ParameterIn.QUERY)
     @Parameter(name = "endDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
-    public ResponseEntity<Page<SchedulesResponse>> findSchedules(
+    public ResponseEntity<Page<SchedulesResponse>> getSchedules(
         @PathVariable(name = "clubId") Long clubId,
         @RequestParam(name = "keyword", required = false, defaultValue = "") String query,
         @RequestParam(name = "startDate", defaultValue = "1900-01-01") String startDate,
@@ -120,5 +121,25 @@ public class ScheduleController {
         return ResponseEntity
             .status(OK)
             .body(scheduleService.findAllSchedule(clubId, query, sDate, eDate, PageRequest.of(page, size)));
+    }
+
+    @Operation(summary = "일정이 존재하는 일자 조회(기간)")
+    @GetMapping("/exist-date")
+    @Parameter(name = "startDate", description = "기간 시작일(yyyy-MM-dd). 미입력 시 1900년", in = ParameterIn.QUERY)
+    @Parameter(name = "endDate", description = "기간 마지막일(yyyy-MM-dd). 미입력 시 2200년", in = ParameterIn.QUERY)
+    public ResponseEntity<Page<LocalDate>> getDateByScheduleExist(
+        @PathVariable(name = "clubId") Long clubId,
+        @RequestParam(name = "startDate", defaultValue = "1900-01-01") String startDate,
+        @RequestParam(name = "endDate", required = false, defaultValue = "2199-12-31") String endDate,
+        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+        @RequestParam(name = "size", required = false, defaultValue = "40") int size) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate sDate = LocalDate.parse(startDate, formatter);
+        LocalDate eDate = LocalDate.parse(endDate, formatter);
+
+        return ResponseEntity
+            .status(OK)
+            .body(scheduleService.getDateByScheduleExist(clubId, sDate, eDate, PageRequest.of(page, size)));
     }
 }

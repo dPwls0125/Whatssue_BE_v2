@@ -6,6 +6,7 @@ import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
 import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
+import GDG.whatssue.domain.schedule.dto.GetDateByScheduleExistResponse;
 import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.club.entity.Club;
@@ -16,6 +17,9 @@ import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import GDG.whatssue.global.error.CommonException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +68,14 @@ public class ScheduleService {
 
     public Page<SchedulesResponse> findAllSchedule(Long clubId, String keyword, LocalDate sDate, LocalDate eDate, Pageable pageable) {
         return scheduleRepository.findAllScheduleDto(clubId, keyword, sDate, eDate, pageable);
+    }
+
+    public Page<LocalDate> getDateByScheduleExist(Long clubId, LocalDate sDate, LocalDate eDate, Pageable pageable) {
+        LocalDateTime sDateTime = sDate.atStartOfDay();
+        LocalDateTime eDateTime = LocalDateTime.of(eDate, LocalTime.MAX).withNano(0);
+
+        return scheduleRepository.findDateByScheduleExist(clubId, sDateTime, eDateTime, pageable)
+            .map(d -> d.toLocalDate());
     }
 
     public boolean isClubSchedule(Long clubId, Long scheduleId) {
