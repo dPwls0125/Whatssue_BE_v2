@@ -2,6 +2,7 @@ package GDG.whatssue.domain.post.entity;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.comment.entity.Comment;
+import GDG.whatssue.domain.file.entity.PostImage;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.post.exception.PostErrorCode;
@@ -50,7 +51,7 @@ public class Post extends BaseEntity {
     private String postContent;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<UploadFile> postImageFiles = new ArrayList<>();
+    private List<PostImage> postImageFiles = new ArrayList<>();
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -63,14 +64,18 @@ public class Post extends BaseEntity {
     private List<PostLike> postLikeList = new ArrayList<>();
     
     //연관관계 메서드
-    public void addPostImageFile(UploadFile uploadFile) {
-        uploadFile.setPost(this);
-        this.postImageFiles.add(uploadFile);
+    public void addPostImageFile(PostImage postImage) {
+        postImage.setPost(this);
+        this.postImageFiles.add(postImage);
     }
     public void clearPostImageFiles() {
         if (this.postImageFiles != null) {
             this.postImageFiles.clear();
         }
+    }
+    public void removePostImageFile(PostImage postImage) {
+        postImageFiles.remove(postImage);
+        postImage.setPost(null);
     }
 
     //==생성 메서드==//

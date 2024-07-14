@@ -1,8 +1,11 @@
 package GDG.whatssue.domain.comment.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ChildCommentAddDto extends CommentAddDto{
 
     private Long parentId;

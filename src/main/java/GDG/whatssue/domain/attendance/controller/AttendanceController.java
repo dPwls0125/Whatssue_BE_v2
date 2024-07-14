@@ -85,9 +85,9 @@ public class AttendanceController {
     @ClubManager
     @Operation(summary = "출석 정정")
     @PutMapping("/{scheduleId}/attendance/{memberId}/{attendanceType}")
-    public ResponseEntity modifyMemberAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId, @PathVariable Long memberId, @PathVariable String attendanceType){
-        attendanceService.modifyMemberAttendance(scheduleId, memberId, attendanceType);
-         return ResponseEntity.status(HttpStatus.OK).body("출석이 정정되었습니다.");
+    public ResponseEntity<Void> modifyMemberAttendance(@PathVariable Long clubId, @RequestBody AttendModifyRequest request) {
+        attendanceService.modifyMemberAttendance(request.getScheduleId(), request.getAttendmodifyDtoList());
+         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/attendance/my-results")

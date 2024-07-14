@@ -1,5 +1,8 @@
 package GDG.whatssue.domain.file.service.impl;
 
+import GDG.whatssue.domain.file.entity.ClubProfileImage;
+import GDG.whatssue.domain.file.entity.MemberProfileImage;
+import GDG.whatssue.domain.file.entity.PostImage;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.file.FileConst;
@@ -27,16 +30,15 @@ public class S3UploadService implements FileUploadService {
     public String bucket;
 
     @Override
-    public UploadFile uploadFile(MultipartFile multipartFile, String dirName) throws IOException {
+    public String uploadFile(MultipartFile multipartFile, String dirName) throws IOException {
         String storeFileName;
+
         //저장 사진이 없으면 기본 경로 반환
-        if (multipartFile == null) {
-            storeFileName = dirName + FileConst.DEFAULT_IMAGE_NAME;
-            return UploadFile.of(storeFileName,storeFileName);
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            return storeFileName = dirName + FileConst.DEFAULT_IMAGE_NAME;
         }
 
-        String originalFileName = multipartFile.getOriginalFilename();
-        storeFileName = getFileName(dirName, originalFileName);
+        storeFileName = getFileName(dirName, multipartFile.getOriginalFilename());
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
@@ -45,7 +47,7 @@ public class S3UploadService implements FileUploadService {
         amazonS3.putObject(new PutObjectRequest(bucket, storeFileName, multipartFile.getInputStream(), metadata)
             .withCannedAcl(CannedAccessControlList.PublicRead));
 
-        return UploadFile.of(originalFileName, storeFileName);
+        return storeFileName;
     }
 
     @Override
@@ -62,6 +64,19 @@ public class S3UploadService implements FileUploadService {
         }
 
         amazonS3.deleteObject(bucket, storeFileName);
+    }
+
+    @Override
+    public String getOriginalFileName(MultipartFile multipartFile) {
+        String originalFileName;
+
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            originalFileName = "default";
+        } else {
+            originalFileName = multipartFile.getOriginalFilename();
+        }
+
+        return originalFileName;
     }
 
     private String getFileName(String dirName, String originalFileName) {

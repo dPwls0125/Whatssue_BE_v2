@@ -49,7 +49,7 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime scheduleDate;
 
-    @Column(nullable = false)
+    @Column
     private String schedulePlace;
 
     @Enumerated(EnumType.STRING)

@@ -11,6 +11,7 @@ import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.club.dto.GetJoinClubResponse;
+import GDG.whatssue.domain.file.entity.ClubProfileImage;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
@@ -20,6 +21,7 @@ import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.domain.user.repository.UserRepository;
 import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
+import com.amazonaws.services.s3.transfer.Upload;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,7 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class ClubService {
     private final ClubRepository clubRepository;
-    private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
     private final ClubMemberRepository clubMemberRepository;
@@ -52,7 +53,7 @@ public class ClubService {
     }
 
     @Transactional
-    public CreateClubResponse createClub(Long userId, CreateClubRequest requestDto, MultipartFile profileImage) throws IOException {
+    public CreateClubResponse createClub(Long userId, CreateClubRequest requestDto, MultipartFile multipartFile) throws IOException {
         User user = userRepository.findById(userId).get();
 
         //클럽 생성
@@ -60,9 +61,11 @@ public class ClubService {
         clubRepository.save(club);
 
         //클럽 프로필 사진 저장
-        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
-        club.updateProfileImage(clubProfileImage);
-        fileRepository.save(clubProfileImage);
+        String storeFileName = fileUploadService.uploadFile(multipartFile, CLUB_PROFILE_IMAGE_DIRNAME);
+        String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
+
+        ClubProfileImage profileImage = ClubProfileImage.of(originalFileName, storeFileName);
+        club.updateProfileImage(profileImage);
 
         //로그인 유저 관리자로 추가
         ClubMember newMember = ClubMember.newMember(club, user);
@@ -72,21 +75,26 @@ public class ClubService {
         return CreateClubResponse.builder().clubId(club.getId()).build();
     }
 
+    /**
+     * TODO
+     */
     @Transactional
-    public void updateClubInfo(Long clubId, UpdateClubInfoRequest requestDto, MultipartFile profileImage) throws IOException {
+    public void updateClubInfo(Long clubId, UpdateClubInfoRequest requestDto, MultipartFile multipartFile) throws IOException {
         Club club = findClub(clubId);
 
         //정보 update
         club.updateClubInfo(requestDto);
 
-        //기존 프로필 사진 버킷 및 DB 삭제
-        fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
-        fileRepository.delete(club.getProfileImage());//레포에서 삭제
+        //기본 사진 또는 사진 변경
+        if (requestDto.getImageIsChanged()) {
+            fileUploadService.deleteFile(club.getProfileImage().getStoreFileName()); //s3에서 삭제
 
-        //새로운 프로필 사진 저장
-        UploadFile clubProfileImage = fileUploadService.uploadFile(profileImage, CLUB_PROFILE_IMAGE_DIRNAME);
-        club.updateProfileImage(clubProfileImage);
-        fileRepository.save(clubProfileImage);
+            //새로운 프로필 사진 저장
+            String storeFileName = fileUploadService.uploadFile(multipartFile, CLUB_PROFILE_IMAGE_DIRNAME);
+            String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
+            ClubProfileImage profileImage = ClubProfileImage.of(originalFileName, storeFileName);
+            club.updateProfileImage(profileImage);
+        }
     }
 
     @Transactional

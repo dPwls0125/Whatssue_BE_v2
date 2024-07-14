@@ -3,11 +3,11 @@ package GDG.whatssue.domain.post.service;
 import static GDG.whatssue.domain.file.FileConst.POST_IMAGE_DIRNAME;
 
 import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.comment.repository.CommentRepository;
 import GDG.whatssue.domain.comment.service.CommentService;
+import GDG.whatssue.domain.file.entity.PostImage;
 import GDG.whatssue.domain.file.entity.UploadFile;
 import GDG.whatssue.domain.file.repository.FileRepository;
 import GDG.whatssue.domain.file.service.FileUploadService;
@@ -29,7 +29,9 @@ import GDG.whatssue.global.error.CommonException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import GDG.whatssue.global.util.S3Utils;
@@ -43,7 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PostService {
-
+    private static final int MAX_IMAGE_LIST_SIZE = 10;
     private final ClubRepository clubRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final PostRepository postRepository;
@@ -66,6 +68,10 @@ public class PostService {
             throw new CommonException(PostErrorCode.EX7200);//공지 게시글 작성 권한이 없습니다.
         }
 
+        if(postImages.size()>10){
+            throw new CommonException(PostErrorCode.EX7207);//사진은 최대 10장 업로드 가능
+        }
+
         //게시글 db 저장
         Post post = request.toEntity(club, writer);
         postRepository.save(post);
@@ -80,11 +86,11 @@ public class PostService {
             .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
 
         //게시글 이미지 Path List
-        List <String> postImages = new ArrayList<>();
-        List <UploadFile> storeFileNames = post.getPostImageFiles();
+        Map<Integer, String> postImages = new HashMap<>();
+        List <PostImage> storeFileNames = post.getPostImageFiles();
         if (storeFileNames != null) {
-            for (UploadFile storeFileName : storeFileNames){
-                postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+            for (PostImage storeFileName : storeFileNames){
+                postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
             }
         }
 
@@ -144,19 +150,23 @@ public class PostService {
     }
 
     @Transactional
-    public void uploadPostImages(List<MultipartFile> postImages, Post post) throws IOException {
-        if (postImages != null) {
-            for (MultipartFile postImage : postImages) {
-                UploadFile imageFile = fileUploadService.uploadFile(postImage, POST_IMAGE_DIRNAME);
-                post.addPostImageFile(imageFile);
-                fileRepository.save(imageFile);
+    public void uploadPostImages(List<MultipartFile> files, Post post) throws IOException {
+        if (files != null) {
+            int orderNum = 1;
+            for (MultipartFile file : files) {
+                String storeFileName = fileUploadService.uploadFile(file, POST_IMAGE_DIRNAME);
+                String originalFileName = fileUploadService.getOriginalFileName(file);
+                PostImage postImage = PostImage.of(originalFileName,storeFileName,orderNum);
+                post.addPostImageFile(postImage);
+                fileRepository.save(postImage);
+                orderNum++;
             }
         }
     }
 
     @Transactional
-    public void deletePostImages(Post post) throws IOException {
-        List<UploadFile> deleteImages = post.getPostImageFiles();
+    public void deleteAllPostImages(Post post) throws IOException {
+        List<PostImage> deleteImages = post.getPostImageFiles();
         if(deleteImages != null){
             for(UploadFile deleteImage : deleteImages){
                 // S3에서 파일 삭제
@@ -188,16 +198,73 @@ public class PostService {
             }
         }
         //이미지 삭제
-        deletePostImages(post);
+        deleteAllPostImages(post);
         //post 삭제
         postRepository.delete(post);
     }
     @Transactional
-    public void updatePost(Long clubId, Long userId, Long postId, UpdatePostRequest request, List<MultipartFile> postImages) throws IOException {
+    public void updatePost(Long clubId, Long userId, Long postId, UpdatePostRequest postRequest, List<MultipartFile> newImages) throws IOException {
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
+        validateMemberAbleToUpdatePost(clubMember, post);
+
+        post.updatePost(postRequest.getPostTitle(), postRequest.getPostContent());
+
+        List<String> deleteImages = postRequest.getDeleteImages();
+        Map<Integer, String> maintainImages = postRequest.getMaintainImages();
+
+
+        //삭제 이미지 리스트 삭제 진행
+        deletePostImages(deleteImages, post);
+
+        // 유지할 이미지들의 orderNum 업데이트
+        if (maintainImages != null) {
+            List<PostImage> storeFiles = post.getPostImageFiles();
+            for (Map.Entry<Integer, String> entry : maintainImages.entrySet()) {
+                Integer orderNum = entry.getKey();
+                String fullPath = entry.getValue();
+                for (PostImage storeFile : storeFiles) {
+                    if (fullPath.equals(S3Utils.getFullPath(storeFile.getStoreFileName()))) {
+                        storeFile.changeOrder(orderNum);
+                        fileRepository.save(storeFile); // 변경사항 저장
+                    }
+                }
+            }
+        }
+
+        //새로운 이미지 업로드
+        int checkNewImagesNum = 0;
+        for(MultipartFile newImage:newImages){
+            if(newImage.isEmpty()) checkNewImagesNum=1;
+        }
+        if(checkNewImagesNum==0) { // 새로운 이미지가 있는 경우에만
+            int nullCount = 0;
+            for (int orderNum = 1; orderNum < MAX_IMAGE_LIST_SIZE + 1; orderNum++) { // 최대 이미지 10장
+                if (maintainImages.get(orderNum) == null) {
+                    System.out.println(nullCount);
+                    nullCount++;
+                }
+            }
+            if (newImages.size() <= nullCount) { // 최대 이미지 갯수 조건 비교
+                int newImagesFlag = 0;
+                for (int orderNum = 1; orderNum < MAX_IMAGE_LIST_SIZE + 1; orderNum++) {
+                    String s = maintainImages.get(orderNum); // get(key) / key == orderNum
+                    if (s == null) { // orderNum이 비어있는 경우
+                        if (newImagesFlag < newImages.size()) {
+                            uploadPostImage(newImages.get(newImagesFlag), orderNum, post); // newImages가 차례로 빈 자리로 할당.
+                            newImagesFlag++;
+                        }
+                    }
+                }
+            } else {
+                throw new CommonException(PostErrorCode.EX7207); //사진은 10장 까지만 업로드 가능
+            }
+        }
+    }
+
+    private void validateMemberAbleToUpdatePost(ClubMember clubMember, Post post) {
         // 공지사항인 경우, 관리자만 수정 가능
         if (post.getPostCategory() == PostCategory.NOTICE) {
             if (!clubMember.checkManagerRole()) {
@@ -209,25 +276,52 @@ public class PostService {
                 throw new CommonException(PostErrorCode.EX7203); // 작성자 본인이나 매니저가 아닌 경우 수정 권한 없음
             }
         }
+    }
+    @Transactional
+    public void uploadPostImage(MultipartFile file, int orderNum, Post post) throws IOException {
+        if (file != null) {
+            String storeFileName = fileUploadService.uploadFile(file, POST_IMAGE_DIRNAME);
+            String originalFileName = fileUploadService.getOriginalFileName(file);
+            PostImage postImage = PostImage.of(originalFileName,storeFileName, orderNum);
+            post.addPostImageFile(postImage);
+            fileRepository.save(postImage);
+        }
+    }
+    @Transactional
+    public void deletePostImages(List<String> deleteImagesPath, Post post) throws IOException {
+        List<PostImage> storeFiles = post.getPostImageFiles();
+        List<PostImage> filesToRemove = new ArrayList<>();
 
-        post.updatePost(request.getPostTitle(), request.getPostContent());
-        //기존 이미지 삭제
-        deletePostImages(post);
-        //새로운 이미지 s3 업로드, db 저장
-        uploadPostImages(postImages, post);
-        postRepository.save(post);
+        if(deleteImagesPath != null){
+            for(String deleteImagePath : deleteImagesPath) {
+                for (PostImage storeFile : storeFiles) {
+                    if (deleteImagePath.equals(S3Utils.getFullPath(storeFile.getStoreFileName()))){
+                        // S3에서 파일 삭제
+                        fileUploadService.deleteFile(storeFile.getStoreFileName());
+                        // DB에서 파일 삭제
+                        fileRepository.delete(storeFile);
+                        // 제거할 파일을 목록에 추가
+                        filesToRemove.add(storeFile);
+                    }
+                }
+            }
+            // Post에서 파일 제거
+            for (PostImage fileToRemove : filesToRemove) {
+                post.removePostImageFile(fileToRemove);
+            }
+        }
     }
     public Page<GetPostResponse> getPostList(Long clubId, Long userId, String keyword, LocalDateTime startDate, LocalDateTime endDate, String sortBy, PostCategory category, Pageable pageable) {
         Page<Post> posts = postQueryRepository.findPosts(clubId, keyword, startDate, endDate, sortBy, category, pageable);
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
         for (Post post : posts) {
-            // 게시글 이미지 Path List
-            List<String> postImages = new ArrayList<>();
-            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            //게시글 이미지 Path List
+            Map<Integer, String> postImages = new HashMap<>();
+            List <PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
-                for (UploadFile storeFileName : storeFileNames) {
-                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                for (PostImage storeFileName : storeFileNames){
+                    postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
                 }
             }
             // 작성자 프로필 이미지 Path
@@ -300,12 +394,12 @@ public class PostService {
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
         for (Post post : posts) {
-            // 게시글 이미지 Path List
-            List<String> postImages = new ArrayList<>();
-            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            //게시글 이미지 Path List
+            Map<Integer, String> postImages = new HashMap<>();
+            List <PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
-                for (UploadFile storeFileName : storeFileNames) {
-                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                for (PostImage storeFileName : storeFileNames){
+                    postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
                 }
             }
             // 작성자 프로필 이미지 Path
@@ -348,12 +442,12 @@ public class PostService {
         List<GetPostResponse> getPostResponses = new ArrayList<>();
 
         for (Post post : posts) {
-            // 게시글 이미지 Path List
-            List<String> postImages = new ArrayList<>();
-            List<UploadFile> storeFileNames = post.getPostImageFiles();
+            //게시글 이미지 Path List
+            Map<Integer, String> postImages = new HashMap<>();
+            List <PostImage> storeFileNames = post.getPostImageFiles();
             if (storeFileNames != null) {
-                for (UploadFile storeFileName : storeFileNames) {
-                    postImages.add(S3Utils.getFullPath(storeFileName.getStoreFileName()));
+                for (PostImage storeFileName : storeFileNames){
+                    postImages.put(storeFileName.getOrderNum(),S3Utils.getFullPath(storeFileName.getStoreFileName()));
                 }
             }
             // 작성자 프로필 이미지 Path

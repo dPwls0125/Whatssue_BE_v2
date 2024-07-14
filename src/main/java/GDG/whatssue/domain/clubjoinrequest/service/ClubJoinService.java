@@ -62,8 +62,7 @@ public class ClubJoinService {
 
     @Transactional
     public void deleteJoinRequest(Long userId, Long joinRequestId) {
-        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(userId,
-            joinRequestId);
+        ClubJoinRequest joinRequest = getJoinRequestByUserIdAndRequestId(userId, joinRequestId);
 
         joinRequest.validateDeletable();
 

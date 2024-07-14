@@ -18,7 +18,10 @@ import jakarta.validation.constraints.Size;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -78,11 +81,14 @@ public class ClubController {
 
     @Operation(summary = "가입한 모임 조회")
     @GetMapping("/my")
-    public ResponseEntity<Page<GetJoinClubResponse>> getJoinClubList(@LoginUser Long userId, Pageable pageable) {
+    public ResponseEntity<Page<GetJoinClubResponse>> getJoinClubList(
+        @LoginUser Long userId,
+        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+        @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(clubService.getJoinClubList(userId, pageable));
+            .body(clubService.getJoinClubList(userId, PageRequest.of(page, size)));
     }
 
     @ClubManager

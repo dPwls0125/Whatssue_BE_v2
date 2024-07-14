@@ -17,4 +17,6 @@ public class UpdateClubInfoRequest {
     String contactMeans;
 
     String link;
+    @NotNull(message = "사진 변경 여부는 필수값입니다.")
+    Boolean imageIsChanged;
 }

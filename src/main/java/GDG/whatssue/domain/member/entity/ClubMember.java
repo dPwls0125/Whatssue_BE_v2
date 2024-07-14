@@ -3,7 +3,7 @@ package GDG.whatssue.domain.member.entity;
 import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.EX2200;
 
 import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.file.entity.UploadFile;
+import GDG.whatssue.domain.file.entity.MemberProfileImage;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
@@ -48,13 +48,13 @@ public class ClubMember extends BaseEntity {
     @Column(nullable = false)
     private boolean isFirstVisit;
 
-    @OneToOne(mappedBy = "clubMember", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY) //지연 로딩 설정
-    private UploadFile profileImage;
+    @OneToOne(mappedBy = "clubMember", cascade = {CascadeType.REMOVE, CascadeType.ALL}, fetch = FetchType.LAZY) //지연 로딩 설정
+    private MemberProfileImage profileImage;
 
     //==연관관계 메서드==//
-    public void setProfileImage(UploadFile profileImage) {
-        this.profileImage = profileImage;
+    public void changeProfileImage(MemberProfileImage profileImage) {
         profileImage.setClubMember(this);
+        this.profileImage = profileImage;
     }
 
     //==생성메서드==//
@@ -72,7 +72,6 @@ public class ClubMember extends BaseEntity {
         return new ClubMember(club, user);
     }
 
-
     //==비즈니스 로직==//
 
     /**
@@ -88,7 +87,6 @@ public class ClubMember extends BaseEntity {
     public void setFirstVisitFalse(){
         this.isFirstVisit = false;
     }
-
 
     /**
      * 관리자 권한 부여
@@ -109,7 +107,6 @@ public class ClubMember extends BaseEntity {
     }
 
     public void validateFirstVisit() {
-
         if (this.isFirstVisit == true) {
             throw new CommonException(EX2200);
         }
