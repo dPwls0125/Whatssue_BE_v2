@@ -10,10 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface OfficialAbsenceRequestRepository extends JpaRepository<OfficialAbsenceRequest, Long> {
+public interface OfficialAbsenceRequestRepository extends JpaRepository<OfficialAbsenceRequest, Long>,OfficialAbsenceQueryRepository  {
 
     Page<OfficialAbsenceRequest> findByClubMember_Club_IdAndOfficialAbsenceRequestType(Long clubId, OfficialAbsenceRequestType officialAbsenceRequestType, Pageable pageable);
 
@@ -27,6 +28,8 @@ public interface OfficialAbsenceRequestRepository extends JpaRepository<Official
     Page<OfficialAbsenceRequest> findByClubMember_Club_Id(Long clubId, Pageable pageable);
 
     Optional<OfficialAbsenceRequest> findByClubMember_Club_IdAndId(Long clubId, Long officialAbsenceId);
+
+    Page<OfficialAbsenceRequest> findByClubMember_Club_IdAndOfficialAbsenceRequestTypeNotAndSchedule_ScheduleDateBetween(Long clubId, OfficialAbsenceRequestType officialAbsenceRequestType, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
     Optional<OfficialAbsenceRequest> findByClubMemberId(Long clubMemberId);
 }
