@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostImage extends UploadFile{
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @Column
+    @Column(nullable = false)
     private int orderNum;
 
     public void setPost(Post post) {
@@ -26,6 +26,8 @@ public class PostImage extends UploadFile{
     public void changeOrder(int orderNum) {
         this.orderNum = orderNum;
     }
+
+    public int getOrderNum() {return orderNum;}
 
     //==생성 메서드==//
     private PostImage(String uploadFileName, String storeFileName, int orderNum) {

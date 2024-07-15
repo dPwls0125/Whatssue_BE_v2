@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "ClubJoinController", description = "유저의 모임가입과 가입요청 처리에 관련된 api")
@@ -44,11 +46,14 @@ public class ClubJoinController {
 
     @Operation(summary = "모임가입 신청내역 조회")
     @GetMapping
-    public ResponseEntity<Page<GetJoinRequestsResponse>> getJoinRequests(@LoginUser Long userId, Pageable pageable) {
+    public ResponseEntity<Page<GetJoinRequestsResponse>> getJoinRequests(
+        @LoginUser Long userId,
+        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+        @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(clubJoinService.getJoinRequests(userId, pageable));
+            .body(clubJoinService.getJoinRequests(userId, PageRequest.of(page, size)));
     }
     
     @Operation(summary = "모임가입 신청 거절 사유 조회")
@@ -59,7 +64,7 @@ public class ClubJoinController {
             .body(clubJoinService.getJoinRequestRejectionReason(userId, joinRequestId));
     }
 
-    @Operation(summary = "모임가입 신청 삭제")
+    @Operation(summary = "모임가입 신청 내역 삭제")
     @DeleteMapping("/{joinRequestId}")
     public ResponseEntity<String> deleteJoinRequest(@LoginUser Long userId, @PathVariable(name = "joinRequestId") Long joinRequestId) {
         clubJoinService.deleteJoinRequest(userId, joinRequestId);

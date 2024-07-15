@@ -11,6 +11,7 @@ import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType;
 import GDG.whatssue.domain.officialabsence.exception.OfficialAbsenceErrorCode;
 import GDG.whatssue.domain.officialabsence.repository.OfficialAbsenceRequestRepository;
 import GDG.whatssue.domain.post.dto.GetPostResponse;
+import GDG.whatssue.domain.schedule.entity.AttendanceStatus;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
@@ -38,7 +39,7 @@ public class OfficialAbsenceService {
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
     private final ClubMemberRepository clubMemberRepository;
     private final ScheduleAttendanceResultRepository scheduleAttendanceResultRepository;
-    private static final Logger logger = LoggerFactory.getLogger(OfficialAbsenceService.class);
+
 
     @Transactional
     public void createOfficialAbsenceRequest(Long userId, Long clubId, Long scheduleId, String officialAbsenceContent) {
@@ -46,12 +47,16 @@ public class OfficialAbsenceService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new CommonException(ScheduleErrorCode.EX4100)); //존재하지 않는 일정
 
+        checkAttendanceStatus(scheduleId); //일정 상태 확인
+
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
                 .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));//존재하지 않는 멤버
 
         if (officialAbsenceRequestRepository.existsByScheduleAndClubMember(schedule, clubMember)) {
             throw new CommonException(OfficialAbsenceErrorCode.EX6200); //중복 신청
         }
+
+
 
         OfficialAbsenceRequest officialAbsenceRequest = OfficialAbsenceRequest.builder()
             .clubMember(clubMember)
@@ -61,6 +66,14 @@ public class OfficialAbsenceService {
             .build();
         officialAbsenceRequestRepository.save(officialAbsenceRequest);
     }
+
+    public void checkAttendanceStatus(Long scheduleId){
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        if(schedule.getAttendanceStatus() != AttendanceStatus.BEFORE){
+            throw new CommonException(OfficialAbsenceErrorCode.EX6202); // 이미 출석이 진행된 일정
+        }
+    }
+
     public Page<OfficialAbsenceGetRequestDto> getMyOfficialAbsenceRequests(Long userId, Long clubId, Pageable pageable) {
         //내 공결 신청 List 조회
         ClubMember clubMember = clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
@@ -75,9 +88,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -114,9 +130,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -136,9 +155,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -158,9 +180,12 @@ public class OfficialAbsenceService {
                     .id(officialAbsenceRequest.getId())
                     .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                     .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
                     .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                     .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
                     .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
                     .build();
 
             officialAbsenceGetRequestDtos.add(response);
@@ -178,8 +203,12 @@ public class OfficialAbsenceService {
                 .id(officialAbsenceRequest.getId())
                 .clubMemberId(officialAbsenceRequest.getClubMember().getId())
                 .scheduleId(officialAbsenceRequest.getSchedule().getId())
-                .officialAbsenceContent(officialAbsenceRequest.getOfficialAbsenceContent())
+                .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
+                .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
                 .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
+                .createdAt((officialAbsenceRequest.getCreateAt()))
+                .updatedAt((officialAbsenceRequest.getUpdateAt()))
                 .build();
 
         return officialAbsenceGetRequestDto;
@@ -191,6 +220,9 @@ public class OfficialAbsenceService {
         OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findByClubMember_Club_IdAndId(clubId, officialAbsenceId)
                 .orElseThrow(() -> new CommonException(OfficialAbsenceErrorCode.EX6100)); //존재하지 않는 공결신청
 
+        Schedule schedule = officialAbsenceRequestRepository.findById(officialAbsenceId).get().getSchedule();
+        checkAttendanceStatus(schedule.getId()); //일정 상태 확인
+
         officialAbsenceRequest.setOfficialAbsenceRequestType(OfficialAbsenceRequestType.ACCEPTED);
     }
     @Transactional
@@ -198,6 +230,9 @@ public class OfficialAbsenceService {
         // 공결 신청 거절(MANAGER)
         OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findByClubMember_Club_IdAndId(clubId, officialAbsenceId)
                 .orElseThrow(() -> new CommonException(OfficialAbsenceErrorCode.EX6100)); //존재하지 않는 공결신청
+
+        Schedule schedule = officialAbsenceRequestRepository.findById(officialAbsenceId).get().getSchedule();
+        checkAttendanceStatus(schedule.getId()); //일정 상태 확인
 
         officialAbsenceRequest.setOfficialAbsenceRequestType(OfficialAbsenceRequestType.REJECTED);
     }

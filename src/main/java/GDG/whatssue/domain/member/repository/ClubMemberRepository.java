@@ -21,14 +21,15 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
     @Query("select count(m) from ClubMember m where m.club.id = :clubId")
     long countClubMember(@Param("clubId") Long clubId);
 
-    @Query("select new GDG.whatssue.domain.club.dto.GetJoinClubResponse(" +
+    @Query(value = "select new GDG.whatssue.domain.club.dto.GetJoinClubResponse(" +
                         "c.id, c.clubName, i.storeFileName, m.createAt, m.role, " +
                             "(select count(subM) from ClubMember subM where subM.club = c))" +
             " from ClubMember m" +
-                " join m.club c" +
-                " join c.profileImage i" +
+                " left join m.club c" +
+                " left join c.profileImage i" +
             " where m.user.userId = :userId" +
-            " order by m.createAt"
+            " order by c.clubName asc"
+    , countQuery = "select count(m) from ClubMember m where m.user.userId = :userId"
     )
     Page<GetJoinClubResponse> getJoinClubList(@Param("userId") Long userId, Pageable pageable);
 
