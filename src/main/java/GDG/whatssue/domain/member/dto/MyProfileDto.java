@@ -27,6 +27,7 @@ public class MyProfileDto {
     private String profileImage;
 
     public static MyProfileDto of(ClubMember clubMember){
+
         User user = clubMember.getUser();
         String storeFileName = clubMember.getProfileImage().getStoreFileName();
         String memberProfileImage = S3Utils.getFullPath(storeFileName);

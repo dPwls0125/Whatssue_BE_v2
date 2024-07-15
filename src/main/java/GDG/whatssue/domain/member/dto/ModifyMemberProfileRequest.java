@@ -25,5 +25,5 @@ public class ModifyMemberProfileRequest {
 
     private MultipartFile profileImage;
 
-    private ImgModifyStatus ImageModifyStatus;
+    private Boolean isProfileImageChanged;
 }

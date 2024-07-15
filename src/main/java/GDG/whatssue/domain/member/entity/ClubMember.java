@@ -4,6 +4,8 @@ import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.EX2200;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.file.entity.MemberProfileImage;
+import GDG.whatssue.domain.member.dto.CreateMemberProfileRequest;
+import GDG.whatssue.domain.member.dto.ModifyMemberProfileRequest;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
@@ -82,6 +84,20 @@ public class ClubMember extends BaseEntity {
         this.memberName = memberName;
         this.isEmailPublic = isEmailPublic;
         this.isPhonePublic = isPhonePublic;
+    }
+
+    public void updateProfile(ModifyMemberProfileRequest request, String memberName){
+        this.memberIntro = request.getMemberIntro();
+        this.memberName = memberName;
+        this.isEmailPublic = request.getIsEmailPublic();
+        this.isPhonePublic = request.getIsPhonePublic();
+    }
+
+    public void updateProfile(CreateMemberProfileRequest request, String memberName){
+        this.memberIntro = request.getMemberIntro();
+        this.memberName = memberName;
+        this.isEmailPublic = request.getIsEmailPublic();
+        this.isPhonePublic = request.getIsPhonePublic();
     }
 
     public void setFirstVisitFalse(){
