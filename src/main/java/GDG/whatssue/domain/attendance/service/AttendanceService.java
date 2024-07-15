@@ -18,6 +18,9 @@ import GDG.whatssue.domain.attendance.repository.ScheduleAttendanceResultReposit
 import GDG.whatssue.domain.schedule.service.ScheduleFacade;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,33 +66,38 @@ public class AttendanceService {
 
     }
 
-    public List<ScheduleAttendanceResultDto> getFilteredMemberAttendance(Long userId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType) {
+    public List<ScheduleAttendanceResultDto> getFilteredMemberAttendance(Long userId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType,int size, int page) {
 
         Long memberId = getClubMemberId(clubId, userId);
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
         attendanceType = attendanceType.toUpperCase();
-        System.out.println(attendanceType);
+
+        Page<ScheduleAttendanceResult> entityList;
+
+        Pageable pageable = PageRequest.of(page,size);
 
         if(attendanceType.equals("TOTAL") ){
 
-            List<ScheduleAttendanceResult> entityList = scheduleAttendanceResultRepository.findAllByScheduleDateBetween(startDateTime, endDateTime, memberId);
-            return entityList.stream()
-                    .map(ScheduleAttendanceResultDto::of)
-                    .collect(Collectors.toList());
+            entityList = scheduleAttendanceResultRepository.findAllByScheduleDateBetween(startDateTime, endDateTime, memberId, pageable);
 
         } else if (attendanceType.equals("ATTENDANCE") || attendanceType.equals("ABSENCE") || attendanceType.equals("OFFICIAL_ABSENCE")) {
 
-            List<ScheduleAttendanceResult> entityList = scheduleAttendanceResultRepository.findAllByScheduleDateBetweenAndAttendanceType(startDateTime, endDateTime, AttendanceType.valueOf(attendanceType), memberId);
-
-            return entityList.stream()
-                    .map(ScheduleAttendanceResultDto::of)
-                    .collect(Collectors.toList());
+            entityList = scheduleAttendanceResultRepository
+                    .findAllByScheduleDateBetweenAndAttendanceType(startDateTime, endDateTime,
+                            AttendanceType.valueOf(attendanceType)
+                            ,memberId
+                            ,pageable
+                    );
 
         }else{
             throw new CommonException(AttendanceErrorCode.EX5207);
         }
+
+        return entityList.stream()
+                .map(ScheduleAttendanceResultDto::of)
+                .collect(Collectors.toList());
     }
 
     //현재 진행중인 일정 리스트
@@ -117,11 +125,6 @@ public class AttendanceService {
         attendanceNumRepository.deleteById(getId(clubId,scheduleId));
 
     }
-
-//    public getMemberAttendanceList(Long clubId, Long scheduleId, Long memberId) {
-//
-//    }
-
 
     @Transactional
     public void initAttendance(Long clubId, Long scheduleId) {

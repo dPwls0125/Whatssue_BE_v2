@@ -98,9 +98,13 @@ public class AttendanceController {
             @Parameter(description = "시작 날짜 (형식: YYYY-MM-DD)", required = true) @RequestParam("startDate") LocalDate startDate,
             @Parameter(description = "종료 날짜 (형식: YYYY-MM-DD)", required = true) @RequestParam("endDate") LocalDate endDate,
             @Parameter(description = "출석 검색 타입 (TOTAL, ATTENDANCE, ABSENCE, OFFICIAL_ABSENCE)", required = true)
-            @RequestParam("attendanceType") String attendanceType){
+            @RequestParam("attendanceType") String attendanceType,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "page", defaultValue = "0") int page
 
-        List<ScheduleAttendanceResultDto> dtos =  attendanceService.getFilteredMemberAttendance(userId, clubId, startDate, endDate, attendanceType);
+    ){
+
+        List<ScheduleAttendanceResultDto> dtos =  attendanceService.getFilteredMemberAttendance(userId, clubId, startDate, endDate, attendanceType,size,page);
         Map<String,List<ScheduleAttendanceResultDto>> json = new HashMap<>();
         json.put("data",dtos);
 
