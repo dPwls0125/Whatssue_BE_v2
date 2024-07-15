@@ -12,7 +12,8 @@ import java.time.LocalDate;
 public class ScheduleAttendanceResultDto {
 
     private Long id;
-    private String schedulTitle;
+    private Long scheduleId;
+    private String scheduleTitle;
     private AttendanceType attendanceType;
     private String clubMemberName;
     private Long clubMemberId;
@@ -21,7 +22,8 @@ public class ScheduleAttendanceResultDto {
     public static ScheduleAttendanceResultDto of(ScheduleAttendanceResult entity){
         return ScheduleAttendanceResultDto.builder()
                 .id(entity.getId())
-                .schedulTitle(entity.getSchedule().getScheduleName())
+                .scheduleId(entity.getSchedule().getId())
+                .scheduleTitle(entity.getSchedule().getScheduleName())
                 .attendanceType(entity.getAttendanceType())
                 .clubMemberName(entity.getClubMember().getMemberName())
                 .clubMemberId(entity.getClubMember().getId())
