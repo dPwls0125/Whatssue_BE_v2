@@ -2,6 +2,7 @@ package GDG.whatssue.domain.officialabsence.controller;
 
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceAddRequestDto;
 import GDG.whatssue.domain.officialabsence.dto.OfficialAbsenceGetRequestDto;
+import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType;
 import GDG.whatssue.domain.officialabsence.service.OfficialAbsenceService;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
@@ -9,10 +10,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -36,8 +42,21 @@ public class OfficialAbsenceController {
     public ResponseEntity<Page<OfficialAbsenceGetRequestDto>> getMyOfficialAbsenceRequestList(
             @LoginUser Long userId,
             @PathVariable Long clubId,
+            @RequestParam(value = "requestType", required = false) OfficialAbsenceRequestType requestType,
+            @RequestParam(name = "startDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(name = "endDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             Pageable pageable){
-        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getMyOfficialAbsenceRequests(userId, clubId, pageable);
+        // 기본값 설정
+        LocalDateTime defaultStartDate = LocalDateTime.of(1900, 1, 1, 0, 0);
+        LocalDateTime defaultEndDate = LocalDateTime.of(2199, 12, 31, 23, 59);
+
+        /// 입력 값 변환
+        LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : defaultStartDate;
+        LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(LocalTime.MAX) : defaultEndDate;
+
+        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getMyOfficialAbsenceRequests(userId, clubId, requestType, startDateTime, endDateTime, pageable);
         return ResponseEntity.ok(officialAbsenceRequests);
     }
     @DeleteMapping(value="/delete/{officialAbsenceId}")
@@ -72,8 +91,20 @@ public class OfficialAbsenceController {
     @ClubManager
     public ResponseEntity<Page<OfficialAbsenceGetRequestDto>> getDoneOfficialAbsenceRequestList(
             @PathVariable Long clubId,
+            @RequestParam(name = "startDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(name = "endDate", required = false)
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             Pageable pageable){
-        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getDoneOfficialAbsenceRequests(clubId, pageable);
+        // 기본값 설정
+        LocalDateTime defaultStartDate = LocalDateTime.of(1900, 1, 1, 0, 0);
+        LocalDateTime defaultEndDate = LocalDateTime.of(2199, 12, 31, 23, 59);
+
+        // 입력 값 변환
+        LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : defaultStartDate;
+        LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(LocalTime.MAX) : defaultEndDate;
+
+        Page<OfficialAbsenceGetRequestDto> officialAbsenceRequests = officialAbsenceService.getDoneOfficialAbsenceRequests(clubId, startDateTime, endDateTime, pageable);
         return ResponseEntity.ok(officialAbsenceRequests);
     }
     @GetMapping(value="/detail/{officialAbsenceId}")
