@@ -7,12 +7,8 @@ import GDG.whatssue.domain.file.entity.MemberProfileImage;
 import GDG.whatssue.domain.file.service.FileUploadService;
 import GDG.whatssue.domain.member.dto.*;
 import GDG.whatssue.domain.member.entity.ClubMember;
-import GDG.whatssue.domain.member.entity.ImgModifyStatus;
 import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.repository.ClubMemberRepository;
-import GDG.whatssue.domain.user.entity.User;
-import GDG.whatssue.domain.user.repository.UserRepository;
-import GDG.whatssue.global.util.S3Utils;
 import GDG.whatssue.global.error.CommonException;
 
 import java.io.IOException;
@@ -31,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static GDG.whatssue.domain.club.entity.NamePolicy.REAL_NAME;
 import static GDG.whatssue.domain.file.FileConst.MEMBER_PROFILE_IMAGE_DIRNAME;
-import static GDG.whatssue.domain.member.entity.ImgModifyStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,62 +35,32 @@ public class ClubMemberService {
 
     private final ClubRepository clubRepository;
     private final ClubMemberRepository clubMemberRepository;
-    private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
 
     @Transactional
     public void modifyClubMember(Long clubId, Long userId, ModifyMemberProfileRequest request) throws IOException {
 
-        Club club = clubRepository.findById(clubId).get();
-        NamePolicy namePolicy = club.getNamePolicy();
-
         ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
-        ImgModifyStatus imageModifyStatus = request.getImageModifyStatus();
 
-       if(imageModifyStatus == DELETE) {
+        clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId, clubMember));
 
-            MemberProfileImage memberProfileImage = clubMember.getProfileImage();
-            // 버킷에서 사진 삭제
+        if(request.getIsProfileImageChanged()){
 
-           fileUploadService.deleteFile(memberProfileImage.getStoreFileName());
-            // 프로필 이미지 삭제 - multipart file == null 인 경우 기본 이미지
-           String storeFileName = fileUploadService.uploadFile(null, MEMBER_PROFILE_IMAGE_DIRNAME);
-           String originalFileName = fileUploadService.getOriginalFileName(null);
-           // 기본 이미지로 업데이트
-           memberProfileImage.update(originalFileName, storeFileName);
+            //기존 이미지 가져오기 및 삭제
+            MemberProfileImage currentProfileImage = clubMember.getProfileImage();
+            fileUploadService.deleteFile(currentProfileImage.getStoreFileName());
 
-        } else if (imageModifyStatus == MODIFY){
-           if(request.getProfileImage() == null ) throw new CommonException(ClubMemberErrorCode.EX2202);
+            MultipartFile multipartFile = request.getProfileImage();
+            String storeFileName = fileUploadService.uploadFile(multipartFile, MEMBER_PROFILE_IMAGE_DIRNAME);
+            String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
 
-           // 멤버 프로필 이미지 저장
-           MultipartFile multipartFile = request.getProfileImage();
-
-           String storeFileName = fileUploadService.uploadFile(multipartFile, MEMBER_PROFILE_IMAGE_DIRNAME);
-           String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
-           MemberProfileImage currentProfileImage = clubMember.getProfileImage();
-           // 버킷에서 기존 사진 삭제
-           fileUploadService.deleteFile(currentProfileImage.getStoreFileName());
-           // DB 새로운 사진으로 업데이트
-           currentProfileImage.update(originalFileName, storeFileName);
-
-       }
-
-        // 멤버 프로필 정보 업데이트
-        String memberName;
-        if(namePolicy == REAL_NAME)
-            memberName = clubMember.getUser().getUserName();
-        else
-            memberName = request.getMemberName();
-
-        clubMember.updateProfile(request.getMemberIntro(), memberName, request.getIsEmailPublic(), request.getIsPhonePublic());
-
+            // 번호 유지 및 파일명 변경
+            currentProfileImage.update(originalFileName, storeFileName);
+        }
     }
 
     @Transactional
     public void setMemberProfile(Long clubId, Long userId, CreateMemberProfileRequest request) throws IOException {
-
-        Club club = clubRepository.findById(clubId).get();
-        NamePolicy namePolicy = club.getNamePolicy();
 
         ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
 
@@ -107,14 +72,8 @@ public class ClubMemberService {
         String originalFileName = fileUploadService.getOriginalFileName(multipartFile);
         MemberProfileImage memberProfileImage = MemberProfileImage.of(originalFileName, storeFileName);
 
-        // 멤버 프로필 정보  업데이트
-        String memberName;
-        if(namePolicy == REAL_NAME)
-            memberName = clubMember.getUser().getUserName();
-        else
-            memberName = request.getMemberName();
 
-        clubMember.updateProfile(request.getMemberIntro(), memberName, request.getIsEmailPublic(), request.getIsPhonePublic());
+        clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId,clubMember));
         clubMember.changeProfileImage(memberProfileImage);
         clubMember.setFirstVisitFalse();
     }
@@ -162,6 +121,17 @@ public class ClubMemberService {
 
     public Optional<ClubMember> findClubMemberByClubAndUser(Long clubId, Long userId) {
         return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId);
+    }
+
+    public String getMemberNameByNamePolicy(Long clubId, ClubMember member){
+
+        Club club = clubRepository.findById(clubId).get();
+        NamePolicy namePolicy = club.getNamePolicy();
+        if(namePolicy == REAL_NAME)
+            return member.getUser().getUserName();
+        else
+            return member.getMemberName();
+
     }
 
 }
