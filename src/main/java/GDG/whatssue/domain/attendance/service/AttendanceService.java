@@ -60,9 +60,7 @@ public class AttendanceService {
         // 출석번호 생성 및 맵에 저장
         int randomInt = putAttendanceNumInMapAndReturn(clubId, scheduleId);
 
-        AttendanceNumResponseDto responseDto = AttendanceNumResponseDto.of(clubId, scheduleId, randomInt);
-
-        return responseDto;
+        return AttendanceNumResponseDto.of(clubId, scheduleId, randomInt);
 
     }
 
@@ -86,10 +84,7 @@ public class AttendanceService {
 
             entityList = scheduleAttendanceResultRepository
                     .findAllByScheduleDateBetweenAndAttendanceType(startDateTime, endDateTime,
-                            AttendanceType.valueOf(attendanceType)
-                            ,memberId
-                            ,pageable
-                    );
+                            AttendanceType.valueOf(attendanceType) ,memberId ,pageable );
 
         }else{
             throw new CommonException(AttendanceErrorCode.EX5207);
@@ -184,8 +179,6 @@ public class AttendanceService {
 
     }
 
-
-
     private void initializeMemberAttendance(Long clubId, Long scheduleId) throws RuntimeException {
 
         List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.EX3100));
@@ -203,15 +196,18 @@ public class AttendanceService {
                         .schedule(scheduleFacade.getScheduleById(scheduleId))
                         .attendanceType(OFFICIAL_ABSENCE)
                         .build();
+
                 scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
 
             }else{
+
                 ScheduleAttendanceResult scheduleAttendanceResult = ScheduleAttendanceResult.builder()
                         .clubMember(clubMember)
                         .schedule(scheduleFacade.getScheduleById(scheduleId))
                         .attendanceType(AttendanceType.ABSENCE)
                         .build();
                 scheduleAttendanceResultRepository.save(scheduleAttendanceResult);
+
             }
         }
     }
@@ -258,7 +254,6 @@ public class AttendanceService {
         return "attendanceNum" + clubId.toString() +":" + scheduleId.toString();
     }
 
-
     private boolean isOfficial_Accepted(Long clubMemberId, Long scheduleId){
         return officialAbsenceRequestRepository.findByScheduleIdAndClubMemberId(scheduleId, clubMemberId)
                 .map(officialAbsenceRequest -> officialAbsenceRequest.getOfficialAbsenceRequestType() == ACCEPTED)
@@ -279,10 +274,12 @@ public class AttendanceService {
         if(dto.getAttendanceType().equals(OFFICIAL_ABSENCE)){
 
             if(officialAbsenceRequestRepository.findByClubMemberId(dto.getMemberId()).isPresent()){
+
                 OfficialAbsenceRequest officialAbsenceRequest = officialAbsenceRequestRepository.findByClubMemberId(dto.getMemberId()).get();
                 officialAbsenceRequest.setOfficialAbsenceRequestType(ACCEPTED);
                 officialAbsenceRequest.setOfficialAbsenceContent("관리자의 출석 정정에 의해 인정된 공결입니다.");
                 return;
+
             }
 
             OfficialAbsenceRequest officialAbsenceRequest = OfficialAbsenceRequest.builder()

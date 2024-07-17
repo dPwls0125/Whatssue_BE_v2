@@ -47,7 +47,7 @@ public class AttendanceController {
     @ClubManager
     @Operation(summary = "멤버들의 출석 진행 현황 리스트 조회")
     @GetMapping("/{scheduleId}/attendance-list")
-    public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId) {
+    public ResponseEntity getAttendanceList( @PathVariable Long clubId, @PathVariable Long scheduleId){
         List<ScheduleAttendanceMemberDto> list =  attendanceService.getAttendanceList(scheduleId);
         Map<String,Object> response = new HashMap<>();
         response.put("data",list);
@@ -75,7 +75,7 @@ public class AttendanceController {
 
     @Operation(summary = "출석 초기화")
     @GetMapping("/{scheduleId}/attendance-reset")
-    public ResponseEntity resetAttendance(@PathVariable Long clubId, @PathVariable Long scheduleId) {
+    public ResponseEntity resetAttendance( @PathVariable Long clubId, @PathVariable Long scheduleId ) {
 
         attendanceService.initAttendance(clubId, scheduleId);
         return ResponseEntity.status(HttpStatus.OK).body("출석이 초기화되었습니다.");
@@ -86,13 +86,16 @@ public class AttendanceController {
     @Operation(summary = "출석 정정")
     @PutMapping("/{scheduleId}/attendance/{memberId}/{attendanceType}")
     public ResponseEntity<Void> modifyMemberAttendance(@PathVariable Long clubId, @RequestBody AttendModifyRequest request) {
+
         attendanceService.modifyMemberAttendance(request.getScheduleId(), request.getAttendmodifyDtoList());
-         return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
+
     }
 
     @GetMapping("/attendance/my-results")
     @Operation(summary = "멤버(본인)별 출석 필터링 결과 조회")
     public ResponseEntity getAttendanceResults(
+
             @LoginUser Long userId,
             @PathVariable Long clubId,
             @Parameter(description = "시작 날짜 (형식: YYYY-MM-DD)", required = true) @RequestParam("startDate") LocalDate startDate,
@@ -109,6 +112,7 @@ public class AttendanceController {
         json.put("data",dtos);
 
         return ResponseEntity.status(HttpStatus.OK).body(json);
+
     }
 
 }
