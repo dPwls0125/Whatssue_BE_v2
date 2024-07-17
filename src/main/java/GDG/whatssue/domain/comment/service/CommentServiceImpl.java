@@ -115,10 +115,6 @@ public class CommentServiceImpl implements CommentService{
 
     }
 
-    private Long getClubMemberId(Long clubId, Long userId) {
-        return clubMemberService.getClubMemberId(clubId, userId);
-    }
-
     private ClubMember getClubMember(Long clubId, Long userId) {
         return clubMemberService.findClubMemberByClubAndUser(clubId, userId).get();
     }
@@ -138,9 +134,11 @@ public class CommentServiceImpl implements CommentService{
             throw new CommonException(CommentErrorCode.EX8101);
 
     }
+
     public long getChildCommentCount(Long parentId) {
         return commentRepository.countByParentCommentId(parentId);
     }
+
     private CommentDto nullifyDeletedCommentFields(CommentDto commentDto){
         if(commentDto.getDeleteAt() != null){
             commentDto.setWriterId(null);
@@ -153,9 +151,6 @@ public class CommentServiceImpl implements CommentService{
         return commentDto;
     }
 
-    private String getProfileImage(Comment comment) {
-        String storeFileName = comment.getClubMember().getProfileImage().getStoreFileName();
-        return S3Utils.getFullPath(storeFileName);
-    }
+
 }
 
