@@ -19,6 +19,7 @@ import GDG.whatssue.domain.schedule.service.ScheduleFacade;
 import GDG.whatssue.global.error.CommonException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static GDG.whatssue.domain.attendance.entity.AttendanceType.OFFICIAL_ABSENCE;
+import static GDG.whatssue.domain.attendance.entity.AttendanceType.*;
 import static GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType.ACCEPTED;
 import static GDG.whatssue.domain.schedule.entity.AttendanceStatus.BEFORE;
 import static GDG.whatssue.domain.schedule.entity.AttendanceStatus.ONGOING;
@@ -64,7 +65,7 @@ public class AttendanceService {
 
     }
 
-    public List<ScheduleAttendanceResultDto> getFilteredMemberAttendance(Long userId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType,int size, int page) {
+    public MyAttendanceResultResponse getFilteredMemberAttendance(Long userId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType, int size, int page) {
 
         Long memberId = getClubMemberId(clubId, userId);
         LocalDateTime startDateTime = startDate.atStartOfDay();
@@ -90,9 +91,15 @@ public class AttendanceService {
             throw new CommonException(AttendanceErrorCode.EX5207);
         }
 
-        return entityList.stream()
+        List<ScheduleAttendanceResultDto> dtos =  entityList.stream()
                 .map(ScheduleAttendanceResultDto::of)
                 .collect(Collectors.toList());
+
+        return MyAttendanceResultResponse.builder()
+                .attendanceList(new PageImpl<>(dtos,pageable,entityList.getTotalElements()))
+                .memberName(getClubMember(clubId, userId).getMemberName())
+                .memberId(memberId)
+                .build();
     }
 
     //현재 진행중인 일정 리스트
@@ -169,13 +176,27 @@ public class AttendanceService {
             throw new CommonException(AttendanceErrorCode.Ex5209);
         }
 
+        HashMap<AttendanceType,List<Long>> modifiedMemberMap = new HashMap<>(){
+            {
+                put(ATTENDANCE, new ArrayList<>());
+                put(ABSENCE, new ArrayList<>());
+                put(OFFICIAL_ABSENCE, new ArrayList<>());
+            }
+        };
+
         request.stream()
                 .filter(dto -> isModified(dto))
                 .forEach(dto -> {
-                    ScheduleAttendanceResult entity = getAttendanceResult(scheduleId, dto.getMemberId());
-                    isOfficialAbsence(entity,dto);
-                    entity.setAttendanceType(dto.getAttendanceType());
+                    modifiedMemberMap.get(dto.getAttendanceType()).add(dto.getMemberId());
+                    isOfficialAbsence(getAttendanceResult(scheduleId, dto.getMemberId()),dto);
                 });
+
+        modifiedMemberMap.forEach((attendanceType, memberIdList) -> {
+            if(!memberIdList.isEmpty()){
+                scheduleAttendanceResultRepository.updateAttendanceTypeByScheduleIdAndClubMemberId(scheduleId, memberIdList, attendanceType);
+            }
+
+        });
 
     }
 
@@ -230,7 +251,15 @@ public class AttendanceService {
     }
 
     private Long getClubMemberId(Long clubId, Long userId) {
-        return clubMemberService.getClubMemberId(clubId, userId);
+        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
+                .orElseThrow(() -> new CommonException(ClubErrorCode.EX3100))
+                .getId();
+
+    }
+
+    private ClubMember getClubMember(Long clubId, Long userId){
+        return clubMemberRepository.findById(getClubMemberId(clubId, userId))
+                .orElseThrow(() -> new CommonException(ClubErrorCode.EX3100));
     }
 
     private int getStoredNum(Long clubId, Long scheduleId) {
@@ -279,7 +308,6 @@ public class AttendanceService {
                 officialAbsenceRequest.setOfficialAbsenceRequestType(ACCEPTED);
                 officialAbsenceRequest.setOfficialAbsenceContent("관리자의 출석 정정에 의해 인정된 공결입니다.");
                 return;
-
             }
 
             OfficialAbsenceRequest officialAbsenceRequest = OfficialAbsenceRequest.builder()

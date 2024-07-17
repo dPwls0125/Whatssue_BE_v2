@@ -37,6 +37,7 @@ public class ClubMemberManagingService {
 
         if (request.getRole() == MANAGER)
             clubMember.switchToManager();
+
         else if (request.getRole() == MEMBER)
             clubMember.switchToMember();
 
