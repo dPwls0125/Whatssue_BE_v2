@@ -15,8 +15,6 @@ public class ScheduleAttendanceResultDto {
     private Long scheduleId;
     private String scheduleTitle;
     private AttendanceType attendanceType;
-    private String clubMemberName;
-    private Long clubMemberId;
     private LocalDate scheduleDate;
 
     public static ScheduleAttendanceResultDto of(ScheduleAttendanceResult entity){
@@ -25,8 +23,6 @@ public class ScheduleAttendanceResultDto {
                 .scheduleId(entity.getSchedule().getId())
                 .scheduleTitle(entity.getSchedule().getScheduleName())
                 .attendanceType(entity.getAttendanceType())
-                .clubMemberName(entity.getClubMember().getMemberName())
-                .clubMemberId(entity.getClubMember().getId())
                 .scheduleDate(entity.getSchedule().getScheduleDate().toLocalDate())
                 .build();
     }

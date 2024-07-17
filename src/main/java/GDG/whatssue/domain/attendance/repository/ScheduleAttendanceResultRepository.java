@@ -5,8 +5,10 @@ import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,5 +44,9 @@ public interface ScheduleAttendanceResultRepository extends JpaRepository<Schedu
             Pageable pageable
     );
 
+    @Transactional
+    @Modifying
+    @Query("update ScheduleAttendanceResult s set s.attendanceType = :attendanceType where s.schedule.id = :scheduleId and s.clubMember.id IN :memberIdList")
+    void updateAttendanceTypeByScheduleIdAndClubMemberId(@Param("scheduleId") Long scheduleId, @Param("memberIdList") List<Long> memberIdList, @Param("attendanceType") AttendanceType attendanceType);
 
 }

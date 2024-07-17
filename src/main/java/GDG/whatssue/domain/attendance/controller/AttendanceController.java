@@ -12,6 +12,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -106,12 +107,8 @@ public class AttendanceController {
             @RequestParam(value = "page", defaultValue = "0") int page
 
     ){
-
-        List<ScheduleAttendanceResultDto> dtos =  attendanceService.getFilteredMemberAttendance(userId, clubId, startDate, endDate, attendanceType,size,page);
-        Map<String,List<ScheduleAttendanceResultDto>> json = new HashMap<>();
-        json.put("data",dtos);
-
-        return ResponseEntity.status(HttpStatus.OK).body(json);
+        MyAttendanceResultResponse response = attendanceService.getFilteredMemberAttendance(userId, clubId, startDate, endDate, attendanceType,size,page);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 
