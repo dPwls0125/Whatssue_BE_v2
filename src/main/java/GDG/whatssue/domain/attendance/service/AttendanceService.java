@@ -153,12 +153,16 @@ public class AttendanceService {
         int inputValue = requestDto.getAttendanceNum();
 
         if (getStoredNum(clubId,scheduleId) == inputValue) {
+
             ScheduleAttendanceResult scheduleAttendanceResult = attendanceFacade.getAttendanceResult(scheduleId, getClubMemberId(clubId, userId));
+
             if(scheduleAttendanceResult.getAttendanceType() == AttendanceType.ATTENDANCE){
                 throw new CommonException(AttendanceErrorCode.EX5205);
             }
+
             scheduleAttendanceResult.setAttendanceType(AttendanceType.ATTENDANCE);
-        }else throw new CommonException(AttendanceErrorCode.EX5204);
+
+        } else throw new CommonException(AttendanceErrorCode.EX5204);
     }
 
     @Transactional

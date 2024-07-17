@@ -103,7 +103,7 @@ public class ClubMemberService {
         Page<ClubMember> clubMemberPage = clubMemberRepository.findByClubIdOrderByRole(clubId,pageable);
 
         List<ClubMemberListResponse> clubMemberList = clubMemberPage.stream()
-                .map(clubMember -> ClubMemberListResponse.of(clubMember))
+                .map(ClubMemberListResponse::of)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(clubMemberList,pageable,clubMemberPage.getTotalElements());
