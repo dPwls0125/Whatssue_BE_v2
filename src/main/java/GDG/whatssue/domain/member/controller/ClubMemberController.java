@@ -97,7 +97,7 @@ public class ClubMemberController {
     @GetMapping("profile")
     public ResponseEntity getMemberProfile(@PathVariable Long clubId, @RequestParam Long memberId){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(clubMemberService.getMemberProfile(memberId));
+                .body(clubMemberService.getMemberProfile(clubId,memberId));
     }
 
     @GetMapping("/my/auth")

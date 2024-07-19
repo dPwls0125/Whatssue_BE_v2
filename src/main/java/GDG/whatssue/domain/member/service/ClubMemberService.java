@@ -87,10 +87,11 @@ public class ClubMemberService {
         return MyProfileDto.of(clubMember);
     }
 
-
-    public MemberProfileDto getMemberProfile(Long memberId){
+    public MemberProfileDto getMemberProfile(Long clubId, Long memberId){
 
         ClubMember clubMember = clubMemberRepository.findById(memberId).orElseThrow(()-> new CommonException(ClubMemberErrorCode.EX2100));
+
+        if(clubMember.getClub().getId() != clubId) throw new CommonException(ClubMemberErrorCode.EX2203);
 
         return MemberProfileDto.of(clubMember);
 
