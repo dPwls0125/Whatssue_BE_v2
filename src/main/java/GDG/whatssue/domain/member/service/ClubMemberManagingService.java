@@ -1,6 +1,5 @@
 package GDG.whatssue.domain.member.service;
 
-
 import GDG.whatssue.domain.member.dto.MemberRoleRequest;
 import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.domain.member.entity.Role;

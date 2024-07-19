@@ -6,6 +6,8 @@ import GDG.whatssue.domain.attendance.entity.AttendanceNum;
 import GDG.whatssue.domain.attendance.repository.AttendanceNumRepository;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
 import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.member.entity.Role;
+import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
 import GDG.whatssue.domain.member.service.ClubMemberService;
 import GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequest;
 import GDG.whatssue.domain.officialabsence.repository.OfficialAbsenceRequestRepository;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static GDG.whatssue.domain.attendance.entity.AttendanceType.*;
+import static GDG.whatssue.domain.member.entity.Role.MANAGER;
 import static GDG.whatssue.domain.officialabsence.entity.OfficialAbsenceRequestType.ACCEPTED;
 import static GDG.whatssue.domain.schedule.entity.AttendanceStatus.BEFORE;
 import static GDG.whatssue.domain.schedule.entity.AttendanceStatus.ONGOING;
@@ -200,6 +204,15 @@ public class AttendanceService {
 
     }
 
+//    public AttendanceTimesResponse getAttendanceTimes(Long clubId, Long memberId){
+//
+//        ClubMember clubMember = getClubMember(memberId);
+//        if(clubMember.getRole() == MANAGER) throw new CommonException(AttendanceErrorCode.Ex5210);
+//
+//
+//
+//    }
+
     private void initializeMemberAttendance(Long clubId, Long scheduleId) throws RuntimeException {
 
         List<ClubMember> clubMembers = clubMemberRepository.findByClubId(clubId).orElseThrow(()->new CommonException(ClubErrorCode.EX3100));
@@ -252,14 +265,19 @@ public class AttendanceService {
 
     private Long getClubMemberId(Long clubId, Long userId) {
         return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
-                .orElseThrow(() -> new CommonException(ClubErrorCode.EX3100))
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100))
                 .getId();
 
     }
 
     private ClubMember getClubMember(Long clubId, Long userId){
         return clubMemberRepository.findById(getClubMemberId(clubId, userId))
-                .orElseThrow(() -> new CommonException(ClubErrorCode.EX3100));
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
+    }
+
+    private ClubMember getClubMember(Long memberId){
+        return clubMemberRepository.findById(memberId)
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
     }
 
     private int getStoredNum(Long clubId, Long scheduleId) {
@@ -320,6 +338,9 @@ public class AttendanceService {
             officialAbsenceRequestRepository.save(officialAbsenceRequest);
         }
     }
+
+
+
 
 }
 
