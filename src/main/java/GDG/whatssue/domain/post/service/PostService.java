@@ -68,16 +68,24 @@ public class PostService {
             throw new CommonException(PostErrorCode.EX7200);//공지 게시글 작성 권한이 없습니다.
         }
 
-        if(postImages.size()>10){
-            throw new CommonException(PostErrorCode.EX7207);//사진은 최대 10장 업로드 가능
-        }
-
         //게시글 db 저장
         Post post = request.toEntity(club, writer);
         postRepository.save(post);
 
-        //이미지 s3 업로드, db 저장
-        uploadPostImages(postImages, post);
+        //이미지 null 체크
+        if(postImages!=null) {
+            int checkNewImagesNum = 0;
+            for (MultipartFile postImage : postImages) {
+                if (postImage.isEmpty()) checkNewImagesNum = 1;
+            }
+            if (checkNewImagesNum == 0) { //이미지가 있는 경우
+                if (postImages.size() > 10) {
+                    throw new CommonException(PostErrorCode.EX7207);//사진은 최대 10장 업로드 가능
+                }
+                //이미지 s3 업로드, db 저장
+                uploadPostImages(postImages, post);
+            }
+        }
     }
 
     public GetPostResponse getPost(Long clubId, Long userId, Long postId) {
@@ -235,31 +243,33 @@ public class PostService {
         }
 
         //새로운 이미지 업로드
-        int checkNewImagesNum = 0;
-        for(MultipartFile newImage:newImages){
-            if(newImage.isEmpty()) checkNewImagesNum=1;
-        }
-        if(checkNewImagesNum==0) { // 새로운 이미지가 있는 경우에만
-            int nullCount = 0;
-            for (int orderNum = 1; orderNum < MAX_IMAGE_LIST_SIZE + 1; orderNum++) { // 최대 이미지 10장
-                if (maintainImages.get(orderNum) == null) {
-                    System.out.println(nullCount);
-                    nullCount++;
-                }
+        //이미지 null 체크
+        if(newImages!=null) {
+            int checkNewImagesNum = 0;
+            for (MultipartFile newImage : newImages) {
+                if (newImage.isEmpty()) checkNewImagesNum = 1;
             }
-            if (newImages.size() <= nullCount) { // 최대 이미지 갯수 조건 비교
-                int newImagesFlag = 0;
-                for (int orderNum = 1; orderNum < MAX_IMAGE_LIST_SIZE + 1; orderNum++) {
-                    String s = maintainImages.get(orderNum); // get(key) / key == orderNum
-                    if (s == null) { // orderNum이 비어있는 경우
-                        if (newImagesFlag < newImages.size()) {
-                            uploadPostImage(newImages.get(newImagesFlag), orderNum, post); // newImages가 차례로 빈 자리로 할당.
-                            newImagesFlag++;
-                        }
+            if (checkNewImagesNum == 0) { // 새로운 이미지가 있는 경우에만
+                int nullCount = 0;
+                for (int orderNum = 1; orderNum < MAX_IMAGE_LIST_SIZE + 1; orderNum++) { // 최대 이미지 10장
+                    if (maintainImages.get(orderNum) == null) {
+                        nullCount++;
                     }
                 }
-            } else {
-                throw new CommonException(PostErrorCode.EX7207); //사진은 10장 까지만 업로드 가능
+                if (newImages.size() <= nullCount) { // 최대 이미지 갯수 조건 비교
+                    int newImagesFlag = 0;
+                    for (int orderNum = 1; orderNum < MAX_IMAGE_LIST_SIZE + 1; orderNum++) {
+                        String s = maintainImages.get(orderNum); // get(key) / key == orderNum
+                        if (s == null) { // orderNum이 비어있는 경우
+                            if (newImagesFlag < newImages.size()) {
+                                uploadPostImage(newImages.get(newImagesFlag), orderNum, post); // newImages가 차례로 빈 자리로 할당.
+                                newImagesFlag++;
+                            }
+                        }
+                    }
+                } else {
+                    throw new CommonException(PostErrorCode.EX7207); //사진은 10장 까지만 업로드 가능
+                }
             }
         }
     }
