@@ -76,6 +76,7 @@ public class ClubMemberService {
         clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId,clubMember));
         clubMember.changeProfileImage(memberProfileImage);
         clubMember.setFirstVisitFalse();
+
     }
 
     // TDDO
@@ -109,7 +110,6 @@ public class ClubMemberService {
 
         return new PageImpl<>(clubMemberList,pageable,clubMemberPage.getTotalElements());
     }
-
 
     public MemberAuthInfoResponse getMemberAuthInfo(Long clubId, Long userId) {
         ClubMember member = clubMemberRepository.findMemberWithClub(clubId, userId);

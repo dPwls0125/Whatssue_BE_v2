@@ -3,8 +3,12 @@ package GDG.whatssue.domain.attendance.controller;
 import GDG.whatssue.domain.attendance.dto.*;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.service.AttendanceService;
+import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
+import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
+import GDG.whatssue.global.error.CommonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +32,7 @@ import java.util.*;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private final ClubMemberRepository clubMemberRepository;
 
     @ClubManager
     @Operation(summary = "출석 열기_manager ",description = "출석을 열면 출석을 진행하지 않았던 경우는 모두 결석 처리 리스트를 생성합니다.")
@@ -93,6 +98,14 @@ public class AttendanceController {
 
     }
 
+    @GetMapping("/attendance/times")
+    @Operation(summary = " 멤버의 출석/부재/공결 횟수 조회 ")
+    public ResponseEntity getAttendanceTimes(@PathVariable Long clubId, @RequestParam Long memberId)
+    {
+        AttendanceTimesResponse response = attendanceService.getAttendanceTimes(clubId,memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @GetMapping("/attendance/my-results")
     @Operation(summary = "멤버(본인)별 출석 필터링 결과 조회")
     public ResponseEntity getAttendanceResults(
@@ -111,6 +124,9 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
+
+
+
 
 }
 
