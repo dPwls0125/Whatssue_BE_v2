@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.attendance.repository;
 
+import GDG.whatssue.domain.attendance.dto.AttendanceTimesResponse;
 import GDG.whatssue.domain.attendance.entity.AttendanceType;
 import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import org.springframework.data.domain.Page;
@@ -48,5 +49,12 @@ public interface ScheduleAttendanceResultRepository extends JpaRepository<Schedu
     @Modifying
     @Query("update ScheduleAttendanceResult s set s.attendanceType = :attendanceType where s.schedule.id = :scheduleId and s.clubMember.id IN :memberIdList")
     void updateAttendanceTypeByScheduleIdAndClubMemberId(@Param("scheduleId") Long scheduleId, @Param("memberIdList") List<Long> memberIdList, @Param("attendanceType") AttendanceType attendanceType);
+
+    @Query("select new GDG.whatssue.domain.attendance.dto.AttendanceTimesResponse("+
+            "SUM(CASE WHEN s.attendanceType = GDG.whatssue.domain.attendance.entity.AttendanceType.ATTENDANCE THEN 1 ELSE 0 END)," +
+            "SUM(CASE WHEN s.attendanceType = GDG.whatssue.domain.attendance.entity.AttendanceType.ABSENCE THEN 1 ELSE 0 END), "+
+            "SUM(CASE WHEN s.attendanceType = GDG.whatssue.domain.attendance.entity.AttendanceType.OFFICIAL_ABSENCE THEN 1 ELSE 0 END))"+
+            "from ScheduleAttendanceResult s where s.clubMember.id = :memberId ")
+    AttendanceTimesResponse countByClubIdIdAndAttendanceType(@Param("memberId") Long memberId);
 
 }

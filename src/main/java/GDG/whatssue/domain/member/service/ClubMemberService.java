@@ -76,6 +76,7 @@ public class ClubMemberService {
         clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId,clubMember));
         clubMember.changeProfileImage(memberProfileImage);
         clubMember.setFirstVisitFalse();
+
     }
 
     // TDDO
@@ -87,10 +88,11 @@ public class ClubMemberService {
         return MyProfileDto.of(clubMember);
     }
 
-
-    public MemberProfileDto getMemberProfile(Long memberId){
+    public MemberProfileDto getMemberProfile(Long clubId, Long memberId){
 
         ClubMember clubMember = clubMemberRepository.findById(memberId).orElseThrow(()-> new CommonException(ClubMemberErrorCode.EX2100));
+
+        if(clubMember.getClub().getId() != clubId) throw new CommonException(ClubMemberErrorCode.EX2203);
 
         return MemberProfileDto.of(clubMember);
 
@@ -108,7 +110,6 @@ public class ClubMemberService {
 
         return new PageImpl<>(clubMemberList,pageable,clubMemberPage.getTotalElements());
     }
-
 
     public MemberAuthInfoResponse getMemberAuthInfo(Long clubId, Long userId) {
         ClubMember member = clubMemberRepository.findMemberWithClub(clubId, userId);

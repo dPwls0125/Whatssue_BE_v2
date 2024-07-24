@@ -9,7 +9,9 @@ import lombok.Setter;
 public class AttendmodifyDto {
 
     Long memberId;
+
     AttendanceType attendanceType;
+
     Boolean isModified;
 
 }
