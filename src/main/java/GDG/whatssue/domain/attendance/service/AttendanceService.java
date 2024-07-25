@@ -172,9 +172,14 @@ public class AttendanceService {
     }
 
     @Transactional
-    public void modifyMemberAttendance(Long scheduleId, List<AttendmodifyDto> request){
+    public void modifyMemberAttendance(Long clubId, Long scheduleId, List<AttendmodifyDto> request){
 
         Schedule schedule = scheduleFacade.getScheduleById(scheduleId);
+
+        if(schedule.getClub().getId() != clubId){
+            throw new CommonException(ClubErrorCode.EX3206);
+        }
+
 
         if(schedule.getAttendanceStatus() == ONGOING || schedule.getAttendanceStatus() == BEFORE){
             throw new CommonException(AttendanceErrorCode.Ex5209);
@@ -190,6 +195,7 @@ public class AttendanceService {
 
         request.stream()
                 .filter(dto -> isModified(dto))
+                .filter(dto -> isMemberInClub(dto.getMemberId(), clubId))
                 .forEach(dto -> {
                     modifiedMemberMap.get(dto.getAttendanceType()).add(dto.getMemberId());
                     isOfficialAbsence(getAttendanceResult(scheduleId, dto.getMemberId()),dto);
@@ -199,7 +205,6 @@ public class AttendanceService {
             if(!memberIdList.isEmpty()){
                 scheduleAttendanceResultRepository.updateAttendanceTypeByScheduleIdAndClubMemberId(scheduleId, memberIdList, attendanceType);
             }
-
         });
 
     }
@@ -344,6 +349,10 @@ public class AttendanceService {
     }
 
 
+    private boolean isMemberInClub(Long memberId, Long clubId){
+        ClubMember member = getClubMember(memberId);
+        return member.getClub().getId() == clubId; // 클럽에 속해있는지 확인
+    }
 
 
 }
