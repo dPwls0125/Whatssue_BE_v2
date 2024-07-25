@@ -93,7 +93,7 @@ public class AttendanceController {
     @PutMapping("/attendance")
     public ResponseEntity<Void> modifyMemberAttendance(@PathVariable Long clubId, @RequestBody AttendModifyRequest request) {
 
-        attendanceService.modifyMemberAttendance(request.getScheduleId(), request.getAttendmodifyDtoList());
+        attendanceService.modifyMemberAttendance(clubId, request.getScheduleId(), request.getAttendmodifyDtoList());
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
