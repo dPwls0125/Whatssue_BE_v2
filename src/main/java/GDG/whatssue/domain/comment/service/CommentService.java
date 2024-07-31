@@ -1,9 +1,6 @@
 package GDG.whatssue.domain.comment.service;
 
-import GDG.whatssue.domain.comment.dto.ChildCommentAddDto;
-import GDG.whatssue.domain.comment.dto.CommentAddDto;
-import GDG.whatssue.domain.comment.dto.CommentDto;
-import GDG.whatssue.domain.comment.dto.CommentUpdateDto;
+import GDG.whatssue.domain.comment.dto.*;
 import GDG.whatssue.domain.comment.entity.Comment;
 import org.springframework.data.domain.Page;
 
@@ -23,7 +20,7 @@ public interface CommentService {
 
     Page<CommentDto> getChildCommentList(Long parentId, int size, int page);
 
-    void getMyCommentList(Long userId, Long clubId);
+    MyCommentListResponse getMyCommentList(Long userId, Long clubId, int size, int page);
 
 
 }

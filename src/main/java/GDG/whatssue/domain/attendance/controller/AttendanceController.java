@@ -32,7 +32,6 @@ import java.util.*;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
-    private final ClubMemberRepository clubMemberRepository;
 
     @ClubManager
     @Operation(summary = "출석 열기_manager ",description = "출석을 열면 출석을 진행하지 않았던 경우는 모두 결석 처리 리스트를 생성합니다.")

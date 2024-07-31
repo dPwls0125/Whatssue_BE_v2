@@ -348,7 +348,6 @@ public class AttendanceService {
         }
     }
 
-
     private boolean isMemberInClub(Long memberId, Long clubId){
         ClubMember member = getClubMember(memberId);
         return member.getClub().getId() == clubId; // 클럽에 속해있는지 확인
