@@ -172,9 +172,14 @@ public class AttendanceService {
     }
 
     @Transactional
-    public void modifyMemberAttendance(Long scheduleId, List<AttendmodifyDto> request){
+    public void modifyMemberAttendance(Long clubId, Long scheduleId, List<AttendmodifyDto> request){
 
         Schedule schedule = scheduleFacade.getScheduleById(scheduleId);
+
+        if(schedule.getClub().getId() != clubId){
+            throw new CommonException(ClubErrorCode.EX3206);
+        }
+
 
         if(schedule.getAttendanceStatus() == ONGOING || schedule.getAttendanceStatus() == BEFORE){
             throw new CommonException(AttendanceErrorCode.Ex5209);
@@ -190,6 +195,7 @@ public class AttendanceService {
 
         request.stream()
                 .filter(dto -> isModified(dto))
+                .filter(dto -> isMemberInClub(dto.getMemberId(), clubId))
                 .forEach(dto -> {
                     modifiedMemberMap.get(dto.getAttendanceType()).add(dto.getMemberId());
                     isOfficialAbsence(getAttendanceResult(scheduleId, dto.getMemberId()),dto);
@@ -199,19 +205,23 @@ public class AttendanceService {
             if(!memberIdList.isEmpty()){
                 scheduleAttendanceResultRepository.updateAttendanceTypeByScheduleIdAndClubMemberId(scheduleId, memberIdList, attendanceType);
             }
-
         });
 
     }
 
-//    public AttendanceTimesResponse getAttendanceTimes(Long clubId, Long memberId){
-//
-//        ClubMember clubMember = getClubMember(memberId);
-//        if(clubMember.getRole() == MANAGER) throw new CommonException(AttendanceErrorCode.Ex5210);
-//
-//
-//
-//    }
+    public AttendanceTimesResponse getAttendanceTimes(Long clubId, Long memberId){
+
+        ClubMember clubMember = getClubMember(memberId);
+        Long memberClubId = clubMember.getClub().getId();
+
+        if(memberClubId != clubId)
+            throw new CommonException(ClubMemberErrorCode.EX2203);
+
+        if(clubMember.getRole() == MANAGER) throw new CommonException(AttendanceErrorCode.Ex5210);
+
+        return scheduleAttendanceResultRepository.countByClubIdIdAndAttendanceType(memberId);
+
+    }
 
     private void initializeMemberAttendance(Long clubId, Long scheduleId) throws RuntimeException {
 
@@ -276,8 +286,7 @@ public class AttendanceService {
     }
 
     private ClubMember getClubMember(Long memberId){
-        return clubMemberRepository.findById(memberId)
-                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
+        return clubMemberRepository.findById(memberId).orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
     }
 
     private int getStoredNum(Long clubId, Long scheduleId) {
@@ -340,6 +349,10 @@ public class AttendanceService {
     }
 
 
+    private boolean isMemberInClub(Long memberId, Long clubId){
+        ClubMember member = getClubMember(memberId);
+        return member.getClub().getId() == clubId; // 클럽에 속해있는지 확인
+    }
 
 
 }
