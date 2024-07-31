@@ -112,5 +112,11 @@ public class ClubMemberController {
                     .body(clubMemberService.getClubMemberList(clubId,size,page));
     }
 
-
+    @GetMapping("/info")
+    public ResponseEntity<GetMemberInfoResponse> getMemberInfo(@PathVariable Long clubId, @LoginUser Long userId) {
+        GetMemberInfoResponse result = clubMemberService.getMemberInfo(clubId, userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(result);
+    }
 }
