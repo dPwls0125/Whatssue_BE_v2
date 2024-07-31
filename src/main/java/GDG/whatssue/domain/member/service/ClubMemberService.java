@@ -135,4 +135,7 @@ public class ClubMemberService {
 
     }
 
+    public GetMemberInfoResponse getMemberInfo(Long clubId, Long userId) {
+        return new GetMemberInfoResponse(clubMemberRepository.findMemberWithClub(clubId, userId));
+    }
 }
