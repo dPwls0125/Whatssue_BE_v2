@@ -24,7 +24,8 @@ public enum ClubErrorCode implements ErrorCode {
     EX3203("3203", HttpStatus.BAD_REQUEST, "이미 처리가 완료된 신청 내역입니다."),
     EX3204("3204", HttpStatus.BAD_REQUEST, "아직 처리가 완료되지 않은 신청 내역입니다."),
     EX3205("3205", HttpStatus.BAD_REQUEST, "현재 가입 신청을 받고 있지 않는 모임입니다."),
-    EX3206("3206", HttpStatus.BAD_REQUEST, "다른 클럽의 정보를 변경 할 수 없습니다.");
+    EX3206("3206", HttpStatus.BAD_REQUEST, "다른 클럽의 정보를 변경 할 수 없습니다."),
+    EX3207("3207", HttpStatus.BAD_REQUEST, "다른 클럽의 가입 신청에 접근할 수 없습니다.");
 
     private final String code;
     private final HttpStatus httpStatus;
