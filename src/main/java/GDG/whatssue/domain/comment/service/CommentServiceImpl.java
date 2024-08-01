@@ -1,10 +1,7 @@
 package GDG.whatssue.domain.comment.service;
 
 
-import GDG.whatssue.domain.comment.dto.ChildCommentAddDto;
-import GDG.whatssue.domain.comment.dto.CommentAddDto;
-import GDG.whatssue.domain.comment.dto.CommentDto;
-import GDG.whatssue.domain.comment.dto.CommentUpdateDto;
+import GDG.whatssue.domain.comment.dto.*;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.comment.exception.CommentErrorCode;
 import GDG.whatssue.domain.comment.repository.CommentRepository;
@@ -110,10 +107,31 @@ public class CommentServiceImpl implements CommentService{
         });
     }
 
-    @Override
-    public void getMyCommentList(Long userId, Long clubId) {
+    public MyCommentListResponse getMyCommentList(Long userId, Long clubId, int size, int page) {
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").ascending());
+
+        ClubMember clubMember = getClubMember(clubId, userId);
+        Long memberId = clubMember.getId();
+
+
+        Page<Comment> myCommentList = commentRepository.findMyCommentList(memberId, pageable);
+
+        Page<MyCommentDto> myCommentDtoList = myCommentList.map(comment -> {
+            MyCommentDto myCommentDto = MyCommentDto.of(comment);
+            return myCommentDto;
+        });
+
+        MyCommentListResponse myCommentListResponse = MyCommentListResponse.builder()
+                .memberId(memberId)
+                .clubMemberImage(clubMember.getProfileImage().getStoreFileName())
+                .myCommentList(myCommentDtoList)
+                .memberName(clubMember.getMemberName())
+                .build();
+
+        return myCommentListResponse;
     }
+
 
     private ClubMember getClubMember(Long clubId, Long userId) {
         return clubMemberService.findClubMemberByClubAndUser(clubId, userId).get();
@@ -133,10 +151,6 @@ public class CommentServiceImpl implements CommentService{
         if(comment.getClubMember() != getClubMember(clubId, userId) || getClubMember(clubId,userId) == null)
             throw new CommonException(CommentErrorCode.EX8101);
 
-    }
-
-    public long getChildCommentCount(Long parentId) {
-        return commentRepository.countByParentCommentId(parentId);
     }
 
     private CommentDto nullifyDeletedCommentFields(CommentDto commentDto){

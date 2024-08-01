@@ -23,6 +23,9 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 
+/**
+ * 인터셉터 예외처리 TODO
+ */
 @Slf4j
 @Component
 public class ClubCheckInterceptor implements HandlerInterceptor {

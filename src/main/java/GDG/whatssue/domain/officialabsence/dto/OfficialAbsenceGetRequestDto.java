@@ -14,7 +14,9 @@ public class OfficialAbsenceGetRequestDto {
 
     private Long id;
     private Long clubMemberId;
+    private String clubMemberName;
     private Long scheduleId;
+    private Long officialAbsenceId;
     private String scheduleName;
     private LocalDateTime scheduleDate;
     private String officialAbsenceContent;

@@ -8,12 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "ClubJoinManageController", description = "모임 가입요청 처리에 관련된 api")
 @RestController
@@ -27,8 +22,10 @@ public class ClubJoinManageController {
     @ClubManager
     @Operation(summary="멤버 가입요청 수락")
     @PostMapping("/{clubJoinRequestId}/accept")
-    public ResponseEntity acceptClubJoinRequest(@PathVariable Long clubJoinRequestId){
-        memberJoinService.acceptResponse(clubJoinRequestId);
+    public ResponseEntity acceptClubJoinRequest(
+            @PathVariable Long clubId,
+            @RequestBody List<Long> clubJoinRequestsId){
+        memberJoinService.acceptResponse(clubJoinRequestsId, clubId);
 
         return ResponseEntity.status(200).body("가입 신청 수락 완료");
     }
@@ -36,8 +33,10 @@ public class ClubJoinManageController {
     @ClubManager
     @Operation(summary="멤버 가입요청 거절")
     @PostMapping("/{clubJoinRequestId}/deny")
-    public ResponseEntity denyClubJoinRequest(@PathVariable Long clubJoinRequestId){
-        memberJoinService.denyResponse(clubJoinRequestId);
+    public ResponseEntity denyClubJoinRequest(
+            @PathVariable Long clubId,
+            @RequestBody List<Long> clubJoinRequestsId){
+        memberJoinService.denyResponse(clubJoinRequestsId, clubId);
 
         return ResponseEntity.status(200).body("가입 신청 거절 완료");
     }
