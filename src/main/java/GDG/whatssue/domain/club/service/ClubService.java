@@ -114,8 +114,8 @@ public class ClubService {
     }
 
     @Transactional
-    public void updateClubCode(Long clubId) {
-        findClub(clubId).updatePrivateCode();
+    public String updateClubCode(Long clubId) {
+        return findClub(clubId).updatePrivateCode();
     }
 
     public boolean isClubExist(Long clubId) {
