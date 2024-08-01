@@ -8,16 +8,17 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ClubMemberErrorCode implements ErrorCode {
+    EX2100("2100", HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
 
-    CLUB_NOT_FOUND_ERROR(HttpStatus.BAD_REQUEST, "No Club With That Club Code"),
-    INVALID_PRIVATE_CODE_PATTERN_ERROR(HttpStatus.BAD_REQUEST, "Invalid Private Code Pattern [FFFFFF]"),
-    INVALID_PRIVATE_CODE_ERROR(HttpStatus.BAD_REQUEST, "Invalid Private Code"),
-    DUPLICATE_CLUB_JOIN_ERROR(HttpStatus.BAD_REQUEST, "Club That Has Already Joined"),
-    PRIVATE_CLUB_ERROR(HttpStatus.BAD_REQUEST, "Private Club Needs Private Code"),
-    CLUB_MEMBER_NOT_FOUND_ERROR(HttpStatus.BAD_REQUEST, "No Club Member With That Member Id"),
-    CLUB_MEMBER_COULD_NOT_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"Club Member Cannot be Not Deleted" ),
-    CLUB_MEMBER_COULD_NOT_MODIFY_ERROR(HttpStatus.NOT_MODIFIED, "Club Member's Role Was Not Modified" );
+    EX2200("2200", HttpStatus.PRECONDITION_REQUIRED, "멤버 프로필 초기 설정이 필요합니다."),
 
+    EX2201("2201", HttpStatus.BAD_REQUEST, "멤버 프로필 설정은 최초에만 가능합니다."),
+
+    EX2202("2202", HttpStatus.BAD_REQUEST, "이미지가 null 입니다. 이미지를 업로드해주세요."),
+
+    EX2203("2203", HttpStatus.BAD_REQUEST, "조회하려는 멤버가 해당 클럽에 속하지 않은 멤버입니다.");
+
+    private final String code;
     private final HttpStatus httpStatus;
     private final String message;
 }

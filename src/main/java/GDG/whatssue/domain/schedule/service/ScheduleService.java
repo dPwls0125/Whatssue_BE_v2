@@ -1,113 +1,99 @@
 package GDG.whatssue.domain.schedule.service;
 
+import GDG.whatssue.domain.club.exception.ClubErrorCode;
+import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.domain.member.exception.ClubMemberErrorCode;
+import GDG.whatssue.domain.member.repository.ClubMemberRepository;
 import GDG.whatssue.domain.schedule.dto.AddScheduleRequest;
-import GDG.whatssue.domain.schedule.dto.GetScheduleResponse;
+import GDG.whatssue.domain.schedule.dto.AddScheduleResponse;
+import GDG.whatssue.domain.schedule.dto.ScheduleDetailResponse;
 import GDG.whatssue.domain.schedule.dto.ModifyScheduleRequest;
 import GDG.whatssue.domain.club.entity.Club;
+import GDG.whatssue.domain.schedule.dto.SchedulesResponse;
 import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.club.repository.ClubRepository;
 import GDG.whatssue.domain.schedule.exception.ScheduleErrorCode;
 import GDG.whatssue.domain.schedule.repository.ScheduleRepository;
 import GDG.whatssue.global.error.CommonException;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-/**
- * club에 유효한 schedule인지 체크. TODO
- * schedule 생성 시 scheduleId 반환처리
- */
-
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ClubRepository clubRepository;
+    private final ClubMemberRepository clubMemberRepository;
 
-    public void saveSchedule(Long clubId, AddScheduleRequest requestDto) {
-        Club club = clubRepository.findById(clubId).orElse(null);
+    @Transactional
+    public AddScheduleResponse saveSchedule(Long clubId, Long userId, AddScheduleRequest requestDto) {
+        Schedule schedule = requestDto.toEntity(findClub(clubId), findMember(clubId, userId));
 
-        Schedule saveSchedule = requestDto.toEntity(club);
-        scheduleRepository.save(saveSchedule);
+        scheduleRepository.save(schedule);
+
+        return new AddScheduleResponse(schedule.getId());
     }
 
     @Transactional
-    public void updateSchedule(Long scheduleId, ModifyScheduleRequest requestDto) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
-
-        schedule.update(requestDto);
-
-        scheduleRepository.save(schedule);
+    public void updateSchedule(Long clubId, Long scheduleId, ModifyScheduleRequest requestDto) {
+        findSchedule(scheduleId, clubId).update(
+            requestDto.getScheduleName(),
+            requestDto.getScheduleContent(),
+            requestDto.getScheduleDate(),
+            requestDto.getScheduleTime(),
+            requestDto.getSchedulePlace());
     }
 
-    /**
-     * now HardDelete
-     * SoftDelete TODO
-     */
-    public void deleteSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
-
-        scheduleRepository.deleteById(scheduleId);
+    @Transactional
+    public void deleteSchedule(Long clubId, Long scheduleId) {
+        scheduleRepository.delete(findSchedule(clubId, scheduleId));
     }
 
-    public GetScheduleResponse findSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(()-> new CommonException(ScheduleErrorCode.SCHEDULE_NOT_FOUND_ERROR));
+    public ScheduleDetailResponse getScheduleDetail(Long clubId, Long scheduleId) {
+        Schedule schedule = findSchedule(scheduleId, clubId);
+        ClubMember register = schedule.getRegister();
 
-        return scheduleToGetScheduleResponse(schedule);
+        return new ScheduleDetailResponse(schedule, register);
     }
 
-    public List<GetScheduleResponse> findScheduleAll(Long clubId) {
-        Club findClub = clubRepository.findById(clubId).get();
-
-        List<Schedule> scheduleList = findClub.getScheduleList();
-
-        return ScheduleListToResponseDtoList(scheduleList, null, null);
+    public Page<SchedulesResponse> findAllSchedule(Long clubId, String keyword, LocalDate sDate, LocalDate eDate, Pageable pageable) {
+        return scheduleRepository.findAllScheduleDto(clubId, keyword, sDate, eDate, pageable);
     }
 
-    public List<GetScheduleResponse> findScheduleByDay(Long clubId, String date) {
-        Club findClub = clubRepository.findById(clubId).get();
+    public Page<LocalDate> getDateByScheduleExist(Long clubId, LocalDate sDate, LocalDate eDate, Pageable pageable) {
+        LocalDateTime sDateTime = sDate.atStartOfDay();
+        LocalDateTime eDateTime = LocalDateTime.of(eDate, LocalTime.MAX).withNano(0);
 
-        List<Schedule> scheduleList = findClub.getScheduleList();
-
-        return ScheduleListToResponseDtoList(scheduleList, "yyyy-MM-dd", date);
+        return scheduleRepository.findDateByScheduleExist(clubId, sDateTime, eDateTime, pageable)
+            .map(d -> d.toLocalDate());
     }
 
-    public List<GetScheduleResponse> findScheduleByMonth(Long clubId, String date) {
-        Club findClub = clubRepository.findById(clubId).get();
-
-        List<Schedule> scheduleList = findClub.getScheduleList();
-
-        return ScheduleListToResponseDtoList(scheduleList, "yyyy-MM", date);
+    public boolean isClubSchedule(Long clubId, Long scheduleId) {
+        return scheduleRepository.existsByIdAndClub_Id(scheduleId, clubId);
     }
 
-    public List<GetScheduleResponse> ScheduleListToResponseDtoList(List<Schedule> scheduleList, String pattern, String date) {
-
-        if (pattern==null || date==null) { //전체 조회
-            return scheduleList.stream()
-                .map(s -> scheduleToGetScheduleResponse(s))
-                .collect(Collectors.toList());
-        } else { //필터링 조회
-        return scheduleList.stream()
-            .filter(s-> s.getScheduleDateTime().format(DateTimeFormatter.ofPattern(pattern)).equals(date))
-            .map(s -> scheduleToGetScheduleResponse(s))
-            .collect(Collectors.toList());
-        }
+    private Club findClub(Long clubId) {
+        return clubRepository.findById(clubId)
+            .orElseThrow(() -> new CommonException(ClubErrorCode.EX3100));
     }
 
-    public GetScheduleResponse scheduleToGetScheduleResponse(Schedule schedule) {
-        return GetScheduleResponse.builder()
-            .scheduleId(schedule.getId())
-            .scheduleName(schedule.getScheduleName())
-            .scheduleContent(schedule.getScheduleContent())
-            .scheduleDateTime(schedule.getScheduleDateTime())
-            .isChecked(schedule.isChecked()).build();
+    private ClubMember findMember(Long clubId, Long userId) {
+        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
+            .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
+    }
+
+    private Schedule findSchedule(Long scheduleId, Long clubId) {
+        return scheduleRepository.findByIdAndClub_Id(scheduleId, clubId)
+            .orElseThrow(() -> new CommonException(ScheduleErrorCode.EX4100));
     }
 }
 

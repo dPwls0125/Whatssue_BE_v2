@@ -2,47 +2,41 @@ package GDG.whatssue.domain.user.controller;
 
 import GDG.whatssue.domain.user.dto.SignUpRequestDto;
 import GDG.whatssue.domain.user.dto.UserDto;
-//import GDG.whatssue.domain.user.entity.PrincipalDetails;
-//import GDG.whatssue.domain.user.service.UserService;
-import GDG.whatssue.domain.user.entity.KakaoDetails;
+import GDG.whatssue.domain.user.dto.UserModifiyRequestDto;
 import GDG.whatssue.domain.user.service.CustomOauth2Service;
-import io.swagger.v3.oas.annotations.Operation;
+import GDG.whatssue.domain.user.service.UserService;
+import GDG.whatssue.domain.user.service.UserServiceFacade;
+import GDG.whatssue.global.common.annotation.LoginUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class  UserController {
 
-    private final CustomOauth2Service customOauth2Service;
+    private final UserService userService;
 
-    @GetMapping({ "", "/" })
-    @Operation(summary = "메인 페이지")
-    public String index() {
-        return "index";
+    @GetMapping("/getInfo")
+    public ResponseEntity getUserProfile(@LoginUser Long userId) {
+        UserDto userDto  = userService.getUserInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
-    @GetMapping("/api/user/getInfo")
-    public ResponseEntity getUserProfile(@AuthenticationPrincipal KakaoDetails kakaoDetails) {
-        UserDto userDto  = customOauth2Service.getUserInfo(kakaoDetails);
+    @PostMapping ("/signUp")
+    public ResponseEntity signUpWithPhoneNumAndName(@LoginUser Long userId, @RequestBody SignUpRequestDto request) {
+        UserDto userDto = userService.signUp(userId,request);
         return ResponseEntity.status(200).body(userDto);
     }
 
-    @PostMapping ("/api/user/signUp")
-    public ResponseEntity signUpWithPhoneNumAndName(@AuthenticationPrincipal KakaoDetails kakaoDetails, SignUpRequestDto request) {
-        UserDto userDto = customOauth2Service.signUp(kakaoDetails,request);
+    @PostMapping("/modification")
+    public ResponseEntity modifyUserInfo(@LoginUser Long userId,  @RequestBody UserModifiyRequestDto request) {
+        UserDto userDto = userService.modifyUserInfo(userId,request);
         return ResponseEntity.status(200).body(userDto);
     }
 
-    @PostMapping("/api/user/modification")
-    public ResponseEntity modifyUserInfo(@AuthenticationPrincipal KakaoDetails kakaoDetails, UserDto request) {
-        UserDto userDto = customOauth2Service.modifyUserInfo(kakaoDetails,request);
-        return ResponseEntity.status(200).body(userDto);
-    }
 }

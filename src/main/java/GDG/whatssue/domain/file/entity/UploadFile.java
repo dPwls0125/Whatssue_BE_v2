@@ -1,35 +1,30 @@
 package GDG.whatssue.domain.file.entity;
 
-import GDG.whatssue.domain.club.entity.Club;
-import GDG.whatssue.domain.member.entity.ClubMember;
+import GDG.whatssue.global.common.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import lombok.Builder;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
-public class UploadFile {
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "DTYPE")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UploadFile extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "upload_file_id")
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "club_id")
-    private Club club;
-
-    @OneToOne
-    @JoinColumn(name = "club_member_id")
-    private ClubMember clubMember;
 
     @Column(nullable = false)
     private String uploadFileName;
@@ -37,9 +32,13 @@ public class UploadFile {
     @Column(nullable = false)
     private String storeFileName;
 
-    @Builder
-    public UploadFile(Club club, String uploadFileName, String storeFileName) {
-        this.club = club;
+    //==생성 메서드==//
+    protected UploadFile(String uploadFileName, String storeFileName) {
+        this.uploadFileName = uploadFileName;
+        this.storeFileName = storeFileName;
+    }
+
+    protected void  updateUploadFile(String uploadFileName, String storeFileName) {
         this.uploadFileName = uploadFileName;
         this.storeFileName = storeFileName;
     }

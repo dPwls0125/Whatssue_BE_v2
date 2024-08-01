@@ -10,11 +10,19 @@ import GDG.whatssue.domain.member.entity.Role;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,23 +34,18 @@ import java.util.Map;
 @Transactional
 @Getter
 public class CustomOauth2Service extends DefaultOAuth2UserService {
+
     private final UserRepository userRepository;
     /*
     Third party 접근을 위한 accessToken 발급 이후 실행됨
      */
-
     private User findOrSaveUser(OAuth2User oAuth2User, String registrationId, String name) {
         String oauth2Id = registrationId + ":" + oAuth2User.getName(); // name = ID값
-        // 임시 유저로 역할 설정
-//        Role role = roleRepository.findByName(RoleName.TEMPORARY)
-//                .orElseThrow(() -> new OAuth2AuthenticationException("존재하지 않는 권한입니다."));
 
         return userRepository.findByOauth2Id(oauth2Id)
                 .orElseGet(() -> userRepository.save(User.builder()
                         .oauth2Id(oauth2Id)
                         .userName(name)
-                        .clubMemberList(new ArrayList<>())
-                        .clubJoinRequestList(new ArrayList<>())
                         .build()));
     }
 
@@ -55,15 +58,16 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
         User user = findOrSaveUser(oAuth2User, userRequest.getClientRegistration().getRegistrationId(), profile.get("nickname").toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        List<ClubMember> clubMemberList = user.getClubMemberList();
-        for (ClubMember clubMember : clubMemberList) {
-            authorities.add((GrantedAuthority) () -> {
-                Long clubId = clubMember.getClub().getId();
-                Role role = clubMember.getRole();
-                System.out.println("ROLE_" + clubId + role);
-                return "ROLE_" + clubId + role;
-            });
-        }
+
+//        for (ClubMember clubMember : clubMemberList) {
+//            authorities.add((GrantedAuthority) () -> {
+//                Long clubId = clubMember.getClub().getId();
+//                Role role = clubMember.getRole();
+//                System.out.println("ROLE_" + clubId + role);
+//                return "ROLE_" + clubId + role;
+//            });
+//        }
+
         KakaoDetails kakaoDetails = KakaoDetails.builder()
                 .registrationId(userRequest.getClientRegistration().getRegistrationId())
                 .user(user)
@@ -75,54 +79,20 @@ public class CustomOauth2Service extends DefaultOAuth2UserService {
         // Session(내부 Authentication(내부 oauthUserDetails))
     }
 
-    public UserDto getUserInfo(KakaoDetails kakaoDetails) {
-        User user = kakaoDetails.getUser();
-        Long userId = user.getUserId();
-        user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-         // user정보를 Repository에서 가져와야 signup 이후의 정보(phone, name)를 가져올 수 있음.
-        UserDto dto = UserDto.builder()
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .oauth2Id(user.getOauth2Id())
-                .userPhone(user.getUserPhone())
-                .userEmail(user.getUserEmail())
-                .build();
-        return dto;
-    }
-    public UserDto signUp(KakaoDetails kakaoDetails, SignUpRequestDto request){
-        User user = kakaoDetails.getUser();
-        user.setUserPhone(request.getUserPhone());
-        user.setUserName(request.getUserName());
-        user.setUserEmail(request.getUserEmail());
-        userRepository.save(user);
-        return UserDto.builder()
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .oauth2Id(user.getOauth2Id())
-                .userEmail(user.getUserEmail())
-                .userPhone(request.getUserPhone())
-                .build();
+
+    @Bean
+    @Profile("test")
+    public UserDetailsService userDetailsService() {
+        UserDetailsService userDetailsService = username -> new InMemoryUserDetailsManager(
+                org.springframework.security.core.userdetails.User.withDefaultPasswordEncoder()
+                        .username("testuser")
+                        .password("password")
+                        .roles("USER")
+                        .build()
+        ).loadUserByUsername(username);
+        return userDetailsService;
     }
 
-    public UserDto modifyUserInfo(KakaoDetails kakaoDetails, UserDto request){
-        User user = kakaoDetails.getUser();
-        if(request.getUserId() != user.getUserId()){
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
-        }
-        user = User.builder()
-                .userId(user.getUserId())
-                .userPhone(request.getUserPhone())
-                .userName(request.getUserName())
-                .userEmail(request.getUserEmail())
-                .oauth2Id(user.getOauth2Id())
-                .build();
-        userRepository.save(user);
-        UserDto dto = UserDto.builder()
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .oauth2Id(user.getOauth2Id())
-                .userPhone(user.getUserPhone())
-                .build();
-        return dto;
-    }
+
+
 }

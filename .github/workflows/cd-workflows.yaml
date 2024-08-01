@@ -5,7 +5,6 @@ on:
     branches:
       - 'develop'
       - 'main'
-
 jobs:
   CD:
     runs-on: ubuntu-latest
@@ -29,8 +28,9 @@ jobs:
           spring.datasource.url: ${{ secrets.DB_URL }}
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
           spring.datasource.password: ${{ secrets.DB_PASSWORD }}
-          spring.security.oauth2.client.registration.Kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
-          spring.security.oauth2.client.registration.Kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          spring.security.oauth2.client.registration.kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
+          spring.security.oauth2.client.registration.kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          spring.jpa.hibernate.ddl-auto: update
           coolsms.api.number: ${{ secrets.FROMNUMBER }}
           coolsms.api.secret: ${{ secrets.COOLSMS_API_SECRET }}
           coolsms.api.key: ${{ secrets.COOLSMS_API_KEY }}
@@ -40,6 +40,8 @@ jobs:
           cloud.aws.region.static: ap-northeast-2
           spring.redis.data.host: ${{ secrets.REDIS_HOST }}
           spring.redis.data.password: ${{ secrets.REDIS_PASSWORD }}
+          server.url: ${{ secrets.SERVER_URL }}
+          front.url: ${{ secrets.FRONT_URL }}
 
       - name: Grant execute permission for gradlew
 
@@ -78,16 +80,20 @@ jobs:
           username: ${{ secrets.DEV_SERVER_USER }}
           script: |
             echo "${{ secrets.GHCR_TOKEN }}" | sudo docker login ghcr.io -u pinetree2 --password-stdin
+            cd /home/ubuntu/docker-compose
+
+            # 이전 버전의 Spring Boot 컨테이너 중지 및 삭제
             if [ "$(docker ps -aq -f name=whatssue-be)" ]; then
-                sudo docker stop whatssue-be
-                sudo docker rm whatssue-be
+                sudo docker-compose stop springboot
+                sudo docker-compose rm -f springboot
             fi
+            
             
             if [ "$(docker images -q ghcr.io/onion-city/whatssue_be_v2/whatssue)" ]; then
             sudo docker rmi ghcr.io/onion-city/whatssue_be_v2/whatssue
             fi
-            sudo docker pull ghcr.io/onion-city/whatssue_be_v2/whatssue:latest
-            sudo docker stop whatssue-be
-            sudo docker rm whatssue-be
-            sudo docker run -d -p 8080:8080 --name whatssue-be ghcr.io/onion-city/whatssue_be_v2/whatssue:latest
+            
+            sudo docker-compose pull springboot
+            sudo docker-compose up -d springboot
+            # 사용하지 않는 이미지 정리
             sudo docker image prune -a -f
