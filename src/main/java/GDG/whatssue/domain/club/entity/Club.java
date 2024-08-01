@@ -97,8 +97,9 @@ public class Club extends BaseEntity {
     /**
      * 모임코드 갱신
      */
-    public void updatePrivateCode() {
+    public String updatePrivateCode() {
         this.privateCode = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        return this.privateCode;
     }
 
     /**

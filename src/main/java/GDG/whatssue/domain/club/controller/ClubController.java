@@ -108,9 +108,9 @@ public class ClubController {
     @Operation(summary = "초대코드 갱신")
     @PostMapping("/{clubId}/private-code")
     public ResponseEntity updateClubPrivateCode(@PathVariable("clubId") Long clubId) {
-        clubService.updateClubCode(clubId);
+        String code = clubService.updateClubCode(clubId);
 
-        return ResponseEntity.status(HttpStatus.OK).body("OK");
+        return ResponseEntity.status(HttpStatus.OK).body(code);
     }
 
     @ClubManager
