@@ -41,4 +41,5 @@ public class GetPostResponse {
         this.isLiked = isLiked;
         this.createdAt = createdAt;
     }
+
 }

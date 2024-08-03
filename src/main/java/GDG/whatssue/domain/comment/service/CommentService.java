@@ -20,7 +20,6 @@ public interface CommentService {
 
     Page<CommentDto> getChildCommentList(Long parentId, int size, int page);
 
-    MyCommentListResponse getMyCommentList(Long userId, Long clubId, int size, int page);
 
 
 }

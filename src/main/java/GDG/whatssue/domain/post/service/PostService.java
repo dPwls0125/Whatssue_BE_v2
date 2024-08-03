@@ -4,6 +4,8 @@ import static GDG.whatssue.domain.file.FileConst.POST_IMAGE_DIRNAME;
 
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.club.repository.ClubRepository;
+import GDG.whatssue.domain.comment.dto.MyCommentDto;
+import GDG.whatssue.domain.comment.dto.MyCommentListResponse;
 import GDG.whatssue.domain.comment.entity.Comment;
 import GDG.whatssue.domain.comment.repository.CommentRepository;
 import GDG.whatssue.domain.comment.service.CommentService;
@@ -129,6 +131,34 @@ public class PostService {
                 .createdAt(post.getCreateAt())
                 .build();
     }
+
+
+    public MyCommentListResponse getMyCommentList(Long userId, Long clubId, int size, int page) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").ascending());
+
+        ClubMember clubMember = getClubMember(clubId, userId);
+        Long memberId = clubMember.getId();
+
+        Page<Comment> myCommentList = commentRepository.findMyCommentList(memberId, pageable);
+
+        List<MyCommentDto> dtoList = myCommentList.stream()
+                .map(comment -> MyCommentDto.of(comment, getPost(clubId,userId,comment.getPost().getId())))
+                .collect(Collectors.toList());
+
+        Page<MyCommentDto> dtoPage = new PageImpl<>(dtoList, pageable, myCommentList.getTotalElements());
+
+        MyCommentListResponse myCommentListResponse = MyCommentListResponse.builder()
+                .memberId(memberId)
+                .clubMemberImage(S3Utils.getFullPath(clubMember.getProfileImage().getStoreFileName()))
+                .memberName(clubMember.getMemberName())
+                .myCommentList(dtoPage)
+                .build();
+
+        return myCommentListResponse;
+    }
+
+
     public Long commentCount(Long postId){
         Pageable pageable = PageRequest.of(0, 1, Sort.by("createAt").ascending());
 
@@ -491,8 +521,17 @@ public class PostService {
         return new PageImpl<>(getPostResponses, pageable, posts.getTotalElements());
     }
 
+    private ClubMember getClubMember(Long clubId, Long userId) {
+        return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId)
+                .orElseThrow(() -> new CommonException(ClubMemberErrorCode.EX2100));
+    }
+
+
     public Post getPost(Long postId){
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CommonException(PostErrorCode.EX7100));//존재하지 않는 게시글
     }
+
+
+
 }

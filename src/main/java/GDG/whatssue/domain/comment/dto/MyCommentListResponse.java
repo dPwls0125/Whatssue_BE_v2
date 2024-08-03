@@ -1,5 +1,6 @@
 package GDG.whatssue.domain.comment.dto;
 
+import GDG.whatssue.domain.comment.entity.Comment;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,8 @@ public class MyCommentListResponse {
     private String memberName;
 
     private Page<MyCommentDto> myCommentList;
+
+
 
 
 }

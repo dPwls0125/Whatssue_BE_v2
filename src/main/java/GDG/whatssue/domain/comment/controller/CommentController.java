@@ -54,11 +54,6 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getParentCommentList(postId, size, page));
     }
 
-    @Operation(summary = "내가 쓴 댓글 조회")
-    @GetMapping("/my")
-    public ResponseEntity getMyCommentList(@PathVariable Long clubId, @LoginUser Long userId, @RequestParam int size, @RequestParam int page) {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.getMyCommentList(userId, clubId, size, page));
-    }
 
 
     @Operation(summary = "대댓글 리스트 조회")
