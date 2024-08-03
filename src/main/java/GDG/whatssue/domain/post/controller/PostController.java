@@ -162,4 +162,10 @@ public class PostController {
         Page<GetPostResponse> posts = postService.getLikedPosts(clubId, userId, pageable);
         return ResponseEntity.ok(posts);
     }
+
+    @Operation(summary = "내가 댓글 단 글 리스트 조회")
+    @GetMapping("/my-comment-list")
+    public ResponseEntity getMyCommentList(@PathVariable Long clubId, @LoginUser Long userId, @RequestParam int size, @RequestParam int page) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getMyCommentList(clubId, userId, size, page));
+    }
 }

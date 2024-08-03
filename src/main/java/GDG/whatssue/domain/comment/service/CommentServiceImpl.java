@@ -107,31 +107,6 @@ public class CommentServiceImpl implements CommentService{
         });
     }
 
-    public MyCommentListResponse getMyCommentList(Long userId, Long clubId, int size, int page) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createAt").ascending());
-
-        ClubMember clubMember = getClubMember(clubId, userId);
-        Long memberId = clubMember.getId();
-
-
-        Page<Comment> myCommentList = commentRepository.findMyCommentList(memberId, pageable);
-
-        Page<MyCommentDto> myCommentDtoList = myCommentList.map(comment -> {
-            MyCommentDto myCommentDto = MyCommentDto.of(comment);
-            return myCommentDto;
-        });
-
-        MyCommentListResponse myCommentListResponse = MyCommentListResponse.builder()
-                .memberId(memberId)
-                .clubMemberImage(clubMember.getProfileImage().getStoreFileName())
-                .myCommentList(myCommentDtoList)
-                .memberName(clubMember.getMemberName())
-                .build();
-
-        return myCommentListResponse;
-    }
-
 
     private ClubMember getClubMember(Long clubId, Long userId) {
         return clubMemberService.findClubMemberByClubAndUser(clubId, userId).get();
