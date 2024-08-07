@@ -106,7 +106,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/attendance/my-results")
-    @Operation(summary = "멤버(본인)별 출석 필터링 결과 조회")
+    @Operation(summary = "본인 출석 필터링 결과 조회")
     public ResponseEntity getAttendanceResults(
 
             @LoginUser Long userId,
@@ -119,13 +119,30 @@ public class AttendanceController {
             @RequestParam(value = "page", defaultValue = "0") int page
 
     ){
-        MyAttendanceResultResponse response = attendanceService.getFilteredMemberAttendance(userId, clubId, startDate, endDate, attendanceType,size,page);
+        MyAttendanceResultResponse response = attendanceService.getFilteredMyAttendance(userId, clubId, startDate, endDate, attendanceType,size,page);
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 
+    @GetMapping("/attendance/member/{memberId}")
+    @Operation(summary = "매니저의 멤버별 출석 현황 조회")
+    @ClubManager
+    public ResponseEntity getMemberAttendanceResults(
+            @PathVariable Long memberId,
+            @PathVariable Long clubId,
+            @Parameter(description = "시작 날짜 (형식: YYYY-MM-DD)", required = true) @RequestParam("startDate") LocalDate startDate,
+            @Parameter(description = "종료 날짜 (형식: YYYY-MM-DD)", required = true) @RequestParam("endDate") LocalDate endDate,
+            @Parameter(description = "출석 검색 타입 (TOTAL, ATTENDANCE, ABSENCE, OFFICIAL_ABSENCE)", required = true)
+            @RequestParam("attendanceType") String attendanceType,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "page", defaultValue = "0") int page
 
+    ){
 
+        MyAttendanceResultResponse response = attendanceService.getFilteredMemberAttendance(memberId, clubId, startDate, endDate, attendanceType,size,page);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
 
 }
 
