@@ -21,7 +21,7 @@ public class ClubJoinManageController {
 
     @ClubManager
     @Operation(summary="멤버 가입요청 수락")
-    @PostMapping("/{clubJoinRequestId}/accept")
+    @PostMapping("/accept")
     public ResponseEntity acceptClubJoinRequest(
             @PathVariable Long clubId,
             @RequestBody List<Long> clubJoinRequestsId){
@@ -32,7 +32,7 @@ public class ClubJoinManageController {
 
     @ClubManager
     @Operation(summary="멤버 가입요청 거절")
-    @PostMapping("/{clubJoinRequestId}/deny")
+    @PostMapping("/deny")
     public ResponseEntity denyClubJoinRequest(
             @PathVariable Long clubId,
             @RequestBody List<Long> clubJoinRequestsId){
