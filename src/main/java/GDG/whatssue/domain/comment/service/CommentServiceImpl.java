@@ -107,7 +107,6 @@ public class CommentServiceImpl implements CommentService{
         });
     }
 
-
     private ClubMember getClubMember(Long clubId, Long userId) {
         return clubMemberService.findClubMemberByClubAndUser(clubId, userId).get();
     }
@@ -139,7 +138,6 @@ public class CommentServiceImpl implements CommentService{
         }
         return commentDto;
     }
-
 
 }
 

@@ -54,8 +54,6 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getParentCommentList(postId, size, page));
     }
 
-
-
     @Operation(summary = "대댓글 리스트 조회")
     @GetMapping("/child/{parentId}")
     public ResponseEntity getChildCommentList(@PathVariable Long parentId, @PathVariable(name = "clubId") Long clubId, @RequestParam int size, @RequestParam int page) {

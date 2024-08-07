@@ -69,7 +69,7 @@ public class AttendanceService {
 
     }
 
-    public MyAttendanceResultResponse getFilteredMemberAttendance(Long userId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType, int size, int page) {
+    public MyAttendanceResultResponse getFilteredMyAttendance(Long userId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType, int size, int page) {
 
         Long memberId = getClubMemberId(clubId, userId);
         LocalDateTime startDateTime = startDate.atStartOfDay();
@@ -102,6 +102,46 @@ public class AttendanceService {
         return MyAttendanceResultResponse.builder()
                 .attendanceList(new PageImpl<>(dtos,pageable,entityList.getTotalElements()))
                 .memberName(getClubMember(clubId, userId).getMemberName())
+                .memberId(memberId)
+                .build();
+    }
+
+    public MyAttendanceResultResponse getFilteredMemberAttendance(Long memberId, Long clubId, LocalDate startDate, LocalDate endDate, String attendanceType, int size, int page) {
+        ClubMember clubMember = getClubMember(memberId);
+
+        if(clubMember.getClub().getId() != clubId){
+            throw new CommonException(ClubMemberErrorCode.EX2203);
+        }
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        attendanceType = attendanceType.toUpperCase();
+
+        Page<ScheduleAttendanceResult> entityList;
+
+        Pageable pageable = PageRequest.of(page,size);
+
+        if(attendanceType.equals("TOTAL") ){
+
+            entityList = scheduleAttendanceResultRepository.findAllByScheduleDateBetween(startDateTime, endDateTime, memberId, pageable);
+
+        } else if (attendanceType.equals("ATTENDANCE") || attendanceType.equals("ABSENCE") || attendanceType.equals("OFFICIAL_ABSENCE")) {
+
+            entityList = scheduleAttendanceResultRepository
+                    .findAllByScheduleDateBetweenAndAttendanceType(startDateTime, endDateTime,
+                            AttendanceType.valueOf(attendanceType) ,memberId ,pageable );
+
+        }else{
+            throw new CommonException(AttendanceErrorCode.EX5207);
+        }
+
+        List<ScheduleAttendanceResultDto> dtos =  entityList.stream()
+                .map(ScheduleAttendanceResultDto::of)
+                .collect(Collectors.toList());
+
+        return MyAttendanceResultResponse.builder()
+                .attendanceList(new PageImpl<>(dtos,pageable,entityList.getTotalElements()))
+                .memberName(clubMember.getMemberName())
                 .memberId(memberId)
                 .build();
     }
