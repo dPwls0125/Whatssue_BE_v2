@@ -51,7 +51,6 @@ public class AttendanceService {
     private final AttendanceFacade attendanceFacade;
     private final AttendanceNumRepository attendanceNumRepository;
     private final OfficialAbsenceRequestRepository officialAbsenceRequestRepository;
-    private final ClubMemberService clubMemberService;
     public final static Random random = new Random();
 
     @Transactional
