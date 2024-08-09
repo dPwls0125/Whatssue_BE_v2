@@ -36,7 +36,7 @@ public class ClubJoinManageController {
     public ResponseEntity denyClubJoinRequest(
             @PathVariable Long clubId,
             @RequestBody List<Long> clubJoinRequestsId){
-        memberJoinService.denyResponse(clubJoinRequestsId, clubId);
+        memberJoinService.rejectResponse(clubJoinRequestsId, clubId);
 
         return ResponseEntity.status(200).body("가입 신청 거절 완료");
     }

@@ -79,12 +79,26 @@ public class ClubJoinRequest extends BaseEntity {
     }
 
     /**
-     * 가입신청 수락 TODO
+     * 가입신청 수락
      */
+    public void acceptJoinRequest(){
+        if (status != WAITING) { //이미 처리가 완료 된 신청
+            throw new CommonException(ClubErrorCode.EX3203);
+        }else{
+            this.status = ACCEPTED;
+        }
+    }
 
     /**
-     * 가입신청 거절 TODO
+     * 가입신청 거절
      */
+    public void rejectJoinRequest(){
+        if (status != WAITING) { //이미 처리가 완료 된 신청
+            throw new CommonException(ClubErrorCode.EX3203);
+        }else{
+            this.status = REJECTED;
+        }
+    }
 
     //==조회 로직==//
     /**
