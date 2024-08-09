@@ -40,11 +40,11 @@ public class ClubJoinManageService {
             ClubMember member = ClubMember.newMember(clubJoinRequest.getClub(), clubJoinRequest.getUser());
 
             clubMemberRepository.save(member);
-            clubJoinRequestRepository.delete(clubJoinRequest);
+            clubJoinRequest.acceptJoinRequest(); // 신청 수락
         }
     }
     @Transactional
-    public void denyResponse(List<Long> clubJoinRequestsId, Long clubId) {//거절
+    public void rejectResponse(List<Long> clubJoinRequestsId, Long clubId) {//거절
         // 클럽 가입 요청 엔티티 조회
         for (Long clubJoinRequestId : clubJoinRequestsId) {
             ClubJoinRequest clubJoinRequest = clubJoinRequestRepository.findById(clubJoinRequestId)
@@ -57,7 +57,7 @@ public class ClubJoinManageService {
             if(clubMemberRepository.findByClub_IdAndUser_UserId(clubId,clubJoinRequest.getUser().getUserId()).isPresent()) {
                 throw new CommonException(ClubErrorCode.EX3200); // 이미 가입한 모임
             }
-            clubJoinRequestRepository.delete(clubJoinRequest);
+            clubJoinRequest.rejectJoinRequest(); //신청 거절
         }
     }
 
