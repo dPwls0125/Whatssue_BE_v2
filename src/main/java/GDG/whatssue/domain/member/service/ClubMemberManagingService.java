@@ -20,6 +20,7 @@ public class ClubMemberManagingService {
 
     private final ClubMemberRepository clubMemberRepository;
 
+    @Transactional
     public void deleteClubMember(Long memberId) {
 
         ClubMember clubMember = clubMemberRepository.findById(memberId)

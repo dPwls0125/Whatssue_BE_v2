@@ -30,7 +30,7 @@ public class ClubMemberController {
     private final ClubMemberManagingService clubMemberManagingService;
 
     @ClubManager
-    @DeleteMapping("/exile/")
+    @DeleteMapping("/exile")
     @Operation(summary = "멤버 추방", description = "멤버를 클럽에서 추방합니다.(매니저만 이용 가능한 기능)")
     public ResponseEntity deleteMember(@PathVariable Long clubId, @RequestParam Long memberId) {
 
