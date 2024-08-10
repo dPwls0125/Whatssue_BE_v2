@@ -138,4 +138,10 @@ public class ClubMemberService {
     public GetMemberInfoResponse getMemberInfo(Long clubId, Long userId) {
         return new GetMemberInfoResponse(clubMemberRepository.findMemberWithClub(clubId, userId));
     }
+    @Transactional
+    public void withdrawClub(Long memberId) {
+        ClubMember clubMember = clubMemberRepository.findById(memberId)
+                .orElseThrow(()-> new CommonException(ClubMemberErrorCode.EX2100));
+        clubMemberRepository.delete(clubMember);
+    }
 }
