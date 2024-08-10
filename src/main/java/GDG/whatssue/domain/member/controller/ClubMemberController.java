@@ -38,6 +38,14 @@ public class ClubMemberController {
         return new ResponseEntity("ok", HttpStatus.OK);
 
     }
+    @DeleteMapping("/withdraw")
+    @Operation(summary = "모임 탈퇴", description = "모임에서 탈퇴합니다.")
+    public ResponseEntity withDrawClub(@PathVariable Long clubId, @RequestParam Long memberId) {
+
+        clubMemberService.withdrawClub(memberId);
+        return ResponseEntity.status(200).body("모임 탈퇴 완료");
+
+    }
 
     @ClubManager
     @PatchMapping ("/role/modify")

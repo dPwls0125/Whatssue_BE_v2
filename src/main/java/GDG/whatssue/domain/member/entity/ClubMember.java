@@ -2,16 +2,22 @@ package GDG.whatssue.domain.member.entity;
 
 import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.EX2200;
 
+import GDG.whatssue.domain.attendance.entity.MemberAttendanceResult;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.file.entity.MemberProfileImage;
 import GDG.whatssue.domain.member.dto.CreateMemberProfileRequest;
 import GDG.whatssue.domain.member.dto.ModifyMemberProfileRequest;
+import GDG.whatssue.domain.post.entity.Post;
+import GDG.whatssue.domain.schedule.entity.Schedule;
 import GDG.whatssue.domain.user.entity.User;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.*;
 
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -52,6 +58,15 @@ public class ClubMember extends BaseEntity {
 
     @OneToOne(mappedBy = "clubMember", cascade = {CascadeType.REMOVE, CascadeType.ALL}, fetch = FetchType.LAZY) //지연 로딩 설정
     private MemberProfileImage profileImage;
+
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> Schedules = new ArrayList<>();
+
+    @OneToOne(mappedBy = "clubMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MemberAttendanceResult memberAttendanceResults;
 
     //==연관관계 메서드==//
     public void changeProfileImage(MemberProfileImage profileImage) {
