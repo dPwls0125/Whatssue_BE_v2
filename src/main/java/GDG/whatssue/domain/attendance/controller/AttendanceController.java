@@ -26,9 +26,9 @@ import java.time.LocalDate;
 import java.util.*;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/clubs/{clubId}/schedules")
 @RestController
 @Slf4j
+@RequestMapping("/api/clubs/{clubId}/schedules")
 public class AttendanceController {
 
     private final AttendanceService attendanceService;

@@ -3,6 +3,7 @@ package GDG.whatssue.domain.member.entity;
 import static GDG.whatssue.domain.member.exception.ClubMemberErrorCode.EX2200;
 
 import GDG.whatssue.domain.attendance.entity.MemberAttendanceResult;
+import GDG.whatssue.domain.attendance.entity.ScheduleAttendanceResult;
 import GDG.whatssue.domain.club.entity.Club;
 import GDG.whatssue.domain.file.entity.MemberProfileImage;
 import GDG.whatssue.domain.member.dto.CreateMemberProfileRequest;
@@ -67,6 +68,9 @@ public class ClubMember extends BaseEntity {
 
     @OneToOne(mappedBy = "clubMember", cascade = CascadeType.ALL, orphanRemoval = true)
     private MemberAttendanceResult memberAttendanceResults;
+
+    @OneToMany(mappedBy = "clubMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduleAttendanceResult> results = new ArrayList<>();
 
     //==연관관계 메서드==//
     public void changeProfileImage(MemberProfileImage profileImage) {
