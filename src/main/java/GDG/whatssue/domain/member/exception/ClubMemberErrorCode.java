@@ -17,7 +17,7 @@ public enum ClubMemberErrorCode implements ErrorCode {
 
     EX2202("2202", HttpStatus.BAD_REQUEST, "이미지가 null 입니다. 이미지를 업로드해주세요."),
 
-    EX2203("2203", HttpStatus.BAD_REQUEST, "조회하려는 멤버가 해당 클럽에 속하지 않은 멤버입니다.");
+    EX2203("2203", HttpStatus.BAD_REQUEST, "조회/수정 하려는 멤버가 해당 클럽에 속하지 않은 멤버입니다.");
 
     private final String code;
     private final HttpStatus httpStatus;
