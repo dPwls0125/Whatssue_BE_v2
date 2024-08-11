@@ -3,11 +3,14 @@ package GDG.whatssue.domain.club.entity;
 
 import GDG.whatssue.domain.club.dto.UpdateClubInfoRequest;
 import GDG.whatssue.domain.club.exception.ClubErrorCode;
+import GDG.whatssue.domain.clubjoinrequest.entity.ClubJoinRequest;
 import GDG.whatssue.domain.file.entity.ClubProfileImage;
+import GDG.whatssue.domain.member.entity.ClubMember;
 import GDG.whatssue.global.common.BaseEntity;
 import GDG.whatssue.global.error.CommonException;
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.UUID;
 import lombok.*;
 
@@ -45,6 +48,12 @@ public class Club extends BaseEntity {
 
     @OneToOne(mappedBy = "club", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) //지연 로딩
     private ClubProfileImage profileImage;
+
+    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClubJoinRequest> clubJoinRequests;
+
+    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClubMember> clubMembers;
 
     //==연관관계 메서드==//
 

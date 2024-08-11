@@ -127,5 +127,10 @@ public class ClubService {
         return clubRepository.findById(clubId).orElseThrow(()
             -> new CommonException(ClubErrorCode.EX3100));
     }
+    @Transactional
+    public void deleteClub(Long clubId) {
+        Club club = findClub(clubId);
+        clubRepository.delete(club);
+    }
 }
 
