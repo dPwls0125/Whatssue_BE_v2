@@ -29,7 +29,6 @@ public class ClubMemberManagingService {
         if (clubMember.getClub().getId() != clubId){
             throw new CommonException(ClubMemberErrorCode.EX2203);
         }
-
         clubMemberRepository.delete(clubMember);
     }
 

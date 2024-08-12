@@ -1,7 +1,9 @@
 package GDG.whatssue.domain.user.service;
 
+import GDG.whatssue.domain.user.Error.UserErrorCode;
 import GDG.whatssue.domain.user.entity.PhoneCertNum;
 import GDG.whatssue.domain.user.repository.PhoneCertNumRepository;
+import GDG.whatssue.global.error.CommonException;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -60,17 +62,18 @@ public class MyMessageService {
         phoneCertNumRepository.save(phoneCertNum);
 
         if (phoneCertNumRepository.findById(phoneCertNum.getId()).isEmpty())
-            throw new RuntimeException("인증 번호 저장에 실패했습니다.");
+            throw new CommonException(UserErrorCode.EX1103);
             SingleMessageSentResponse response = this.defalutMessageService.sendOne(new SingleMessageSendingRequest(message));
+
             log.info("response: " + response);
 
             return response;
         }
 
         public void checkCertNum(String toNumber, int certNum,Long userId) {
-            PhoneCertNum phoneCertNum = phoneCertNumRepository.findById(toNumber + ":" + userId).orElseThrow(() -> new RuntimeException("인증번호가 존재하지 않습니다."));
+            PhoneCertNum phoneCertNum = phoneCertNumRepository.findById(toNumber + ":" + userId).orElseThrow(() -> new CommonException(UserErrorCode.EX1101));
             if (phoneCertNum.getCertificationNum() != certNum) {
-                throw new RuntimeException("인증번호가 일치하지 않습니다.");
+                throw new CommonException(UserErrorCode.EX1102);
             }
         }
 
