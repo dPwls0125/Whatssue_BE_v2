@@ -132,7 +132,6 @@ public class ClubMemberService {
             return member.getUser().getUserName();
         else
             return member.getMemberName();
-
     }
 
     public GetMemberInfoResponse getMemberInfo(Long clubId, Long userId) {

@@ -67,6 +67,7 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
         if (skipFirstVisitCheck == null) {
             member.validateFirstVisit();
         }
+
         //인터셉터 통과
         return true;
     }

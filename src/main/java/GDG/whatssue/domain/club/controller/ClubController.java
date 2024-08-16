@@ -10,6 +10,7 @@ import GDG.whatssue.domain.club.dto.GetJoinClubResponse;
 import GDG.whatssue.domain.club.dto.GetClubInfoByPrivateCodeResponse;
 import GDG.whatssue.global.common.annotation.ClubManager;
 import GDG.whatssue.global.common.annotation.LoginUser;
+import GDG.whatssue.global.common.annotation.SkipFirstVisitCheck;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -116,6 +117,7 @@ public class ClubController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @SkipFirstVisitCheck
     @Operation(summary = "모임 정보 조회")
     @GetMapping("/{clubId}/info")
     public ResponseEntity getClubInfo(@PathVariable("clubId") Long clubId) {
