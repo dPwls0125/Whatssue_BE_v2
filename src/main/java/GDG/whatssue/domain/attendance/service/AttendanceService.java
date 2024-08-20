@@ -297,7 +297,7 @@ public class AttendanceService {
 
     private int putAttendanceNumInMapAndReturn(Long clubId, Long scheduleId){
 
-        int randomInt = AttendanceService.random.nextInt(1, 1000);
+        int randomInt = AttendanceService.random.nextInt(100, 1000);
 
         String id = "attendanceNum" + clubId.toString() +":" + scheduleId.toString();
 
