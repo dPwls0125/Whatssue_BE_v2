@@ -62,7 +62,7 @@ public class ClubCheckInterceptor implements HandlerInterceptor {
             throw new CommonException(ClubErrorCode.EX3003);
         }
         
-        //첫 로그인 여부 체크
+        //첫 클럽 가입 여부 여부 체크
         SkipFirstVisitCheck skipFirstVisitCheck = hm.getMethodAnnotation(SkipFirstVisitCheck.class);
         if (skipFirstVisitCheck == null) {
             member.validateFirstVisit();
