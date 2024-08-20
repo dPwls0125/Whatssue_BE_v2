@@ -42,7 +42,7 @@ public class ClubMemberService {
 
         ClubMember clubMember = clubMemberRepository.findById(getClubMemberId(clubId,userId)).get();
 
-        clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId, clubMember));
+        clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId, clubMember, request.getMemberName()));
 
         if(request.getIsProfileImageChanged()){
 
@@ -73,7 +73,7 @@ public class ClubMemberService {
         MemberProfileImage memberProfileImage = MemberProfileImage.of(originalFileName, storeFileName);
 
 
-        clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId,clubMember));
+        clubMember.updateProfile(request, getMemberNameByNamePolicy(clubId,clubMember,request.getMemberName()));
         clubMember.changeProfileImage(memberProfileImage);
         clubMember.setFirstVisitFalse();
 
@@ -124,14 +124,15 @@ public class ClubMemberService {
         return clubMemberRepository.findByClub_IdAndUser_UserId(clubId, userId);
     }
 
-    public String getMemberNameByNamePolicy(Long clubId, ClubMember member){
+    public String getMemberNameByNamePolicy(Long clubId, ClubMember member, String requestName){
 
         Club club = clubRepository.findById(clubId).get();
         NamePolicy namePolicy = club.getNamePolicy();
-        if(namePolicy == REAL_NAME)
+
+        if ( namePolicy == REAL_NAME )
             return member.getUser().getUserName();
         else
-            return member.getMemberName();
+            return requestName;
     }
 
     public GetMemberInfoResponse getMemberInfo(Long clubId, Long userId) {
