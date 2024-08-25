@@ -78,9 +78,22 @@ public class OfficialAbsenceService {
         Page<OfficialAbsenceRequest> officialAbsenceRequests = officialAbsenceRequestRepository.findByClubMember(clubMember, pageable);
 
         List<OfficialAbsenceGetRequestDto> officialAbsenceGetRequestDtos = new ArrayList<>();
+        for(OfficialAbsenceRequest officialAbsenceRequest : officialAbsenceRequests){
+            OfficialAbsenceGetRequestDto response = OfficialAbsenceGetRequestDto.builder()
+                    .id(officialAbsenceRequest.getId())
+                    .clubMemberId(officialAbsenceRequest.getClubMember().getId())
+                    .scheduleId(officialAbsenceRequest.getSchedule().getId())
+                    .scheduleName(officialAbsenceRequest.getSchedule().getScheduleName())
+                    .scheduleDate(officialAbsenceRequest.getSchedule().getScheduleDate())
+                    .officialAbsenceContent((officialAbsenceRequest.getOfficialAbsenceContent()))
+                    .officialAbsenceRequestType(officialAbsenceRequest.getOfficialAbsenceRequestType())
+                    .createdAt((officialAbsenceRequest.getCreateAt()))
+                    .updatedAt((officialAbsenceRequest.getUpdateAt()))
+                    .build();
 
-        return officialAbsenceRequestRepository.findOfficialAbsenceRequests(userId, clubId, requestType, startDate, endDate, pageable);
-    }
+            officialAbsenceGetRequestDtos.add(response);
+        }
+        return new PageImpl<>(officialAbsenceGetRequestDtos, pageable, officialAbsenceRequests.getTotalElements());  }
     @Transactional
     public void deleteOfficialAbsences(Long userId, Long clubId, Long officialAbsenceId) {
         //내 공결 신청 취소
